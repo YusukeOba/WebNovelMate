@@ -16,7 +16,6 @@ class NarouNetworkDataStore {
         .then((rawResponse) {
       if (rawResponse.statusCode == 200) {
         final List<NarouNovelListEntity> entities = new List();
-        print(rawResponse.body);
         for (var value in json.decode(rawResponse.body)) {
           entities.add(NarouNovelListEntity.fromJson(value));
         }
