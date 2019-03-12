@@ -3,9 +3,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_app_2/common/NmLocalization.dart';
 import 'package:flutter_app_2/common/colors.dart';
 import 'package:flutter_app_2/common/datastore/narou/NarouNetworkDataStore.dart';
 import 'package:flutter_app_2/common/entities/narou/NarouNovelListEntity.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() => runApp(MyApp());
 
@@ -33,9 +35,19 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: _novelMateTheme,
-      home: new TodoPage(),
-    );
+        localizationsDelegates: [
+          // アプリ固有のローカライゼーション
+          NmLocalizationsDelegate(),
+          // 事前組み込みのローカライゼーション
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        theme: _novelMateTheme,
+        home: new TodoPage(),
+        supportedLocales: [
+          const Locale('en', ""), // English
+          const Locale('ja', ""), // Japanese
+        ]);
   }
 }
 
@@ -72,7 +84,7 @@ class TodoState extends State<TodoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(slivers: <Widget>[
-        new SliverAppBar(title: Text('todo'), pinned: true, actions: <Widget>[
+        new SliverAppBar(title: Text(NmLocalizations.of(context).appName), pinned: true, actions: <Widget>[
           new IconButton(icon: new Icon(Icons.favorite), onPressed: null)
         ]),
         new SliverList(
