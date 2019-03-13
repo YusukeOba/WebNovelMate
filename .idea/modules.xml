@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/flutter_app_2.iml" filepath="$PROJECT_DIR$/flutter_app_2.iml" />
-      <module fileurl="file://$PROJECT_DIR$/flutter_app_2_android.iml" filepath="$PROJECT_DIR$/flutter_app_2_android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/NovelMate.iml" filepath="$PROJECT_DIR$/NovelMate.iml" />
+      <module fileurl="file://$PROJECT_DIR$/novemlate.iml" filepath="$PROJECT_DIR$/novemlate.iml" />
     </modules>
   </component>
 </project>

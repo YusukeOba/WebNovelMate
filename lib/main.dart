@@ -3,10 +3,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_app_2/common/NmLocalization.dart';
-import 'package:flutter_app_2/common/colors.dart';
-import 'package:flutter_app_2/common/datastore/narou/NarouNetworkDataStore.dart';
-import 'package:flutter_app_2/common/entities/narou/NarouNovelListEntity.dart';
+import 'package:NovelMate/common/NmLocalization.dart';
+import 'package:NovelMate/common/colors.dart';
+import 'package:NovelMate/common/datastore/narou/NarouNetworkDataStore.dart';
+import 'package:NovelMate/common/entities/narou/NarouNovelListEntity.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() => runApp(MyApp());
@@ -43,12 +43,71 @@ class MyApp extends StatelessWidget {
           GlobalWidgetsLocalizations.delegate,
         ],
         theme: _novelMateTheme,
-        home: new TodoPage(),
+        home: MainPage(),
         supportedLocales: [
           const Locale('en', ""), // English
           const Locale('ja', ""), // Japanese
         ]);
   }
+}
+
+/// メイン画面
+class MainPage extends StatefulWidget {
+  @override
+  _MainPageState createState() {
+    return _MainPageState();
+  }
+}
+
+class _MainPageState extends State<MainPage> {
+  _MainPageViewModel _viewModel = new _MainPageViewModel();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(NmLocalizations.of(context).appName)),
+      bottomNavigationBar: BottomNavigationBar(
+        items: [
+          BottomNavigationBarItem(
+              title: Text(NmLocalizations.of(context).tabSearch),
+              icon: Icon(Icons.search)),
+          BottomNavigationBarItem(
+              title: Text(NmLocalizations.of(context).tabBookShelf),
+              icon: Icon(Icons.book)),
+          BottomNavigationBarItem(
+              title: Text(NmLocalizations.of(context).tabSettings),
+              icon: Icon(Icons.settings))
+        ],
+        currentIndex: _viewModel.selectedTabIndex,
+        onTap: (index) {
+          // タブ更新
+          setState(() {
+            _viewModel.selectedTabIndex = index;
+          });
+        },
+      ),
+      body: _buildPage(),
+    );
+  }
+
+  Widget _buildPage() {
+    switch (_viewModel.selectedTabIndex) {
+      case 0:
+        return TodoPage();
+      case 1:
+        return Text("NO PAGE 1");
+      case 2:
+        return Text("NO PAGE 2");
+      default:
+        break;
+    }
+  }
+}
+
+/// メイン画面のView状態を格納する
+class _MainPageViewModel {
+  /// 選択中タブ情報
+  int selectedTabIndex = 0;
 }
 
 class TodoPage extends StatefulWidget {
@@ -84,11 +143,15 @@ class TodoState extends State<TodoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(slivers: <Widget>[
-        new SliverAppBar(title: Text(NmLocalizations.of(context).appName), pinned: true, actions: <Widget>[
-          new IconButton(icon: new Icon(Icons.favorite), onPressed: null)
-        ]),
+//        new SliverAppBar(
+//            title: Text(NmLocalizations.of(context).appName),
+//            pinned: false,
+//            actions: <Widget>[
+//              new IconButton(icon: new Icon(Icons.favorite), onPressed: null)
+//            ]),
         new SliverList(
             delegate: SliverChildListDelegate([
+          new Text("↓に小説名を入力"),
           new TextFormField(
               initialValue: _viewModel.inputedTitle,
               onFieldSubmitted: (text) {
@@ -169,6 +232,7 @@ class TodoState extends State<TodoPage> {
 //              return new Divider();
 //            },
 //            itemCount: novels.length));
+
     return new SliverList(
         delegate: new SliverChildBuilderDelegate((context, index) {
       final title = novels[index].title;

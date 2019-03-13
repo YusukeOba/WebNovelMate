@@ -17,20 +17,37 @@ class NmLocalizations {
   static Map<String, Map<String, String>> _localizedValues = {
     'ja': {
       'app_name': 'NovelMate',
+      "tab_search": "検索",
+      "tab_bookshelf": "本棚",
+      "tab_settings": "設定"
     },
     'en': {
       'app_name': 'NovelMate',
+      "tab_search": "Search",
+      "tab_bookshelf": "Shelf",
+      "tab_settings": "Settings"
     },
   };
 
   String get appName {
     return _localizedValues[locale.languageCode]['app_name'];
   }
+
+  String get tabSearch {
+    return _localizedValues[locale.languageCode]['tab_search'];
+  }
+
+  String get tabBookShelf {
+    return _localizedValues[locale.languageCode]['tab_bookshelf'];
+  }
+
+  String get tabSettings {
+    return _localizedValues[locale.languageCode]['tab_settings'];
+  }
 }
 
 /// 文言リソースのハンドラ
 class NmLocalizationsDelegate extends LocalizationsDelegate<NmLocalizations> {
-
   const NmLocalizationsDelegate();
 
   @override

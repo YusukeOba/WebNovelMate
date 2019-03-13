@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter_app_2/common/entities/narou/NarouNovelListEntity.dart';
+import 'package:NovelMate/common/entities/narou/NarouNovelListEntity.dart';
 import 'package:http/http.dart' as http;
 
 class NarouNetworkDataStore {
