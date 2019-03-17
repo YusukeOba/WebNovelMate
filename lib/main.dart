@@ -45,8 +45,8 @@ class MyApp extends StatelessWidget {
         theme: _buildNovelMateTheme(),
         home: MainPage(),
         supportedLocales: [
-          const Locale('en', ""), // English
           const Locale('ja', ""), // Japanese
+          const Locale('en', ""), // English
         ]);
   }
 }

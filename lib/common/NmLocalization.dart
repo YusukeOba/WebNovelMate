@@ -30,19 +30,19 @@ class NmLocalizations {
   };
 
   String get appName {
-    return _localizedValues[locale.languageCode]['app_name'];
+    return _localizedValues["ja"]['app_name'];
   }
 
   String get tabSearch {
-    return _localizedValues[locale.languageCode]['tab_search'];
+    return _localizedValues["ja"]['tab_search'];
   }
 
   String get tabBookShelf {
-    return _localizedValues[locale.languageCode]['tab_bookshelf'];
+    return _localizedValues["ja"]['tab_bookshelf'];
   }
 
   String get tabSettings {
-    return _localizedValues[locale.languageCode]['tab_settings'];
+    return _localizedValues["ja"]['tab_settings'];
   }
 }
 

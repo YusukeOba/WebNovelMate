@@ -18,14 +18,14 @@ class SearchPage extends StatefulWidget {
 class _SearchPageViewModel {
   final RankingRepository _repository;
 
-  /// 表示中のランキングデータ
-  Future<List<RankingEntity>> rankings;
-
   /// 表示中のサイト種別
   Site showingSite = Site.narou;
 
   /// 入力中の文言
   String inputtedText = "田中";
+
+  /// 表示中のランキングデータ
+  Future<List<RankingEntity>> rankings;
 
   _SearchPageViewModel(this._repository);
 
@@ -40,11 +40,9 @@ class _SearchPageViewModel {
     print("inputed = $text");
   }
 
-  Future<void> onRefresh() {
-    return Future(() {
-      rankings = _repository.setDirty(showingSite).then((_) {
-        return _repository.find(showingSite, 0, 50, inputtedText);
-      });
+  void onRefresh() {
+    this.rankings = _repository.setDirty(showingSite).then((_) {
+      return _repository.find(showingSite, 0, 50, inputtedText);
     });
   }
 }
@@ -58,7 +56,11 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: () {
-        return _viewModel.onRefresh();
+        return Future(() {
+          setState(() {
+            _viewModel.onRefresh();
+          });
+        });
       },
       child: Scrollbar(
           child: ListView(
@@ -87,10 +89,10 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
           Container(height: 8.0),
           TextFormField(
             autocorrect: true,
-            controller: TextEditingController(text: _viewModel.inputtedText),
             onFieldSubmitted: (text) {
               _viewModel.inputText(text);
             },
+            controller: TextEditingController(text: _viewModel.inputtedText),
             style: TextStyle(fontWeight: FontWeight.normal),
             cursorColor: sNMPrimaryColor,
             maxLines: 1,
@@ -139,8 +141,9 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
   /// 読み込み中表示
   Widget _buildListTiles() {
     return FutureBuilder<List<RankingEntity>>(
-        future: _viewModel.rankings,
+        future: this._viewModel.rankings,
         builder: (context, snapShot) {
+          print("will shown!!");
           if (!snapShot.hasData) {
             print("nodata");
             return Center(child: CircularProgressIndicator());
