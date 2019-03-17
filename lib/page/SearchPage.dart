@@ -2,6 +2,7 @@ import 'package:NovelMate/common/Sites.dart';
 import 'package:NovelMate/common/colors.dart';
 import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
 import 'package:NovelMate/common/repository/RankingRepository.dart';
+import 'package:NovelMate/page/SearchResultPage.dart';
 import 'package:flutter/material.dart';
 
 class SearchPage extends StatefulWidget {
@@ -35,9 +36,15 @@ class _SearchPageViewModel {
   }
 
   /// 文字列の入力
-  void inputText(String text) {
+  inputText(String text, BuildContext context) {
     inputtedText = text;
     print("inputed = $text");
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return SearchResultPage(
+        inputtedText,
+        _repository,
+      );
+    }));
   }
 
   void onRefresh() {
@@ -90,7 +97,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
           TextFormField(
             autocorrect: true,
             onFieldSubmitted: (text) {
-              _viewModel.inputText(text);
+              _viewModel.inputText(text, context);
             },
             controller: TextEditingController(text: _viewModel.inputtedText),
             style: TextStyle(fontWeight: FontWeight.normal),
@@ -179,7 +186,15 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return SearchResultPage(
+                          _viewModel.inputtedText,
+                          _viewModel._repository,
+                        );
+                      }));
+                    },
                   ),
                   Divider()
                 ]);
