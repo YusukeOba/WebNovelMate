@@ -12,7 +12,7 @@ class RankingRepositoryImpl extends RankingRepository {
   @override
   Future<void> setDirty(Site site) {
     final cache =
-        cacheDataStores.firstWhere((store) => store.siteIdentifier() == site);
+        cacheDataStores.firstWhere((store) => store.site().identifier == site.identifier);
     return cache.clearAll();
   }
 
@@ -20,10 +20,10 @@ class RankingRepositoryImpl extends RankingRepository {
   Future<List<RankingEntity>> find(
       Site site, int start, int end, String freeWord) async {
     final cache =
-        cacheDataStores.firstWhere((store) => store.siteIdentifier() == site);
+        cacheDataStores.firstWhere((store) => store.site().identifier == site.identifier);
 
     final remote = remoteRankingDataStores
-        .firstWhere((store) => store.siteIdentifier() == site);
+        .firstWhere((store) => store.site().identifier == site.identifier);
 
     // キャッシュがなければリモート経由で取りに行く、あればキャッシュで取りに行く
     if (await cache.hasCache()) {

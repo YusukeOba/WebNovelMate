@@ -7,8 +7,8 @@ import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
 /// キャッシュから小説のランキングを取得する処理の抽象化
 /// 対応サイトを追加する際、このインタフェースを実装すること
 abstract class CachedRankingDataStore {
-  /// 小説の種別
-  Site siteIdentifier();
+  /// 小説サイトの種別
+  Site site();
 
   /// キャッシュがあるか
   Future<bool> hasCache();

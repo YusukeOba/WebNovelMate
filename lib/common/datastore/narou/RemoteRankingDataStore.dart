@@ -6,7 +6,7 @@ import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
 abstract class RemoteRankingDataStore {
 
   /// 小説の種別
-  Site siteIdentifier();
+  Site site();
 
   /// 小説のランキングを取得する
   /// [start]から[end]で順位の取得範囲を決める

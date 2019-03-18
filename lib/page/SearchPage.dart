@@ -20,7 +20,7 @@ class _SearchPageViewModel {
   final RankingRepository _repository;
 
   /// 表示中のサイト種別
-  Site showingSite = Site.narou;
+  Site showingSite = Narou();
 
   /// 入力中の文言
   String inputtedText = "田中";

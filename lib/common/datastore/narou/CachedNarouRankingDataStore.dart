@@ -6,8 +6,8 @@ class CachedNarouRankingDataStore extends CachedRankingDataStore {
   List<RankingEntity> _cache;
 
   @override
-  Site siteIdentifier() {
-    return Site.narou;
+  Site site() {
+    return Narou();
   }
 
   @override

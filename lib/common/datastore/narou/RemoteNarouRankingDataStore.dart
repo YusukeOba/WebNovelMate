@@ -29,8 +29,6 @@ class RemoteNarouRankingDataStore extends RemoteRankingDataStore {
           entities.add(NarouNovelListEntity.fromJson(value));
         }
 
-//        entities.forEach((e) => print(e));
-
         // 最初の値はゴミなので削る
         if (entities.length > 0) {
           entities.removeAt(0);
@@ -45,12 +43,13 @@ class RemoteNarouRankingDataStore extends RemoteRankingDataStore {
           rankings.add(RankingEntity.name(
               index + 1,
               NovelHeader.name(
-                  NovelIdentifier.name(Site.narou, "小説家になろう", entity.nCode),
+                  NovelIdentifier.name(Narou(), "小説家になろう", entity.nCode),
                   entity.title,
                   entity.story,
                   entity.writer)));
         });
         return rankings;
+
       } else {
         print("failue!!");
         print(response);
@@ -60,7 +59,7 @@ class RemoteNarouRankingDataStore extends RemoteRankingDataStore {
   }
 
   @override
-  Site siteIdentifier() {
-    return Site.narou;
+  Site site() {
+    return Narou();
   }
 }
