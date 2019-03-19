@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:NovelMate/common/Sites.dart';
 import 'package:NovelMate/common/datastore/narou/RemoteRankingDataStore.dart';
-import 'package:NovelMate/common/entities/domain/NovelEntity.dart';
+import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
 import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
 import 'package:NovelMate/common/entities/narou/NarouNovelListEntity.dart';
 import 'package:http/http.dart' as http;
@@ -21,7 +21,8 @@ class RemoteNarouRankingDataStore extends RemoteRankingDataStore {
             "&lim=" +
             end.toString() +
             "&word=" +
-            title)
+            title +
+            "&order=\"hyoka\"")
         .then((response) {
       if (response.statusCode == 200) {
         final List<NarouNovelListEntity> entities = new List();
@@ -35,21 +36,28 @@ class RemoteNarouRankingDataStore extends RemoteRankingDataStore {
         }
 
         print("success!!");
-        entities
-            .sort((lhs, rhs) => rhs.global_point.compareTo(lhs.global_point));
 
         final List<RankingEntity> rankings = [];
         entities.asMap().forEach((index, entity) {
+          final isCompleted = entity.end == 0; // 0=完結or短編
+          final date = entity.novelupdated_at;
+
+          final dateInt =
+              DateTime.parse(date).millisecondsSinceEpoch; // YYYY-MM-DD HH:MM:SS
+
           rankings.add(RankingEntity.name(
-              index + 1,
-              NovelHeader.name(
-                  NovelIdentifier.name(Narou(), "小説家になろう", entity.nCode),
-                  entity.title,
-                  entity.story,
-                  entity.writer)));
+            entity.global_point,
+            NovelHeader.name(
+                NovelIdentifier.name(Narou(), entity.nCode),
+                entity.title,
+                entity.story,
+                entity.writer,
+                isCompleted,
+                dateInt,
+                entity.length),
+          ));
         });
         return rankings;
-
       } else {
         print("failue!!");
         print(response);

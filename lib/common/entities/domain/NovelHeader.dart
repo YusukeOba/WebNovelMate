@@ -17,7 +17,17 @@ class NovelHeader {
   /// 作者
   final String writer;
 
-  NovelHeader.name(this.identifier, this.novelName, this.novelStory, this.writer);
+  /// 完結かどうか
+  final bool isComplete;
+  
+  /// 最終更新日時
+  final int lastUpdatedAt;
+  
+  /// 文字数
+  final int textLength;
+
+  NovelHeader.name(this.identifier, this.novelName, this.novelStory,
+      this.writer, this.isComplete, this.lastUpdatedAt, this.textLength);
 
 }
 
@@ -27,13 +37,10 @@ class NovelIdentifier {
   /// 小説サイト
   final Site site;
 
-  /// 小説サイト名
-  final String siteName;
-  
   /// 小説サイト固有のコード
   final String siteIdentifier;
 
-  NovelIdentifier.name(this.site, this.siteName, this.siteIdentifier);
+  NovelIdentifier.name(this.site, this.siteIdentifier);
 
 }
 

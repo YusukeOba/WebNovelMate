@@ -1,12 +1,13 @@
-import 'package:NovelMate/common/entities/domain/NovelEntity.dart';
+import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
 
 /// ランキング表示
 class RankingEntity {
   /// 順位
-  final int rank;
+  final int popularity;
 
   /// 小説情報
   final NovelHeader novelHeader;
 
-  RankingEntity.name(this.rank, this.novelHeader);
+  RankingEntity.name(this.popularity, this.novelHeader);
+
 }

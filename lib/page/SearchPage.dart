@@ -23,7 +23,7 @@ class _SearchPageViewModel {
   Site showingSite = Narou();
 
   /// 入力中の文言
-  String inputtedText = "田中";
+  String inputtedText = "";
 
   /// 表示中のランキングデータ
   Future<List<RankingEntity>> rankings;
@@ -32,7 +32,12 @@ class _SearchPageViewModel {
 
   /// ランキングの表示
   void showRankings() {
-    this.rankings = _repository.fetchLatest(showingSite);
+    this.rankings = _repository.fetchLatest(showingSite).then((entities) {
+      entities.sort((lhs, rhs) {
+        return rhs.popularity - lhs.popularity;
+      });
+      return entities;
+    });
   }
 
   /// 文字列の入力
@@ -50,6 +55,11 @@ class _SearchPageViewModel {
   void onRefresh() {
     this.rankings = _repository.setDirty(showingSite).then((_) {
       return _repository.find(showingSite, 0, 50, inputtedText);
+    }).then((entities) {
+      entities.sort((lhs, rhs) {
+        return rhs.popularity - lhs.popularity;
+      });
+      return entities;
     });
   }
 }
@@ -161,15 +171,15 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
               children: snapShot.data.map((novel) {
                 return Column(children: <Widget>[
                   ListTile(
-                    leading: Container(
-                      width: 25,
-                      height: 25,
-                      decoration: BoxDecoration(
-                        color: sNMAccentColor,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(child: Text(novel.rank.toString())),
-                    ),
+//                    leading: Container(
+//                      width: 25,
+//                      height: 25,
+//                      decoration: BoxDecoration(
+//                        color: sNMAccentColor,
+//                        shape: BoxShape.circle,
+//                      ),
+//                      child: Center(child: Text(novel.rank.toString())),
+//                    ),
                     title: RichText(
                         text: TextSpan(children: <TextSpan>[
                       TextSpan(
