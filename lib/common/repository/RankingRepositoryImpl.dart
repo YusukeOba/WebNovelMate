@@ -1,26 +1,26 @@
 import 'package:NovelMate/common/Sites.dart';
-import 'package:NovelMate/common/datastore/narou/CachedRankingDataStore.dart';
-import 'package:NovelMate/common/datastore/narou/RemoteRankingDataStore.dart';
+import 'package:NovelMate/common/datastore/CachedRankingDataStore.dart';
+import 'package:NovelMate/common/datastore/RemoteRankingDataStore.dart';
 import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
 import 'package:NovelMate/common/repository/RankingRepository.dart';
 
 class RankingRepositoryImpl extends RankingRepository {
-  RankingRepositoryImpl.name(List<CachedRankingDataStore> cacheDataStores,
-      List<RemoteRankingDataStore> remoteRankingDataStores)
-      : super.name(cacheDataStores, remoteRankingDataStores);
+  RankingRepositoryImpl(List<CachedRankingDataStore> cacheDataStores,
+      List<RemoteRankingDataStore> remoteDataStores)
+      : super(cacheDataStores, remoteDataStores);
 
   @override
   Future<void> setDirty(Site site) {
-    final cache =
-        cacheDataStores.firstWhere((store) => store.site().identifier == site.identifier);
+    final cache = cacheDataStores
+        .firstWhere((store) => store.site().identifier == site.identifier);
     return cache.clearAll();
   }
 
   @override
   Future<List<RankingEntity>> find(
       Site site, int start, int end, String freeWord) async {
-    final cache =
-        cacheDataStores.firstWhere((store) => store.site().identifier == site.identifier);
+    final cache = cacheDataStores
+        .firstWhere((store) => store.site().identifier == site.identifier);
 
     final remote = remoteRankingDataStores
         .firstWhere((store) => store.site().identifier == site.identifier);

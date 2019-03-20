@@ -110,6 +110,6 @@ class _MainPageViewModel {
   int selectedTabIndex = 0;
 
   /// ランキング取得用Repository
-  static final rankingRepository = RankingRepositoryImpl.name(
+  static final rankingRepository = RankingRepositoryImpl(
       [CachedNarouRankingDataStore()], [RemoteNarouRankingDataStore()]);
 }

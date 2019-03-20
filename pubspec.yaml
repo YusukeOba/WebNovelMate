@@ -33,6 +33,12 @@ dependencies:
   intl:
   intl_translation:
 
+  # Database
+  moor_flutter:
+
+  # parsing html
+  html: ^0.13.4+1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -40,6 +46,9 @@ dev_dependencies:
   # json serialization
   build_runner: ^1.0.0
   json_serializable: ^2.0.0
+
+  # DataBase
+  moor_generator:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec

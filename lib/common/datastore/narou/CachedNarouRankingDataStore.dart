@@ -1,5 +1,5 @@
 import 'package:NovelMate/common/Sites.dart';
-import 'package:NovelMate/common/datastore/narou/CachedRankingDataStore.dart';
+import 'package:NovelMate/common/datastore/CachedRankingDataStore.dart';
 import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
 
 class CachedNarouRankingDataStore extends CachedRankingDataStore {

@@ -1,6 +1,10 @@
 import 'package:NovelMate/common/Sites.dart';
 import 'package:NovelMate/common/colors.dart';
+import 'package:NovelMate/common/datastore/CachedBookshelfDataStore.dart';
+import 'package:NovelMate/common/datastore/narou/CachedNarouBookshelfDataStore.dart';
+import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
 import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
+import 'package:NovelMate/common/entities/domain/SubscribedNovelEntity.dart';
 import 'package:NovelMate/common/repository/RankingRepository.dart';
 import 'package:NovelMate/page/SearchResultPage.dart';
 import 'package:flutter/material.dart';
