@@ -5,8 +5,8 @@ import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
 
 /// ランキングの取得/更新を司るRepository
 abstract class RankingRepository {
-  final List<CachedRankingDataStore> cacheDataStores;
-  final List<RemoteRankingDataStore> remoteRankingDataStores;
+  final Map<Site, CachedRankingDataStore> cacheDataStores;
+  final Map<Site, RemoteRankingDataStore> remoteRankingDataStores;
 
   RankingRepository(this.cacheDataStores, this.remoteRankingDataStores);
 

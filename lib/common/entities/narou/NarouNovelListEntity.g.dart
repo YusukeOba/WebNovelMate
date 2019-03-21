@@ -9,7 +9,7 @@ part of 'NarouNovelListEntity.dart';
 NarouNovelListEntity _$NarouNovelListEntityFromJson(Map<String, dynamic> json) {
   return NarouNovelListEntity(
       json['title'] as String,
-      json['nCode'] as String,
+      json['ncode'] as String,
       json['userId'] as int,
       json['writer'] as String,
       json['story'] as String,
@@ -46,7 +46,7 @@ Map<String, dynamic> _$NarouNovelListEntityToJson(
         NarouNovelListEntity instance) =>
     <String, dynamic>{
       'title': instance.title,
-      'nCode': instance.nCode,
+      'ncode': instance.ncode,
       'userId': instance.userId,
       'writer': instance.writer,
       'story': instance.story,

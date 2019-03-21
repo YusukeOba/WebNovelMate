@@ -6,11 +6,6 @@ class CachedNarouRankingDataStore extends CachedRankingDataStore {
   List<RankingEntity> _cache;
 
   @override
-  Site site() {
-    return Narou();
-  }
-
-  @override
   Future<Function> clearAll() {
     return Future(() {
       _cache = null;

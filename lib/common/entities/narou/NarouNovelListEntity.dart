@@ -1,6 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
 
-
 // ジェネレートされたクラスからクラスのprivateメンバ変数にアクセスするため
 part 'NarouNovelListEntity.g.dart';
 
@@ -8,9 +7,9 @@ part 'NarouNovelListEntity.g.dart';
 /// @see https://dev.syosetu.com/man/api/
 @JsonSerializable()
 class NarouNovelListEntity {
-
-  NarouNovelListEntity(this.title,
-      this.nCode,
+  NarouNovelListEntity(
+      this.title,
+      this.ncode,
       this.userId,
       this.writer,
       this.story,
@@ -46,7 +45,7 @@ class NarouNovelListEntity {
   String title;
 
   /// Novel Identifier
-  String nCode;
+  String ncode;
 
   /// Writers identifier
   int userId;
@@ -189,9 +188,6 @@ class NarouNovelListEntity {
 
   @override
   String toString() {
-    return 'NarouNovelListEntity{title: $title, nCode: $nCode, userId: $userId, writer: $writer, story: $story, biggenre: $biggenre, gensaku: $gensaku, keyword: $keyword, general_firstup: $general_firstup, general_lastup: $general_lastup, novel_type: $novel_type, end: $end, general_all_no: $general_all_no, length: $length, time: $time, isstop: $isstop, isr15: $isr15, isbl: $isbl, isgl: $isgl, iszankoku: $iszankoku, istensei: $istensei, istenni: $istenni, pc_or_k: $pc_or_k, global_point: $global_point, fav_novel_cnt: $fav_novel_cnt, review_cnt: $review_cnt, all_point: $all_point, all_hyoka_cnt: $all_hyoka_cnt, sasie_cnt: $sasie_cnt, kaiwaritu: $kaiwaritu, novelupdated_at: $novelupdated_at, updated_at: $updated_at}';
+    return 'NarouNovelListEntity{title: $title, ncode: $ncode, userId: $userId, writer: $writer, story: $story, biggenre: $biggenre, gensaku: $gensaku, keyword: $keyword, general_firstup: $general_firstup, general_lastup: $general_lastup, novel_type: $novel_type, end: $end, general_all_no: $general_all_no, length: $length, time: $time, isstop: $isstop, isr15: $isr15, isbl: $isbl, isgl: $isgl, iszankoku: $iszankoku, istensei: $istensei, istenni: $istenni, pc_or_k: $pc_or_k, global_point: $global_point, fav_novel_cnt: $fav_novel_cnt, review_cnt: $review_cnt, all_point: $all_point, all_hyoka_cnt: $all_hyoka_cnt, sasie_cnt: $sasie_cnt, kaiwaritu: $kaiwaritu, novelupdated_at: $novelupdated_at, updated_at: $updated_at}';
   }
-
-
 }
-

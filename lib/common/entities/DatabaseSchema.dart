@@ -37,6 +37,9 @@ class CachedNarouSubscribedNovelEntity extends Table {
   /// 話数
   IntColumn get episodeCount => integer()();
 
+  /// 最終閲覧日時
+  IntColumn get lastReadAt => integer()();
+
   @override
   Set<TextColumn> get primaryKey => {identifier};
 }

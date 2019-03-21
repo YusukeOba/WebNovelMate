@@ -1,7 +1,12 @@
+import 'dart:math';
+
 import 'package:NovelMate/common/Sites.dart';
 import 'package:NovelMate/common/colors.dart';
 import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
+import 'package:NovelMate/common/entities/domain/SubscribedNovelEntity.dart';
+import 'package:NovelMate/common/repository/BookshelfRepository.dart';
 import 'package:NovelMate/common/repository/RankingRepository.dart';
+import 'package:NovelMate/common/repository/RepositoryFactory.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -11,15 +16,11 @@ class SearchResultPage extends StatefulWidget {
   /// 検索キーワード
   final String _searchWord;
 
-  /// 対応リポジトリ
-  final RankingRepository _repository;
-
-  SearchResultPage(this._searchWord, this._repository);
+  SearchResultPage(this._searchWord);
 
   @override
   State createState() {
-    return _SearchResultPageState(
-        _SearchResultPageViewModel(_searchWord, _repository));
+    return _SearchResultPageState(_SearchResultPageViewModel(_searchWord));
   }
 }
 
@@ -28,18 +29,19 @@ class _SearchResultPageViewModel {
   final String _searchWord;
 
   /// 対応リポジトリ
-  final RankingRepository _repository;
+  final RankingRepository _repository =
+      RepositoryFactory.shared.getRankingRepository();
 
-  /// ListViewに表示する小説群
+  /// ListViewに表示する小説
   Future<List<RankingEntity>> _novels;
 
   /// 選択中タブ
   int _currentSelectedTabIndex = 0;
 
   /// 表示中のサイト
-  Site _showningSite = Narou();
+  Site _showningSite = AvailableSites.narou;
 
-  _SearchResultPageViewModel(this._searchWord, this._repository);
+  _SearchResultPageViewModel(this._searchWord);
 
   bool visibleFav = false;
 
@@ -93,6 +95,16 @@ class _SearchResultPageState extends State<SearchResultPage> {
   void initState() {
     super.initState();
     _viewModel._showWithSelectedTabIndex(0);
+    wtf();
+  }
+
+  void wtf() async {
+    BookshelfRepository bkRepository =
+        RepositoryFactory.shared.getBookshelfRepository();
+    List<SubscribedNovelEntity> novels = await bkRepository.findAll();
+    print("novel!!  =" + novels.toString());
+
+    await RepositoryFactory.shared.getBookshelfRepository().delete(novels);
   }
 
   @override
@@ -102,7 +114,8 @@ class _SearchResultPageState extends State<SearchResultPage> {
         initialIndex: _viewModel._currentSelectedTabIndex,
         child: Scaffold(
           body: RefreshIndicator(
-              child: CustomScrollView(
+              child: Scrollbar(
+                  child: CustomScrollView(
                 slivers: <Widget>[
                   SliverAppBar(
                     title: Text(_viewModel.pageTitle()),
@@ -121,7 +134,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
                   SliverPadding(padding: EdgeInsets.symmetric(vertical: 8.0)),
                   _buildNovelLists()
                 ],
-              ),
+              )),
               onRefresh: () {
                 return Future(() {
                   setState(() {
@@ -176,7 +189,20 @@ class _SearchResultPageState extends State<SearchResultPage> {
                 new NumberFormat().format(novel.novelHeader.textLength);
 
             return InkWell(
-                onTap: () {},
+                onTap: () async {
+                  BookshelfRepository bkRepository =
+                      RepositoryFactory.shared.getBookshelfRepository();
+                  snapShot.data.forEach((novel) async {
+                    await bkRepository.save([
+                      SubscribedNovelEntity(
+                          novel.novelHeader,
+                          DateTime.now().millisecondsSinceEpoch +
+                              Random().nextInt(99999999),
+                          123,
+                          123)
+                    ]);
+                  });
+                },
                 child: Container(
                     padding: EdgeInsets.symmetric(vertical: 8.0),
                     decoration: new BoxDecoration(

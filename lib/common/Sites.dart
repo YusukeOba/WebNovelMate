@@ -13,15 +13,27 @@ abstract class Site {
   // 小説サイトのテーマカラー
   Color get siteColor;
 
+  // 小説サイトのテキストカラー
+  Color get textColor;
+
+  @override
+  int get hashCode {
+    return identifier.hashCode;
+  }
+
+  @override
+  bool operator ==(other) =>
+      other is Site && other.identifier == this.identifier;
 }
 
 /// 対応しているWebサイト
-final List<Site> sAvailableSites = [Narou(), Kakuyomu()];
+class AvailableSites {
+  static final _Narou narou = _Narou();
+  static final _Kakuyomu kakuyomu = _Kakuyomu();
+}
 
 /// 小説家になろう
-class Narou implements Site {
-
-
+class _Narou implements Site {
   @override
   String get identifier {
     return "narou";
@@ -33,14 +45,18 @@ class Narou implements Site {
   }
 
   @override
+  Color get textColor {
+    return Colors.black;
+  }
+
+  @override
   String get siteName {
     return "小説家になろう";
   }
 }
 
 /// カクヨム
-class Kakuyomu implements Site {
-
+class _Kakuyomu implements Site {
   @override
   String get identifier {
     return "kakuyomu";
@@ -49,6 +65,11 @@ class Kakuyomu implements Site {
   @override
   Color get siteColor {
     return Colors.lightBlue;
+  }
+
+  @override
+  Color get textColor {
+    return Colors.black;
   }
 
   @override

@@ -5,6 +5,7 @@ import 'package:NovelMate/common/colors.dart';
 import 'package:NovelMate/common/datastore/narou/CachedNarouRankingDataStore.dart';
 import 'package:NovelMate/common/datastore/narou/RemoteNarouRankingDataStore.dart';
 import 'package:NovelMate/common/repository/RankingRepositoryImpl.dart';
+import 'package:NovelMate/page/BookshelfPage.dart';
 import 'package:NovelMate/page/SearchPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -65,7 +66,7 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(NmLocalizations.of(context).appName)),
+//      appBar: AppBar(title: Text(NmLocalizations.of(context).appName)),
       bottomNavigationBar: BottomNavigationBar(
         items: [
           BottomNavigationBarItem(
@@ -93,9 +94,9 @@ class _MainPageState extends State<MainPage> {
   Widget _buildPage() {
     switch (_viewModel.selectedTabIndex) {
       case 0:
-        return SearchPage(_MainPageViewModel.rankingRepository);
+        return SearchPage();
       case 1:
-        return Text("NO PAGE 1");
+        return BookshelfPage();
       case 2:
         return Text("NO PAGE 2");
       default:
@@ -108,8 +109,4 @@ class _MainPageState extends State<MainPage> {
 class _MainPageViewModel {
   /// 選択中タブ情報
   int selectedTabIndex = 0;
-
-  /// ランキング取得用Repository
-  static final rankingRepository = RankingRepositoryImpl(
-      [CachedNarouRankingDataStore()], [RemoteNarouRankingDataStore()]);
 }

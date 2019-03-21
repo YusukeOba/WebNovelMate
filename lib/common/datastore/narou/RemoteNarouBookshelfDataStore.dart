@@ -14,11 +14,6 @@ import 'package:http/http.dart' as http;
 /// なろうの小説の更新処理
 class RemoteNarouBookshelfDataStore extends RemoteBookshelfDataStore {
   @override
-  Site site() {
-    return Narou();
-  }
-
-  @override
   Future<List<SubscribedNovelEntity>> findByNovels(
       List<SubscribedNovelEntity> novels) {
     // 更新対象の小説
@@ -63,7 +58,7 @@ class RemoteNarouBookshelfDataStore extends RemoteBookshelfDataStore {
         mappedEntities.then((entities) {
       entities.forEach((remoteNovel) {
         // 最新データのnCodeで引っ掛ける
-        final cachedNovel = updateTargetNovels[remoteNovel.nCode];
+        final cachedNovel = updateTargetNovels[remoteNovel.ncode];
 
         // 最新データにキャッシュ中の小説が見つからない
         // = その小説がダイジェスト化などで消されている
@@ -88,9 +83,9 @@ class RemoteNarouBookshelfDataStore extends RemoteBookshelfDataStore {
         final correctUnreadCount = newUnreadCount < 0 ? 0 : newUnreadCount;
 
         // 最新情報をマッピングした小説情報を作成する
-        updateTargetNovels[remoteNovel.nCode] = SubscribedNovelEntity(
+        updateTargetNovels[remoteNovel.ncode] = SubscribedNovelEntity(
             NovelHeader(
-                NovelIdentifier(Narou(), remoteNovel.nCode),
+                NovelIdentifier(AvailableSites.narou, remoteNovel.ncode),
                 remoteNovel.title,
                 remoteNovel.story,
                 remoteNovel.writer,

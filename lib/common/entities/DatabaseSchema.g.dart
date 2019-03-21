@@ -16,6 +16,7 @@ class CachedNarouSubscribedNovelEntityData {
   final int lastUpdatedAt;
   final int textLength;
   final int episodeCount;
+  final int lastReadAt;
   CachedNarouSubscribedNovelEntityData(
       {this.identifier,
       this.novelName,
@@ -25,7 +26,8 @@ class CachedNarouSubscribedNovelEntityData {
       this.isComplete,
       this.lastUpdatedAt,
       this.textLength,
-      this.episodeCount});
+      this.episodeCount,
+      this.lastReadAt});
   factory CachedNarouSubscribedNovelEntityData.fromData(
       Map<String, dynamic> data, GeneratedDatabase db) {
     final stringType = db.typeSystem.forDartType<String>();
@@ -41,6 +43,7 @@ class CachedNarouSubscribedNovelEntityData {
       lastUpdatedAt: intType.mapFromDatabaseResponse(data['last_updated_at']),
       textLength: intType.mapFromDatabaseResponse(data['text_length']),
       episodeCount: intType.mapFromDatabaseResponse(data['episode_count']),
+      lastReadAt: intType.mapFromDatabaseResponse(data['last_read_at']),
     );
   }
   CachedNarouSubscribedNovelEntityData copyWith(
@@ -52,7 +55,8 @@ class CachedNarouSubscribedNovelEntityData {
           bool isComplete,
           int lastUpdatedAt,
           int textLength,
-          int episodeCount}) =>
+          int episodeCount,
+          int lastReadAt}) =>
       CachedNarouSubscribedNovelEntityData(
         identifier: identifier ?? this.identifier,
         novelName: novelName ?? this.novelName,
@@ -63,6 +67,7 @@ class CachedNarouSubscribedNovelEntityData {
         lastUpdatedAt: lastUpdatedAt ?? this.lastUpdatedAt,
         textLength: textLength ?? this.textLength,
         episodeCount: episodeCount ?? this.episodeCount,
+        lastReadAt: lastReadAt ?? this.lastReadAt,
       );
   @override
   String toString() {
@@ -75,27 +80,31 @@ class CachedNarouSubscribedNovelEntityData {
           ..write('isComplete: $isComplete, ')
           ..write('lastUpdatedAt: $lastUpdatedAt, ')
           ..write('textLength: $textLength, ')
-          ..write('episodeCount: $episodeCount')
+          ..write('episodeCount: $episodeCount, ')
+          ..write('lastReadAt: $lastReadAt')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode =>
-      ((((((((identifier.hashCode) * 31 + novelName.hashCode) * 31 +
-                                                      novelStory.hashCode) *
+      (((((((((identifier.hashCode) * 31 + novelName.hashCode) * 31 +
+                                                              novelStory
+                                                                  .hashCode) *
+                                                          31 +
+                                                      writer.hashCode) *
                                                   31 +
-                                              writer.hashCode) *
+                                              unreadCount.hashCode) *
                                           31 +
-                                      unreadCount.hashCode) *
+                                      isComplete.hashCode) *
                                   31 +
-                              isComplete.hashCode) *
+                              lastUpdatedAt.hashCode) *
                           31 +
-                      lastUpdatedAt.hashCode) *
+                      textLength.hashCode) *
                   31 +
-              textLength.hashCode) *
+              episodeCount.hashCode) *
           31 +
-      episodeCount.hashCode;
+      lastReadAt.hashCode;
   @override
   bool operator ==(other) =>
       identical(this, other) ||
@@ -108,7 +117,8 @@ class CachedNarouSubscribedNovelEntityData {
           other.isComplete == isComplete &&
           other.lastUpdatedAt == lastUpdatedAt &&
           other.textLength == textLength &&
-          other.episodeCount == episodeCount);
+          other.episodeCount == episodeCount &&
+          other.lastReadAt == lastReadAt);
 }
 
 class $CachedNarouSubscribedNovelEntityTable
@@ -164,6 +174,11 @@ class $CachedNarouSubscribedNovelEntityTable
         false,
       );
   @override
+  GeneratedIntColumn get lastReadAt => GeneratedIntColumn(
+        'last_read_at',
+        false,
+      );
+  @override
   List<GeneratedColumn> get $columns => [
         identifier,
         novelName,
@@ -173,7 +188,8 @@ class $CachedNarouSubscribedNovelEntityTable
         isComplete,
         lastUpdatedAt,
         textLength,
-        episodeCount
+        episodeCount,
+        lastReadAt
       ];
   @override
   CachedNarouSubscribedNovelEntity get asDslTable => this;
@@ -190,7 +206,8 @@ class $CachedNarouSubscribedNovelEntityTable
       isComplete.isAcceptableValue(instance.isComplete, isInserting) &&
       lastUpdatedAt.isAcceptableValue(instance.lastUpdatedAt, isInserting) &&
       textLength.isAcceptableValue(instance.textLength, isInserting) &&
-      episodeCount.isAcceptableValue(instance.episodeCount, isInserting);
+      episodeCount.isAcceptableValue(instance.episodeCount, isInserting) &&
+      lastReadAt.isAcceptableValue(instance.lastReadAt, isInserting);
   @override
   Set<GeneratedColumn> get $primaryKey => {identifier};
   @override
@@ -228,6 +245,9 @@ class $CachedNarouSubscribedNovelEntityTable
     }
     if (d.episodeCount != null || includeNulls) {
       map['episode_count'] = Variable<int, IntType>(d.episodeCount);
+    }
+    if (d.lastReadAt != null || includeNulls) {
+      map['last_read_at'] = Variable<int, IntType>(d.lastReadAt);
     }
     return map;
   }

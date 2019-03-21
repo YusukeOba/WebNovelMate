@@ -5,25 +5,21 @@ import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
 import 'package:NovelMate/common/repository/RankingRepository.dart';
 
 class RankingRepositoryImpl extends RankingRepository {
-  RankingRepositoryImpl(List<CachedRankingDataStore> cacheDataStores,
-      List<RemoteRankingDataStore> remoteDataStores)
+  RankingRepositoryImpl(Map<Site, CachedRankingDataStore> cacheDataStores,
+      Map<Site, RemoteRankingDataStore> remoteDataStores)
       : super(cacheDataStores, remoteDataStores);
 
   @override
   Future<void> setDirty(Site site) {
-    final cache = cacheDataStores
-        .firstWhere((store) => store.site().identifier == site.identifier);
-    return cache.clearAll();
+    return cacheDataStores[site].clearAll();
   }
 
   @override
   Future<List<RankingEntity>> find(
       Site site, int start, int end, String freeWord) async {
-    final cache = cacheDataStores
-        .firstWhere((store) => store.site().identifier == site.identifier);
+    final cache = cacheDataStores[site];
 
-    final remote = remoteRankingDataStores
-        .firstWhere((store) => store.site().identifier == site.identifier);
+    final remote = remoteRankingDataStores[site];
 
     // キャッシュがなければリモート経由で取りに行く、あればキャッシュで取りに行く
     if (await cache.hasCache()) {

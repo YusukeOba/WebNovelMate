@@ -57,7 +57,7 @@ class RemoteNarouRankingDataStore extends RemoteRankingDataStore {
         rankings.add(RankingEntity.name(
           entity.global_point,
           NovelHeader(
-              NovelIdentifier(Narou(), entity.nCode),
+              NovelIdentifier(AvailableSites.narou, entity.ncode),
               entity.title,
               entity.story,
               entity.writer,
@@ -68,10 +68,5 @@ class RemoteNarouRankingDataStore extends RemoteRankingDataStore {
       });
       return Future.value(rankings);
     });
-  }
-
-  @override
-  Site site() {
-    return Narou();
   }
 }

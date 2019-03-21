@@ -16,14 +16,14 @@ class CachedNarouBookshelfDataStore extends CachedBookshelfDataStore {
       return Future.value(novels.map((novel) {
         return SubscribedNovelEntity(
             NovelHeader(
-                NovelIdentifier(Narou(), novel.identifier),
+                NovelIdentifier(AvailableSites.narou, novel.identifier),
                 novel.novelName,
                 novel.novelStory,
                 novel.writer,
                 novel.isComplete,
                 novel.lastUpdatedAt,
                 novel.textLength),
-            novel.lastUpdatedAt,
+            novel.lastReadAt,
             novel.unreadCount,
             novel.episodeCount);
       }).toList());
@@ -38,9 +38,9 @@ class CachedNarouBookshelfDataStore extends CachedBookshelfDataStore {
             ..where((cacheEntity) => cacheEntity.identifier
                 .equals(record.novelHeader.identifier.siteOfIdentifier)))
           .go();
-    });
+    }).toList();
 
-    return Future.forEach(deleteResult, (element) {});
+    return Future.wait(deleteResult);
   }
 
   @override
@@ -58,14 +58,10 @@ class CachedNarouBookshelfDataStore extends CachedBookshelfDataStore {
               isComplete: entity.novelHeader.isComplete,
               lastUpdatedAt: entity.novelHeader.lastUpdatedAt,
               textLength: entity.novelHeader.textLength,
-              episodeCount: entity.episodeCount));
+              episodeCount: entity.episodeCount,
+              lastReadAt: entity.lastReadAt));
     }).toList();
 
-    return Future.forEach(insertResult, (element) {});
-  }
-
-  @override
-  Site site() {
-    return Narou();
+    return Future.wait(insertResult);
   }
 }

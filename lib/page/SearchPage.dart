@@ -6,25 +6,23 @@ import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
 import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
 import 'package:NovelMate/common/entities/domain/SubscribedNovelEntity.dart';
 import 'package:NovelMate/common/repository/RankingRepository.dart';
+import 'package:NovelMate/common/repository/RepositoryFactory.dart';
 import 'package:NovelMate/page/SearchResultPage.dart';
 import 'package:flutter/material.dart';
 
 class SearchPage extends StatefulWidget {
-  final RankingRepository _repository;
-
-  SearchPage(this._repository);
-
   @override
   _SearchPageState createState() {
-    return new _SearchPageState(_SearchPageViewModel(_repository));
+    return new _SearchPageState(_SearchPageViewModel());
   }
 }
 
 class _SearchPageViewModel {
-  final RankingRepository _repository;
+  final RankingRepository _repository =
+      RepositoryFactory.shared.getRankingRepository();
 
   /// 表示中のサイト種別
-  Site showingSite = Narou();
+  Site showingSite = AvailableSites.narou;
 
   /// 入力中の文言
   String inputtedText = "";
@@ -32,15 +30,12 @@ class _SearchPageViewModel {
   /// 表示中のランキングデータ
   Future<List<RankingEntity>> rankings;
 
-  _SearchPageViewModel(this._repository);
-
-  /// ランキングの表示
   void showRankings() {
     this.rankings = _repository.fetchLatest(showingSite).then((entities) {
       entities.sort((lhs, rhs) {
         return rhs.popularity - lhs.popularity;
       });
-      return entities;
+      return entities.sublist(0, 20);
     });
   }
 
@@ -49,10 +44,7 @@ class _SearchPageViewModel {
     inputtedText = text;
     print("inputed = $text");
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return SearchResultPage(
-        inputtedText,
-        _repository,
-      );
+      return SearchResultPage(inputtedText);
     }));
   }
 
@@ -75,19 +67,21 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: () {
-        return Future(() {
-          setState(() {
-            _viewModel.onRefresh();
-          });
-        });
-      },
-      child: Scrollbar(
-          child: ListView(
-        children: <Widget>[_buildSearchBox(), _buildRanking()],
-      )),
-    );
+    return Scaffold(
+        appBar: AppBar(title: Text("検索")),
+        body: RefreshIndicator(
+          onRefresh: () {
+            return Future(() {
+              setState(() {
+                _viewModel.onRefresh();
+              });
+            });
+          },
+          child: Scrollbar(
+              child: ListView(
+            children: <Widget>[_buildSearchBox(), _buildRanking()],
+          )),
+        ));
   }
 
   @override
@@ -175,15 +169,6 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
               children: snapShot.data.map((novel) {
                 return Column(children: <Widget>[
                   ListTile(
-//                    leading: Container(
-//                      width: 25,
-//                      height: 25,
-//                      decoration: BoxDecoration(
-//                        color: sNMAccentColor,
-//                        shape: BoxShape.circle,
-//                      ),
-//                      child: Center(child: Text(novel.rank.toString())),
-//                    ),
                     title: RichText(
                         text: TextSpan(children: <TextSpan>[
                       TextSpan(
@@ -203,10 +188,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                     onTap: () {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) {
-                        return SearchResultPage(
-                          _viewModel.inputtedText,
-                          _viewModel._repository,
-                        );
+                        return SearchResultPage(_viewModel.inputtedText);
                       }));
                     },
                   ),
