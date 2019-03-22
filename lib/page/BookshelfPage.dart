@@ -1,33 +1,27 @@
 import 'package:NovelMate/common/colors.dart';
 import 'package:NovelMate/common/entities/domain/SubscribedNovelEntity.dart';
 import 'package:NovelMate/common/repository/RepositoryFactory.dart';
+import 'package:NovelMate/page/BookshelfTabPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 ///
-/// 本棚画面
+/// 本棚に表示する小説
 ///
 class BookshelfPage extends StatefulWidget {
+  final BookshelfTab _tab;
+
+  BookshelfPage(this._tab);
+
   @override
   _BookshelfState createState() {
-    return _BookshelfState();
+    return _BookshelfState(_tab);
   }
 }
 
-/// 本棚にある小説を表示する順番
-enum _BookshelfTab {
-  // 更新順
-  updateAt,
-  // 閲覧順
-  readAt
-}
-
 class _BookshelfViewModel {
-  /// 選択中のタブ
-  int _currentSelectedTabIndex = _BookshelfTab.updateAt.index;
-
-  /// タブ数
-  int _tabLength = _BookshelfTab.values.length;
+  /// 表示しているタブ
+  final BookshelfTab _tab;
 
   /// 対応リポジトリ
   final _repository = RepositoryFactory.shared.getBookshelfRepository();
@@ -35,11 +29,12 @@ class _BookshelfViewModel {
   /// 表示している小説
   Future<List<SubscribedNovelEntity>> _novels;
 
+  _BookshelfViewModel(this._tab);
+
   /// 選択中のタブに応じたListの状態変更
   void refreshLists() {
-    final tab = _BookshelfTab.values[this._currentSelectedTabIndex];
-    switch (tab) {
-      case _BookshelfTab.updateAt:
+    switch (_tab) {
+      case BookshelfTab.updateAt:
         print("sort by update at");
         _novels = _repository.findAll().then((novels) {
           novels.sort((lhs, rhs) =>
@@ -47,7 +42,7 @@ class _BookshelfViewModel {
           return Future.value(novels);
         });
         break;
-      case _BookshelfTab.readAt:
+      case BookshelfTab.readAt:
         print("sort by read at");
         _novels = _repository.findAll().then((novels) {
           novels.sort((lhs, rhs) => rhs.lastReadAt - lhs.lastReadAt);
@@ -56,16 +51,14 @@ class _BookshelfViewModel {
         break;
     }
   }
-
-  /// タブの選択
-  void onSelectTab(int index) {
-    _currentSelectedTabIndex = index;
-    refreshLists();
-  }
 }
 
 class _BookshelfState extends State<BookshelfPage> {
-  final _viewModel = _BookshelfViewModel();
+  final BookshelfTab _tab;
+
+  final _BookshelfViewModel _viewModel;
+
+  _BookshelfState(this._tab) : _viewModel = _BookshelfViewModel(_tab);
 
   @override
   void initState() {
@@ -77,34 +70,16 @@ class _BookshelfState extends State<BookshelfPage> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-        length: _viewModel._tabLength,
-        initialIndex: _viewModel._currentSelectedTabIndex,
-        child: Scaffold(
-          appBar: AppBar(
-              title: Text("本棚"),
-              bottom: TabBar(
-                tabs: [Tab(text: "更新順"), Tab(text: "閲覧順")],
-                indicatorColor: Colors.white,
-                onTap: (index) {
-                  setState(() {
-                    this._viewModel.onSelectTab(index);
-                  });
-                },
-              )),
-          body: RefreshIndicator(
-              child: CustomScrollView(slivers: <Widget>[
-                SliverPadding(padding: EdgeInsets.symmetric(vertical: 8.0)),
-                _buildNovelLists()
-              ]),
-              onRefresh: () {
-                return Future(() {
-                  setState(() {
-                    this._viewModel.refreshLists();
-                  });
-                });
-              }),
-        ));
+    return RefreshIndicator(
+        child: Scrollbar(
+            child: CustomScrollView(slivers: <Widget>[_buildNovelLists()])),
+        onRefresh: () {
+          return Future(() {
+            setState(() {
+              this._viewModel.refreshLists();
+            });
+          });
+        });
   }
 
   Widget _buildNovelLists() {
@@ -118,6 +93,7 @@ class _BookshelfState extends State<BookshelfPage> {
             snapShot.connectionState == ConnectionState.waiting) {
           return SliverList(
               delegate: SliverChildListDelegate(<Widget>[
+            Container(height: 8.0),
             Container(child: Center(child: CircularProgressIndicator()))
           ]));
         }
@@ -159,7 +135,8 @@ class _BookshelfState extends State<BookshelfPage> {
               Container(
                 height: 4.0,
               ),
-              Row(
+              Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: <Widget>[
                   // 未読数
                   _buildUnreadChip(novel),
@@ -168,7 +145,7 @@ class _BookshelfState extends State<BookshelfPage> {
                     novel.novelHeader.isComplete ? "完結済" : "連載中",
                     style: TextStyle(color: Colors.black87, fontSize: 12.0),
                   ),
-                  _buildCircle(),
+                  Container(width: 4.0),
                   // 掲載話数
                   Text(
                     novel.episodeCount.toString() + "話",
@@ -210,8 +187,8 @@ class _BookshelfState extends State<BookshelfPage> {
   Widget _buildCircle() {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 4.0),
-      width: 8.0,
-      height: 8.0,
+      width: 4.0,
+      height: 4.0,
       decoration: new BoxDecoration(
         color: Colors.black38,
         shape: BoxShape.circle,
