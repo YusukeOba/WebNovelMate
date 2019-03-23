@@ -1,4 +1,3 @@
-
 import 'dart:ui';
 
 const sNMPrimaryColor = const Color(0xFF00838E);

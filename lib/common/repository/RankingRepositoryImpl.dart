@@ -21,21 +21,43 @@ class RankingRepositoryImpl extends RankingRepository {
 
     final remote = remoteRankingDataStores[site];
 
+    if (cache == null || remote == null) {
+      // 非対応サイト
+      throw Exception(
+          "Error. this novel is unavailable site. Please implements.");
+    }
+
     // キャッシュがなければリモート経由で取りに行く、あればキャッシュで取りに行く
     if (await cache.hasCache()) {
       print("find with cache");
-      return cache.fetchAll();
+      return cache.fetchAll().then((rankings) {
+        if (rankings.length == 0) {
+          return Future.value([]);
+        }
+        if (rankings.length < end) {
+          return Future.value(rankings.sublist(0, rankings.length));
+        }
+
+        return Future.value(rankings.sublist(0, end));
+      });
     } else {
       print("find with remote");
       return remote.fetchRanking(start, end, title: freeWord).then((rankings) {
         cache.save(rankings);
-        return Future(() => rankings);
+        if (rankings.length == 0) {
+          return Future.value([]);
+        }
+        if (rankings.length < end) {
+          return Future.value(rankings.sublist(0, rankings.length));
+        }
+
+        return Future.value(rankings.sublist(0, end));
       });
     }
   }
 
   @override
-  Future<List<RankingEntity>> fetchLatest(Site site) async {
+  Future<List<RankingEntity>> fetchLatest(Site site) {
     // 20件のみ取得
     return find(site, 0, 20, "");
   }

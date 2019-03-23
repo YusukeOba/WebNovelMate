@@ -47,6 +47,8 @@ dev_dependencies:
   build_runner: ^1.0.0
   json_serializable: ^2.0.0
 
+  mockito: ^3.0.0
+
   # DataBase
   moor_generator:
 
