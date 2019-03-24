@@ -99,8 +99,13 @@ class RemoteNarouEpisodeDataStore {
             .millisecondsSinceEpoch;
 
         // Domain型に変換
-        episodeEntities.add(EpisodeEntity(identifier, episodeIdentifier,
-            firstWriteDateLong, lastUpdateDateLong, chapterTitle, episodeName));
+        episodeEntities.add(EpisodeEntity(
+            identifier,
+            episodeIdentifier,
+            firstWriteDateLong,
+            lastUpdateDateLong,
+            chapterTitle.trim(),
+            episodeName.trim()));
       }
     });
 

@@ -7,6 +7,7 @@ import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
 import 'package:NovelMate/common/entities/domain/SubscribedNovelEntity.dart';
 import 'package:NovelMate/common/repository/RankingRepository.dart';
 import 'package:NovelMate/common/repository/RepositoryFactory.dart';
+import 'package:NovelMate/page/EpisodeIndexPage.dart';
 import 'package:NovelMate/page/SearchResultPage.dart';
 import 'package:flutter/material.dart';
 
@@ -142,7 +143,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                 child: Text(
                   "ランキングから探す",
                   textAlign: TextAlign.left,
-                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
                 )),
             Container(
               height: 32,
@@ -188,7 +189,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                     onTap: () {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) {
-                        return SearchResultPage(_viewModel.inputtedText);
+                        return EpisodeIndexPage(novel.novelHeader);
                       }));
                     },
                   ),

@@ -4,6 +4,7 @@ import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
 import 'package:NovelMate/common/entities/domain/SubscribedNovelEntity.dart';
 import 'package:NovelMate/common/repository/RepositoryFactory.dart';
 import 'package:NovelMate/page/BookshelfTabPage.dart';
+import 'package:NovelMate/page/EpisodeIndexPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -122,7 +123,9 @@ class _BookshelfState extends State<BookshelfPage> {
   Widget _buildListTile(SubscribedNovelEntity novel) {
     return InkWell(
         onTap: () {
-          this.testCode(novel.novelHeader.identifier);
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return EpisodeIndexPage(novel.novelHeader);
+          }));
         },
         child: Container(
             padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),

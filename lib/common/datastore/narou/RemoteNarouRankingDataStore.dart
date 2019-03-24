@@ -62,7 +62,8 @@ class RemoteNarouRankingDataStore extends RemoteRankingDataStore {
               entity.writer,
               isCompleted,
               lastUpTime,
-              entity.length),
+              entity.length,
+              entity.general_all_no),
         ));
       });
       return Future.value(rankings);

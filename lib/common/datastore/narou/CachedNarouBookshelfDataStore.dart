@@ -22,7 +22,8 @@ class CachedNarouBookshelfDataStore extends CachedBookshelfDataStore {
                 novel.writer,
                 novel.isComplete,
                 novel.lastUpdatedAt,
-                novel.textLength),
+                novel.textLength,
+                novel.episodeCount),
             novel.lastReadAt,
             novel.unreadCount,
             novel.episodeCount);

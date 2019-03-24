@@ -25,8 +25,11 @@ class NovelHeader {
   /// 文字数
   final int textLength;
 
+  /// 話数
+  final int episodeCount;
+
   NovelHeader(this.identifier, this.novelName, this.novelStory, this.writer,
-      this.isComplete, this.lastUpdatedAt, this.textLength);
+      this.isComplete, this.lastUpdatedAt, this.textLength, this.episodeCount);
 
   @override
   String toString() {

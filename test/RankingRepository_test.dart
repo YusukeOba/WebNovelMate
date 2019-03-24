@@ -35,6 +35,7 @@ void main() {
           "Dummy weriter",
           true,
           DateTime.now().millisecondsSinceEpoch,
+          100,
           100));
 
   setUp(() {

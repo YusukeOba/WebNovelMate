@@ -90,7 +90,8 @@ class RemoteNarouBookshelfDataStore extends RemoteBookshelfDataStore {
                 remoteNovel.writer,
                 remoteNovel.end == 0,
                 lastUpTime,
-                remoteNovel.length),
+                remoteNovel.length,
+                remoteNovel.general_all_no),
             cachedNovel.lastReadAt,
             correctUnreadCount,
             remoteEpisodeCount);

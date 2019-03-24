@@ -7,6 +7,7 @@ import 'package:NovelMate/common/entities/domain/SubscribedNovelEntity.dart';
 import 'package:NovelMate/common/repository/BookshelfRepository.dart';
 import 'package:NovelMate/common/repository/RankingRepository.dart';
 import 'package:NovelMate/common/repository/RepositoryFactory.dart';
+import 'package:NovelMate/page/EpisodeIndexPage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -95,16 +96,6 @@ class _SearchResultPageState extends State<SearchResultPage> {
   void initState() {
     super.initState();
     _viewModel._showWithSelectedTabIndex(0);
-    wtf();
-  }
-
-  void wtf() async {
-    BookshelfRepository bkRepository =
-        RepositoryFactory.shared.getBookshelfRepository();
-    List<SubscribedNovelEntity> novels = await bkRepository.findAll();
-    print("novel!!  =" + novels.toString());
-
-    await RepositoryFactory.shared.getBookshelfRepository().delete(novels);
   }
 
   @override
@@ -190,18 +181,9 @@ class _SearchResultPageState extends State<SearchResultPage> {
 
             return InkWell(
                 onTap: () async {
-                  BookshelfRepository bkRepository =
-                      RepositoryFactory.shared.getBookshelfRepository();
-                  snapShot.data.forEach((novel) async {
-                    await bkRepository.save([
-                      SubscribedNovelEntity(
-                          novel.novelHeader,
-                          DateTime.now().millisecondsSinceEpoch +
-                              Random().nextInt(99999999),
-                          123,
-                          123)
-                    ]);
-                  });
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return EpisodeIndexPage(novel.novelHeader);
+                  }));
                 },
                 child: Container(
                     padding: EdgeInsets.symmetric(vertical: 8.0),

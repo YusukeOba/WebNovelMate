@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
@@ -27,7 +28,7 @@ class CustomHttpClient {
         if (gzipCompress) {
           responseText = await _deCompressGzip(response.bodyBytes);
         } else {
-          responseText = response.body;
+          responseText = utf8.decode(response.bodyBytes);
         }
 
         return Future.value(mapper(responseText));
