@@ -14,9 +14,8 @@ class CustomHttpClient {
   /// リクエストヘッダは[header]で指定する
   ///
   /// レスポンス結果は[mapper]で依存元が変換を行う
-  static Future<T> request<T>(HttpMethod method, String url,
-      Map<dynamic, dynamic> header, Mapper<T> mapper,
-      {bool gzipCompress = false}) async {
+  static Future<T> request<T>(HttpMethod method, String url, Mapper<T> mapper,
+      {bool gzipCompress = false, Map<String, String> header}) async {
     if (method == HttpMethod.get) {
       return http.get(url, headers: header).then((response) async {
         // 通信エラー

@@ -1,4 +1,6 @@
 import 'package:NovelMate/common/colors.dart';
+import 'package:NovelMate/common/datastore/narou/RemoteNarouEpisodeDataStore.dart';
+import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
 import 'package:NovelMate/common/entities/domain/SubscribedNovelEntity.dart';
 import 'package:NovelMate/common/repository/RepositoryFactory.dart';
 import 'package:NovelMate/page/BookshelfTabPage.dart';
@@ -68,6 +70,10 @@ class _BookshelfState extends State<BookshelfPage> {
     });
   }
 
+  testCode(NovelIdentifier identifier) async {
+    await RemoteNarouEpisodeDataStore().fetchEpisodeList(identifier);
+  }
+
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
@@ -114,49 +120,53 @@ class _BookshelfState extends State<BookshelfPage> {
   }
 
   Widget _buildListTile(SubscribedNovelEntity novel) {
-    return Container(
-        padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-        decoration: new BoxDecoration(
-            border: new Border(
-                bottom: BorderSide(width: 0.5, color: Colors.black26))),
-        child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              // タイトル
-              Text(novel.novelHeader.novelName,
-                  maxLines: 1,
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                  overflow: TextOverflow.ellipsis),
-              // 作者名
-              Text(
-                novel.novelHeader.writer,
-                style: TextStyle(color: Colors.black87, fontSize: 12.0),
-              ),
-              Container(
-                height: 4.0,
-              ),
-              Wrap(
-                crossAxisAlignment: WrapCrossAlignment.center,
+    return InkWell(
+        onTap: () {
+          this.testCode(novel.novelHeader.identifier);
+        },
+        child: Container(
+            padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            decoration: new BoxDecoration(
+                border: new Border(
+                    bottom: BorderSide(width: 0.5, color: Colors.black26))),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  // 未読数
-                  _buildUnreadChip(novel),
-                  // 完結済かどうか
+                  // タイトル
+                  Text(novel.novelHeader.novelName,
+                      maxLines: 1,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                      overflow: TextOverflow.ellipsis),
+                  // 作者名
                   Text(
-                    novel.novelHeader.isComplete ? "完結済" : "連載中",
+                    novel.novelHeader.writer,
                     style: TextStyle(color: Colors.black87, fontSize: 12.0),
                   ),
-                  Container(width: 4.0),
-                  // 掲載話数
-                  Text(
-                    novel.episodeCount.toString() + "話",
-                    style: TextStyle(color: Colors.black87, fontSize: 12.0),
+                  Container(
+                    height: 4.0,
                   ),
-                  _buildCircle(),
-                  // 更新日
-                  _buildLastUpdateLabel(novel),
-                ],
-              )
-            ]));
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: <Widget>[
+                      // 未読数
+                      _buildUnreadChip(novel),
+                      // 完結済かどうか
+                      Text(
+                        novel.novelHeader.isComplete ? "完結済" : "連載中",
+                        style: TextStyle(color: Colors.black87, fontSize: 12.0),
+                      ),
+                      Container(width: 4.0),
+                      // 掲載話数
+                      Text(
+                        novel.episodeCount.toString() + "話",
+                        style: TextStyle(color: Colors.black87, fontSize: 12.0),
+                      ),
+                      _buildCircle(),
+                      // 更新日
+                      _buildLastUpdateLabel(novel),
+                    ],
+                  )
+                ])));
   }
 
   /// 未読数の生成

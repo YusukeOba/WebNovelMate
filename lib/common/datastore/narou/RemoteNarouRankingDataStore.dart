@@ -29,8 +29,7 @@ class RemoteNarouRankingDataStore extends RemoteRankingDataStore {
 
     // HTTPリクエスト -> JSONをModelにマップ
     Future<List<NarouNovelListEntity>> mappedEntities =
-        CustomHttpClient.request(HttpMethod.get, requestUrl, null,
-            ((responseText) {
+        CustomHttpClient.request(HttpMethod.get, requestUrl, ((responseText) {
       final List<NarouNovelListEntity> entities = new List();
 
       for (var value in json.decode(responseText)) {
