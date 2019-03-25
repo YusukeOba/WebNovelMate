@@ -2,6 +2,7 @@ import 'package:NovelMate/common/colors.dart';
 import 'package:NovelMate/common/datastore/narou/RemoteNarouTextDataStore.dart';
 import 'package:NovelMate/common/entities/domain/EpisodeEntity.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 class TextPage extends StatefulWidget {
@@ -66,24 +67,42 @@ class _TextViewModel {
     shownOuterView = !shownOuterView;
   }
 
-  void addScrollListener(Function listener(ScrollController controller)) {
-    _scrollController.addListener(listener(_scrollController));
+  void setOuterViewVisibility(bool visibility) {
+    shownOuterView = visibility;
   }
 }
 
-class _TextState extends State<TextPage> {
+class _TextState extends State<TextPage> with SingleTickerProviderStateMixin {
   final _TextViewModel _viewModel;
 
   _TextState(this._viewModel);
 
   @override
   void initState() {
-    super.initState();
     setState(() {
       _viewModel.showTexts();
-      _viewModel.addScrollListener((controller) {
-        setState(() {});
-      });
+      _viewModel._scrollController.addListener(this._scrollListener);
+    });
+
+    super.initState();
+  }
+
+  _scrollListener() {
+    setState(() {
+      // スクロール検知時、SliderのUIを更新する
+      // また、スクロールダウンした時はAppBarとSliderは非表示にする
+      bool isScrollDown =
+          _viewModel._scrollController.position.userScrollDirection ==
+              ScrollDirection.reverse;
+      bool isScrollUp =
+          _viewModel._scrollController.position.userScrollDirection ==
+              ScrollDirection.forward;
+      if (isScrollDown) {
+        _viewModel.setOuterViewVisibility(false);
+      }
+      if (isScrollUp) {
+        _viewModel.setOuterViewVisibility(true);
+      }
     });
   }
 
@@ -97,7 +116,16 @@ class _TextState extends State<TextPage> {
 
   Widget _buildAppBar() {
     if (_viewModel.shownOuterView) {
-      return AppBar();
+      final appBar = AppBar(
+        title: IconButton(
+            icon: Image.asset("images/font_sizing.png",
+                width: 28, height: 28, color: Colors.white),
+            onPressed: () {
+              // TODO: implement
+            }),
+        centerTitle: false,
+      );
+      return appBar;
     } else {
       return null;
     }
@@ -105,8 +133,9 @@ class _TextState extends State<TextPage> {
 
   Widget _buildBottomBar() {
     bool isScrollBarAttached = _viewModel._scrollController.hasClients;
+    Widget bottomBar;
     if (_viewModel.shownOuterView && isScrollBarAttached) {
-      return SafeArea(
+      bottomBar = SafeArea(
           child: Container(
               padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               decoration: new BoxDecoration(
@@ -116,7 +145,8 @@ class _TextState extends State<TextPage> {
                 children: <Widget>[
                   Column(
                     children: <Widget>[
-                      Text(_viewModel._episode.episodeName),
+                      Text(_viewModel._episode.episodeName,
+                          style: TextStyle(fontSize: 11.0)),
                       Slider(
                           inactiveColor: sNMAccentColor,
                           activeColor: sNMPrimaryColor,
@@ -135,8 +165,15 @@ class _TextState extends State<TextPage> {
                 ],
               )));
     } else {
-      return null;
+      bottomBar = SizedBox(height: 0);
     }
+
+    return AnimatedSize(
+      vsync: this,
+      duration: Duration(milliseconds: 200),
+      child: bottomBar,
+      curve: Curves.easeIn,
+    );
   }
 
   Widget _buildTexts() {
@@ -156,14 +193,21 @@ class _TextState extends State<TextPage> {
                 controller: _viewModel._scrollController,
                 itemBuilder: (context, index) {
                   final text = snapShot.data[index];
-                  return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _viewModel.toggleOuterView();
-                        });
-                      },
-                      child: Text(text));
+
+                  final itemWidget = GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _viewModel.toggleOuterView();
+                      });
+                    },
+                    child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Text(text)),
+                  );
+
+                  return itemWidget;
                 },
+                physics: BouncingScrollPhysics(),
                 itemCount: snapShot.data.length));
       },
     );

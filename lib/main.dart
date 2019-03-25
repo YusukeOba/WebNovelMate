@@ -17,6 +17,9 @@ final ThemeData _novelMateTheme = _buildNovelMateTheme();
 
 ThemeData _buildNovelMateTheme() {
   final ThemeData base = ThemeData.light();
+  final SliderThemeData sliderThemeData = base.sliderTheme
+      .copyWith(thumbShape: RoundSliderThumbShape(enabledThumbRadius: 12.0));
+
   return base.copyWith(
       accentColor: sNMSecondaryColor,
       primaryColor: sNMPrimaryColor,
@@ -25,6 +28,7 @@ ThemeData _buildNovelMateTheme() {
       textSelectionColor: sNMSecondaryColor,
       errorColor: sNMSecondaryColor,
       canvasColor: sNMBackgroundColor,
+      sliderTheme: sliderThemeData,
       textTheme: base.textTheme.apply(fontFamily: 'Hiragino Kaku Gothic ProN'),
       primaryTextTheme:
           base.primaryTextTheme.apply(fontFamily: 'Hiragino Kaku Gothic ProN'),
@@ -66,7 +70,6 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-//      appBar: AppBar(title: Text(NmLocalizations.of(context).appName)),
       bottomNavigationBar: BottomNavigationBar(
         items: [
           BottomNavigationBarItem(
