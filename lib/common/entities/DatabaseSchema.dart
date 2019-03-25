@@ -44,7 +44,32 @@ class CachedNarouSubscribedNovelEntity extends Table {
   Set<TextColumn> get primaryKey => {identifier};
 }
 
-@UseMoor(tables: [CachedNarouSubscribedNovelEntity])
+/// なろうの小説の話情報
+class CachedNarouEpisodeEntity extends Table {
+  /// 対応サイトの中のID
+  TextColumn get siteOfIdentifier => text()();
+
+  /// 話へのリンク
+  TextColumn get episodeIdentifier => text()();
+
+  /// 投稿日時
+  IntColumn get firstWriteAt => integer()();
+
+  /// 最終更新日時（改稿含む)
+  IntColumn get lastUpdateAt => integer()();
+
+  /// 属するチャプター
+  /// チャプターを設定していない話の場合はnull
+  TextColumn get nullableChapterName => text().nullable()();
+
+  /// 話の名前
+  TextColumn get episodeName => text()();
+
+  @override
+  Set<TextColumn> get primaryKey => {siteOfIdentifier, episodeIdentifier};
+}
+
+@UseMoor(tables: [CachedNarouSubscribedNovelEntity, CachedNarouEpisodeEntity])
 class Database extends _$Database {
   Database()
       : super(FlutterQueryExecutor.inDatabaseFolder(path: 'database.sqlite'));

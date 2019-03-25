@@ -253,10 +253,189 @@ class $CachedNarouSubscribedNovelEntityTable
   }
 }
 
+class CachedNarouEpisodeEntityData {
+  final String siteOfIdentifier;
+  final String episodeIdentifier;
+  final int firstWriteAt;
+  final int lastUpdateAt;
+  final String nullableChapterName;
+  final String episodeName;
+  CachedNarouEpisodeEntityData(
+      {this.siteOfIdentifier,
+      this.episodeIdentifier,
+      this.firstWriteAt,
+      this.lastUpdateAt,
+      this.nullableChapterName,
+      this.episodeName});
+  factory CachedNarouEpisodeEntityData.fromData(
+      Map<String, dynamic> data, GeneratedDatabase db) {
+    final stringType = db.typeSystem.forDartType<String>();
+    final intType = db.typeSystem.forDartType<int>();
+    return CachedNarouEpisodeEntityData(
+      siteOfIdentifier:
+          stringType.mapFromDatabaseResponse(data['site_of_identifier']),
+      episodeIdentifier:
+          stringType.mapFromDatabaseResponse(data['episode_identifier']),
+      firstWriteAt: intType.mapFromDatabaseResponse(data['first_write_at']),
+      lastUpdateAt: intType.mapFromDatabaseResponse(data['last_update_at']),
+      nullableChapterName:
+          stringType.mapFromDatabaseResponse(data['nullable_chapter_name']),
+      episodeName: stringType.mapFromDatabaseResponse(data['episode_name']),
+    );
+  }
+  CachedNarouEpisodeEntityData copyWith(
+          {String siteOfIdentifier,
+          String episodeIdentifier,
+          int firstWriteAt,
+          int lastUpdateAt,
+          String nullableChapterName,
+          String episodeName}) =>
+      CachedNarouEpisodeEntityData(
+        siteOfIdentifier: siteOfIdentifier ?? this.siteOfIdentifier,
+        episodeIdentifier: episodeIdentifier ?? this.episodeIdentifier,
+        firstWriteAt: firstWriteAt ?? this.firstWriteAt,
+        lastUpdateAt: lastUpdateAt ?? this.lastUpdateAt,
+        nullableChapterName: nullableChapterName ?? this.nullableChapterName,
+        episodeName: episodeName ?? this.episodeName,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('CachedNarouEpisodeEntityData(')
+          ..write('siteOfIdentifier: $siteOfIdentifier, ')
+          ..write('episodeIdentifier: $episodeIdentifier, ')
+          ..write('firstWriteAt: $firstWriteAt, ')
+          ..write('lastUpdateAt: $lastUpdateAt, ')
+          ..write('nullableChapterName: $nullableChapterName, ')
+          ..write('episodeName: $episodeName')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      (((((siteOfIdentifier.hashCode) * 31 + episodeIdentifier.hashCode) * 31 +
+                              firstWriteAt.hashCode) *
+                          31 +
+                      lastUpdateAt.hashCode) *
+                  31 +
+              nullableChapterName.hashCode) *
+          31 +
+      episodeName.hashCode;
+  @override
+  bool operator ==(other) =>
+      identical(this, other) ||
+      (other is CachedNarouEpisodeEntityData &&
+          other.siteOfIdentifier == siteOfIdentifier &&
+          other.episodeIdentifier == episodeIdentifier &&
+          other.firstWriteAt == firstWriteAt &&
+          other.lastUpdateAt == lastUpdateAt &&
+          other.nullableChapterName == nullableChapterName &&
+          other.episodeName == episodeName);
+}
+
+class $CachedNarouEpisodeEntityTable extends CachedNarouEpisodeEntity
+    implements
+        TableInfo<CachedNarouEpisodeEntity, CachedNarouEpisodeEntityData> {
+  final GeneratedDatabase _db;
+  $CachedNarouEpisodeEntityTable(this._db);
+  @override
+  GeneratedTextColumn get siteOfIdentifier => GeneratedTextColumn(
+        'site_of_identifier',
+        false,
+      );
+  @override
+  GeneratedTextColumn get episodeIdentifier => GeneratedTextColumn(
+        'episode_identifier',
+        false,
+      );
+  @override
+  GeneratedIntColumn get firstWriteAt => GeneratedIntColumn(
+        'first_write_at',
+        false,
+      );
+  @override
+  GeneratedIntColumn get lastUpdateAt => GeneratedIntColumn(
+        'last_update_at',
+        false,
+      );
+  @override
+  GeneratedTextColumn get nullableChapterName => GeneratedTextColumn(
+        'nullable_chapter_name',
+        true,
+      );
+  @override
+  GeneratedTextColumn get episodeName => GeneratedTextColumn(
+        'episode_name',
+        false,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+        siteOfIdentifier,
+        episodeIdentifier,
+        firstWriteAt,
+        lastUpdateAt,
+        nullableChapterName,
+        episodeName
+      ];
+  @override
+  CachedNarouEpisodeEntity get asDslTable => this;
+  @override
+  String get $tableName => 'cached_narou_episode_entity';
+  @override
+  bool validateIntegrity(
+          CachedNarouEpisodeEntityData instance, bool isInserting) =>
+      siteOfIdentifier.isAcceptableValue(
+          instance.siteOfIdentifier, isInserting) &&
+      episodeIdentifier.isAcceptableValue(
+          instance.episodeIdentifier, isInserting) &&
+      firstWriteAt.isAcceptableValue(instance.firstWriteAt, isInserting) &&
+      lastUpdateAt.isAcceptableValue(instance.lastUpdateAt, isInserting) &&
+      nullableChapterName.isAcceptableValue(
+          instance.nullableChapterName, isInserting) &&
+      episodeName.isAcceptableValue(instance.episodeName, isInserting);
+  @override
+  Set<GeneratedColumn> get $primaryKey => {siteOfIdentifier, episodeIdentifier};
+  @override
+  CachedNarouEpisodeEntityData map(Map<String, dynamic> data) {
+    return CachedNarouEpisodeEntityData.fromData(data, _db);
+  }
+
+  @override
+  Map<String, Variable> entityToSql(CachedNarouEpisodeEntityData d,
+      {bool includeNulls = false}) {
+    final map = <String, Variable>{};
+    if (d.siteOfIdentifier != null || includeNulls) {
+      map['site_of_identifier'] =
+          Variable<String, StringType>(d.siteOfIdentifier);
+    }
+    if (d.episodeIdentifier != null || includeNulls) {
+      map['episode_identifier'] =
+          Variable<String, StringType>(d.episodeIdentifier);
+    }
+    if (d.firstWriteAt != null || includeNulls) {
+      map['first_write_at'] = Variable<int, IntType>(d.firstWriteAt);
+    }
+    if (d.lastUpdateAt != null || includeNulls) {
+      map['last_update_at'] = Variable<int, IntType>(d.lastUpdateAt);
+    }
+    if (d.nullableChapterName != null || includeNulls) {
+      map['nullable_chapter_name'] =
+          Variable<String, StringType>(d.nullableChapterName);
+    }
+    if (d.episodeName != null || includeNulls) {
+      map['episode_name'] = Variable<String, StringType>(d.episodeName);
+    }
+    return map;
+  }
+}
+
 abstract class _$Database extends GeneratedDatabase {
   _$Database(QueryExecutor e) : super(const SqlTypeSystem.withDefaults(), e);
   $CachedNarouSubscribedNovelEntityTable get cachedNarouSubscribedNovelEntity =>
       $CachedNarouSubscribedNovelEntityTable(this);
+  $CachedNarouEpisodeEntityTable get cachedNarouEpisodeEntity =>
+      $CachedNarouEpisodeEntityTable(this);
   @override
-  List<TableInfo> get allTables => [cachedNarouSubscribedNovelEntity];
+  List<TableInfo> get allTables =>
+      [cachedNarouSubscribedNovelEntity, cachedNarouEpisodeEntity];
 }

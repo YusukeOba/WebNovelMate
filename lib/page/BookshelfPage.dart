@@ -71,10 +71,6 @@ class _BookshelfState extends State<BookshelfPage> {
     });
   }
 
-  testCode(NovelIdentifier identifier) async {
-    await RemoteNarouEpisodeDataStore().fetchEpisodeList(identifier);
-  }
-
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(

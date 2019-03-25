@@ -3,7 +3,6 @@ import 'package:NovelMate/common/datastore/CachedBookshelfDataStore.dart';
 import 'package:NovelMate/common/entities/DatabaseSchema.dart';
 import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
 import 'package:NovelMate/common/entities/domain/SubscribedNovelEntity.dart';
-import 'package:moor/moor.dart';
 
 class CachedNarouBookshelfDataStore extends CachedBookshelfDataStore {
   @override

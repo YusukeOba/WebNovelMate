@@ -1,4 +1,5 @@
 import 'package:NovelMate/common/HttpClient.dart';
+import 'package:NovelMate/common/datastore/RemoteEpisodeDataStore.dart';
 import 'package:NovelMate/common/entities/domain/EpisodeEntity.dart';
 import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
 import 'package:html/parser.dart' show parse;
@@ -6,18 +7,24 @@ import 'package:html/dom.dart';
 import 'package:intl/intl.dart';
 
 /// なろうの話一覧を取得する処理
-class RemoteNarouEpisodeDataStore {
-  Future<List<EpisodeEntity>> fetchEpisodeList(
-      NovelIdentifier identifier) async {
+class RemoteNarouEpisodeDataStore extends RemoteEpisodeDataStore {
+  Future<List<EpisodeEntity>> findAllByNovel(NovelIdentifier identifier) {
     final url =
         "https://ncode.syosetu.com/" + identifier.siteOfIdentifier + "/";
 
-    String resopnseText =
-        await CustomHttpClient.request(HttpMethod.get, url, (responseText) {
-      return responseText;
-    });
+    print("episode index url = " + url);
 
-    Document rootDom = parse(resopnseText);
+    return CustomHttpClient.request(HttpMethod.get, url, (responseText) {
+      return responseText;
+    }).then((responseText) {
+      return Future.value(_buildByRemoteResponse(identifier, responseText));
+    });
+  }
+
+  /// 生のHTTPレスポンスからドメインモデルを解析して生成する
+  List<EpisodeEntity> _buildByRemoteResponse(
+      NovelIdentifier identifier, String responseText) {
+    Document rootDom = parse(responseText);
 
     List<Element> novelIndexElement =
         rootDom.body.getElementsByClassName("index_box");
@@ -27,6 +34,9 @@ class RemoteNarouEpisodeDataStore {
       throw Exception(
           "[index_box] tag is undefined. Skip this novel parse. This novel is invalid format.");
     }
+    print("index_box_was found.");
+    print("length =" + novelIndexElement.first.children.length.toString());
+    print("val =" + novelIndexElement.first.children.toString());
 
     // 小説の解析処理
     var chapterTitle = "";
@@ -111,6 +121,6 @@ class RemoteNarouEpisodeDataStore {
 
     print("episodes = " + episodeEntities.toString());
 
-    return Future.value(episodeEntities);
+    return episodeEntities;
   }
 }

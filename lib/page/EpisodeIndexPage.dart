@@ -8,6 +8,7 @@ import 'package:NovelMate/common/entities/domain/EpisodeEntity.dart';
 import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
 import 'package:NovelMate/common/entities/domain/SubscribedNovelEntity.dart';
 import 'package:NovelMate/common/repository/BookshelfRepository.dart';
+import 'package:NovelMate/common/repository/EpisodeRepository.dart';
 import 'package:NovelMate/common/repository/RepositoryFactory.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +30,8 @@ class EpisodeIndexPage extends StatefulWidget {
 class _EpisodeIndexViewModel {
   NovelHeader _novelHeader;
 
+  final _repository = RepositoryFactory().getEpisodeRepository();
+
   _EpisodeIndexViewModel(this._novelHeader);
 
   /// タイトル
@@ -45,6 +48,16 @@ class _EpisodeIndexViewModel {
   String get story {
     return _novelHeader.novelStory;
   }
+
+  Future<List<EpisodeEntity>> _episodes;
+
+  Future<List<EpisodeEntity>> get episodes {
+    return _episodes;
+  }
+
+  void showEpisodes() {
+    _episodes = _repository.findEpisodesByNovel(this._novelHeader.identifier);
+  }
 }
 
 class _EpisodeIndexState extends State<EpisodeIndexPage> {
@@ -56,6 +69,10 @@ class _EpisodeIndexState extends State<EpisodeIndexPage> {
   void initState() {
     super.initState();
     _testRegist();
+
+    setState(() {
+      this._viewModel.showEpisodes();
+    });
   }
 
   /// TODO: 抹消
@@ -66,7 +83,7 @@ class _EpisodeIndexState extends State<EpisodeIndexPage> {
     await bkRepository.save([
       SubscribedNovelEntity(
           _viewModel._novelHeader,
-          DateTime.now().millisecondsSinceEpoch + Random().nextInt(99999999),
+          DateTime.now().millisecondsSinceEpoch,
           _viewModel._novelHeader.episodeCount,
           _viewModel._novelHeader.episodeCount)
     ]);
@@ -155,11 +172,8 @@ class _EpisodeIndexState extends State<EpisodeIndexPage> {
 
   /// 話一覧
   Widget _buildEpisodes() {
-    final lists = RemoteNarouEpisodeDataStore()
-        .fetchEpisodeList(_viewModel._novelHeader.identifier);
-
     return FutureBuilder<List<EpisodeEntity>>(
-        future: lists,
+        future: _viewModel._episodes,
         builder: (context, snapShot) {
           // 読み込み中
           if (!snapShot.hasData ||
