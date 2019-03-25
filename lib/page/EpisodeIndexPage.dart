@@ -10,6 +10,7 @@ import 'package:NovelMate/common/entities/domain/SubscribedNovelEntity.dart';
 import 'package:NovelMate/common/repository/BookshelfRepository.dart';
 import 'package:NovelMate/common/repository/EpisodeRepository.dart';
 import 'package:NovelMate/common/repository/RepositoryFactory.dart';
+import 'package:NovelMate/page/TextPage.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -221,7 +222,15 @@ class _EpisodeIndexState extends State<EpisodeIndexPage> {
                   DateTime.fromMillisecondsSinceEpoch(episode.lastUpdateAt);
 
               return InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) {
+                              return TextPage(episode);
+                            },
+                            fullscreenDialog: true));
+                  },
                   child: Container(
                       padding:
                           EdgeInsets.symmetric(vertical: 8, horizontal: 16.0),
