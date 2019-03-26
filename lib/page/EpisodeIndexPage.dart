@@ -13,6 +13,7 @@ import 'package:NovelMate/common/repository/RepositoryFactory.dart';
 import 'package:NovelMate/page/TextPage.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 /// 小説の話一覧ページ

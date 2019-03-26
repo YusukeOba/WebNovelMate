@@ -3,6 +3,7 @@ import 'package:NovelMate/common/datastore/narou/RemoteNarouTextDataStore.dart';
 import 'package:NovelMate/common/entities/domain/EpisodeEntity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 class TextPage extends StatefulWidget {
@@ -72,7 +73,7 @@ class _TextViewModel {
   }
 }
 
-class _TextState extends State<TextPage> with SingleTickerProviderStateMixin {
+class _TextState extends State<TextPage> with TickerProviderStateMixin {
   final _TextViewModel _viewModel;
 
   _TextState(this._viewModel);
@@ -82,9 +83,18 @@ class _TextState extends State<TextPage> with SingleTickerProviderStateMixin {
     setState(() {
       _viewModel.showTexts();
       _viewModel._scrollController.addListener(this._scrollListener);
+      // フルスクリーン
+      SystemChrome.setEnabledSystemUIOverlays([]);
     });
-
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    print("dispose");
+    _viewModel._scrollController.dispose();
+    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+    super.dispose();
   }
 
   _scrollListener() {
@@ -94,14 +104,8 @@ class _TextState extends State<TextPage> with SingleTickerProviderStateMixin {
       bool isScrollDown =
           _viewModel._scrollController.position.userScrollDirection ==
               ScrollDirection.reverse;
-      bool isScrollUp =
-          _viewModel._scrollController.position.userScrollDirection ==
-              ScrollDirection.forward;
       if (isScrollDown) {
         _viewModel.setOuterViewVisibility(false);
-      }
-      if (isScrollUp) {
-        _viewModel.setOuterViewVisibility(true);
       }
     });
   }
@@ -109,14 +113,29 @@ class _TextState extends State<TextPage> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: _buildAppBar(),
-        body: _buildTexts(),
+        body: Stack(
+          children: <Widget>[
+            Positioned.fill(
+                child: _buildTexts(),
+                top: _viewModel.shownOuterView ? kToolbarHeight : 0,
+                bottom: 0),
+            /*Below is the new AppBar code. Without Positioned widget AppBar will fill entire screen*/
+            Positioned(
+              top: 0.0,
+              left: 0.0,
+              right: 0.0,
+              child: _buildAppBar(),
+              /*You can't put null in the above line since Stack won't allow that*/
+            )
+          ],
+        ),
         bottomNavigationBar: _buildBottomBar());
   }
 
   Widget _buildAppBar() {
+    Widget appbar;
     if (_viewModel.shownOuterView) {
-      final appBar = AppBar(
+      appbar = AppBar(
         title: IconButton(
             icon: Image.asset("images/font_sizing.png",
                 width: 28, height: 28, color: Colors.white),
@@ -125,10 +144,16 @@ class _TextState extends State<TextPage> with SingleTickerProviderStateMixin {
             }),
         centerTitle: false,
       );
-      return appBar;
     } else {
-      return null;
+      appbar = SizedBox(height: 0);
     }
+
+    return AnimatedSize(
+      vsync: this,
+      duration: Duration(milliseconds: 200),
+      child: appbar,
+      curve: Curves.ease,
+    );
   }
 
   Widget _buildBottomBar() {
@@ -172,7 +197,7 @@ class _TextState extends State<TextPage> with SingleTickerProviderStateMixin {
       vsync: this,
       duration: Duration(milliseconds: 200),
       child: bottomBar,
-      curve: Curves.easeIn,
+      curve: Curves.ease,
     );
   }
 
@@ -194,18 +219,32 @@ class _TextState extends State<TextPage> with SingleTickerProviderStateMixin {
                 itemBuilder: (context, index) {
                   final text = snapShot.data[index];
 
-                  final itemWidget = GestureDetector(
+                  final textWidget = GestureDetector(
                     onTap: () {
                       setState(() {
                         _viewModel.toggleOuterView();
                       });
                     },
-                    child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text(text)),
+                    child: Container(
+                        child: Text(text),
+                        padding: EdgeInsets.fromLTRB(16, 0, 16, 0)),
                   );
 
-                  return itemWidget;
+                  bool isLastLength = index == snapShot.data.length - 1;
+                  if (isLastLength) {
+                    return Column(
+                      children: <Widget>[
+                        textWidget,
+                        Container(
+                            height: 150,
+                            child: Center(
+                                child: RaisedButton(
+                                    onPressed: () {}, child: Text("続きをみる"))))
+                      ],
+                    );
+                  } else {
+                    return textWidget;
+                  }
                 },
                 physics: BouncingScrollPhysics(),
                 itemCount: snapShot.data.length));
