@@ -1,13 +1,15 @@
 import 'package:NovelMate/common/HttpClient.dart';
+import 'package:NovelMate/common/datastore/RemoteTextDataStore.dart';
 import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
+import 'package:NovelMate/common/entities/domain/TextEntity.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart';
 
-class RemoteNarouTextDataStore {
+class RemoteNarouTextDataStore extends RemoteTextDataStore {
   /// リモートから小説データを取得する
   /// [identifier] 小説サイト、小説サイト中話の固有情報
   /// [episodeIdentifier] 話を特定する固有情報
-  Future<String> findByEpisodeId(
+  Future<TextEntity> findByEpisodeId(
       NovelIdentifier identifier, String episodeIdentifier) {
     final String requestUrl = "https://ncode.syosetu.com/" +
         identifier.siteOfIdentifier +
@@ -19,7 +21,8 @@ class RemoteNarouTextDataStore {
 
     return CustomHttpClient.request(HttpMethod.get, requestUrl, (text) => text)
         .then((responseText) {
-      return Future.value(_buildByResponseText(responseText));
+      return Future.value(TextEntity(identifier.siteOfIdentifier,
+          episodeIdentifier, _buildByResponseText(responseText)));
     });
   }
 

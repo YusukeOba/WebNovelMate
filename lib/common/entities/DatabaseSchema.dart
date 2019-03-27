@@ -69,7 +69,26 @@ class CachedNarouEpisodeEntity extends Table {
   Set<TextColumn> get primaryKey => {siteOfIdentifier, episodeIdentifier};
 }
 
-@UseMoor(tables: [CachedNarouSubscribedNovelEntity, CachedNarouEpisodeEntity])
+/// なろうの小説本文情報
+class CachedNarouTextEntity extends Table {
+  /// 対応サイトの中のID
+  TextColumn get siteOfIdentifier => text()();
+
+  /// 話へのリンク
+  TextColumn get episodeIdentifier => text()();
+
+  /// 本文
+  TextColumn get episodeText => text()();
+
+  @override
+  Set<TextColumn> get primaryKey => {siteOfIdentifier, episodeIdentifier};
+}
+
+@UseMoor(tables: [
+  CachedNarouSubscribedNovelEntity,
+  CachedNarouEpisodeEntity,
+  CachedNarouTextEntity
+])
 class Database extends _$Database {
   Database()
       : super(FlutterQueryExecutor.inDatabaseFolder(path: 'database.sqlite'));

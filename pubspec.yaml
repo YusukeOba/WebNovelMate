@@ -39,6 +39,12 @@ dependencies:
   # parsing html
   html: ^0.13.4+1
 
+  # ios style pull to refresh
+  pull_to_refresh:
+    git:
+      url: https://github.com/peng8350/flutter_pulltorefresh.git
+      ref: bfac5f8c59d3426497eafae4482bde3017a6be20
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

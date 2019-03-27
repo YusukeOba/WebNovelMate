@@ -35,7 +35,7 @@ packages:
       name: build
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.1"
+    version: "1.1.2"
   build_config:
     dependency: transitive
     description:
@@ -394,6 +394,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.4"
+  pull_to_refresh:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: bfac5f8c59d3426497eafae4482bde3017a6be20
+      resolved-ref: bfac5f8c59d3426497eafae4482bde3017a6be20
+      url: "https://github.com/peng8350/flutter_pulltorefresh.git"
+    source: git
+    version: "1.1.6"
   quiver:
     dependency: transitive
     description:
@@ -587,7 +596,7 @@ packages:
       name: web_socket_channel
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.9"
+    version: "1.0.11"
   yaml:
     dependency: transitive
     description:

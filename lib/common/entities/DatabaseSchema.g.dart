@@ -429,13 +429,127 @@ class $CachedNarouEpisodeEntityTable extends CachedNarouEpisodeEntity
   }
 }
 
+class CachedNarouTextEntityData {
+  final String siteOfIdentifier;
+  final String episodeIdentifier;
+  final String episodeText;
+  CachedNarouTextEntityData(
+      {this.siteOfIdentifier, this.episodeIdentifier, this.episodeText});
+  factory CachedNarouTextEntityData.fromData(
+      Map<String, dynamic> data, GeneratedDatabase db) {
+    final stringType = db.typeSystem.forDartType<String>();
+    return CachedNarouTextEntityData(
+      siteOfIdentifier:
+          stringType.mapFromDatabaseResponse(data['site_of_identifier']),
+      episodeIdentifier:
+          stringType.mapFromDatabaseResponse(data['episode_identifier']),
+      episodeText: stringType.mapFromDatabaseResponse(data['episode_text']),
+    );
+  }
+  CachedNarouTextEntityData copyWith(
+          {String siteOfIdentifier,
+          String episodeIdentifier,
+          String episodeText}) =>
+      CachedNarouTextEntityData(
+        siteOfIdentifier: siteOfIdentifier ?? this.siteOfIdentifier,
+        episodeIdentifier: episodeIdentifier ?? this.episodeIdentifier,
+        episodeText: episodeText ?? this.episodeText,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('CachedNarouTextEntityData(')
+          ..write('siteOfIdentifier: $siteOfIdentifier, ')
+          ..write('episodeIdentifier: $episodeIdentifier, ')
+          ..write('episodeText: $episodeText')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      ((siteOfIdentifier.hashCode) * 31 + episodeIdentifier.hashCode) * 31 +
+      episodeText.hashCode;
+  @override
+  bool operator ==(other) =>
+      identical(this, other) ||
+      (other is CachedNarouTextEntityData &&
+          other.siteOfIdentifier == siteOfIdentifier &&
+          other.episodeIdentifier == episodeIdentifier &&
+          other.episodeText == episodeText);
+}
+
+class $CachedNarouTextEntityTable extends CachedNarouTextEntity
+    implements TableInfo<CachedNarouTextEntity, CachedNarouTextEntityData> {
+  final GeneratedDatabase _db;
+  $CachedNarouTextEntityTable(this._db);
+  @override
+  GeneratedTextColumn get siteOfIdentifier => GeneratedTextColumn(
+        'site_of_identifier',
+        false,
+      );
+  @override
+  GeneratedTextColumn get episodeIdentifier => GeneratedTextColumn(
+        'episode_identifier',
+        false,
+      );
+  @override
+  GeneratedTextColumn get episodeText => GeneratedTextColumn(
+        'episode_text',
+        false,
+      );
+  @override
+  List<GeneratedColumn> get $columns =>
+      [siteOfIdentifier, episodeIdentifier, episodeText];
+  @override
+  CachedNarouTextEntity get asDslTable => this;
+  @override
+  String get $tableName => 'cached_narou_text_entity';
+  @override
+  bool validateIntegrity(
+          CachedNarouTextEntityData instance, bool isInserting) =>
+      siteOfIdentifier.isAcceptableValue(
+          instance.siteOfIdentifier, isInserting) &&
+      episodeIdentifier.isAcceptableValue(
+          instance.episodeIdentifier, isInserting) &&
+      episodeText.isAcceptableValue(instance.episodeText, isInserting);
+  @override
+  Set<GeneratedColumn> get $primaryKey => {siteOfIdentifier, episodeIdentifier};
+  @override
+  CachedNarouTextEntityData map(Map<String, dynamic> data) {
+    return CachedNarouTextEntityData.fromData(data, _db);
+  }
+
+  @override
+  Map<String, Variable> entityToSql(CachedNarouTextEntityData d,
+      {bool includeNulls = false}) {
+    final map = <String, Variable>{};
+    if (d.siteOfIdentifier != null || includeNulls) {
+      map['site_of_identifier'] =
+          Variable<String, StringType>(d.siteOfIdentifier);
+    }
+    if (d.episodeIdentifier != null || includeNulls) {
+      map['episode_identifier'] =
+          Variable<String, StringType>(d.episodeIdentifier);
+    }
+    if (d.episodeText != null || includeNulls) {
+      map['episode_text'] = Variable<String, StringType>(d.episodeText);
+    }
+    return map;
+  }
+}
+
 abstract class _$Database extends GeneratedDatabase {
   _$Database(QueryExecutor e) : super(const SqlTypeSystem.withDefaults(), e);
   $CachedNarouSubscribedNovelEntityTable get cachedNarouSubscribedNovelEntity =>
       $CachedNarouSubscribedNovelEntityTable(this);
   $CachedNarouEpisodeEntityTable get cachedNarouEpisodeEntity =>
       $CachedNarouEpisodeEntityTable(this);
+  $CachedNarouTextEntityTable get cachedNarouTextEntity =>
+      $CachedNarouTextEntityTable(this);
   @override
-  List<TableInfo> get allTables =>
-      [cachedNarouSubscribedNovelEntity, cachedNarouEpisodeEntity];
+  List<TableInfo> get allTables => [
+        cachedNarouSubscribedNovelEntity,
+        cachedNarouEpisodeEntity,
+        cachedNarouTextEntity
+      ];
 }

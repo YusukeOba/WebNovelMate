@@ -195,6 +195,7 @@ class _EpisodeIndexState extends State<EpisodeIndexPage> {
 
           listTargetWidgets.add(Divider());
 
+          episodes.sort((lhs, rhs) => lhs.firstWriteAt - rhs.firstWriteAt);
           Map<String, List<EpisodeEntity>> chapterEpisodeMaps = groupBy(
               episodes, (EpisodeEntity episode) => episode.nullableChapterName);
 
@@ -228,7 +229,7 @@ class _EpisodeIndexState extends State<EpisodeIndexPage> {
                         context,
                         MaterialPageRoute(
                             builder: (context) {
-                              return TextPage(episode);
+                              return TextPage(episodes, episode);
                             },
                             fullscreenDialog: true));
                   },

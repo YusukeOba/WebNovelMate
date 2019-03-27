@@ -1,14 +1,13 @@
 /// 本文のドメインモデル
 class TextEntity {
-  /// 小説のタイトル
-  final String title;
+  /// 小説固有のID
+  final String siteOfIdentifier;
 
-  /// 実際の文言
-  /// TODO: ルビ対応
-  final String text;
+  /// 話の固有のID
+  final String episodeOfIdentifier;
 
-  /// 読破率
-  final double readingAmount;
+  /// 本文
+  final String episodeText;
 
-  TextEntity(this.title, this.text, this.readingAmount);
+  TextEntity(this.siteOfIdentifier, this.episodeOfIdentifier, this.episodeText);
 }

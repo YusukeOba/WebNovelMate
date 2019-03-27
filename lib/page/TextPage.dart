@@ -1,35 +1,55 @@
 import 'package:NovelMate/common/colors.dart';
 import 'package:NovelMate/common/datastore/narou/RemoteNarouTextDataStore.dart';
 import 'package:NovelMate/common/entities/domain/EpisodeEntity.dart';
+import 'package:NovelMate/common/repository/RepositoryFactory.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import "package:pull_to_refresh/pull_to_refresh.dart";
+
+// 画面遷移時のスタイ
+enum TextPageTransitionType {
+  // 続きから読む
+  readContinue,
+  // 最初から読む
+  readTop,
+  // 最後から読む
+  readBottom
+}
 
 class TextPage extends StatefulWidget {
-  final EpisodeEntity _episode;
+  final List<EpisodeEntity> _episodes;
 
-  TextPage(this._episode);
+  final EpisodeEntity _currentEpisode;
+
+  TextPage(this._episodes, this._currentEpisode);
 
   @override
   _TextState createState() {
-    return _TextState(_TextViewModel(_episode));
+    return _TextState(_TextViewModel(_episodes, _currentEpisode));
   }
 }
 
 class _TextViewModel {
-  final EpisodeEntity _episode;
+  /// この小説の総エピソード
+  List<EpisodeEntity> _episodes;
 
-  /// 文言
+  /// 現在読んでいるエピソード
+  EpisodeEntity _currentEpisode;
+
+  /// エピソードの本文
   Future<List<String>> _texts;
 
   /// AppBar, BottomBarを出すかどうか
   bool shownOuterView = true;
 
-  final ScrollController _scrollController = ScrollController();
+  PageController _scrollController;
 
+  /// Sliderに表示するスクロール位置
   double get scrollOffset {
     if (!_scrollController.hasClients) {
+      print("hasClient");
       return 0;
     }
 
@@ -41,9 +61,11 @@ class _TextViewModel {
     bool overScrollUp = _scrollController.offset < 0;
 
     if (overScrollDown) {
+      print("over scroll down.");
       return _scrollController.position.maxScrollExtent;
     }
     if (overScrollUp) {
+      print("over scroll up.");
       return 0;
     }
 
@@ -51,15 +73,75 @@ class _TextViewModel {
     return _scrollController.offset;
   }
 
-  _TextViewModel(this._episode);
+  /// 現在の話のインデックス値
+  int get _index {
+    int currentIndex = _episodes.indexWhere((episode) =>
+        episode.episodeIdentifier == _currentEpisode.episodeIdentifier);
+
+    // 閲覧している話が話一覧に含まれていないのでエラーを返却する
+    if (currentIndex == -1) {
+      throw Exception("Error. This episode is not contained.");
+    }
+
+    return currentIndex;
+  }
+
+  /// 次のエピソード
+  /// 最後のエピソードの場合はnullを返却する
+  EpisodeEntity get _nextEpisode {
+    int currentIndex = _index;
+
+    //　最後のエピソード
+    if (currentIndex + 1 >= _episodes.length) {
+      return null;
+    } else {
+      return _episodes[currentIndex + 1];
+    }
+  }
+
+  /// 前のエピソード
+  /// 最初のエピソードの場合はnullを返却する
+  EpisodeEntity get _prevEpisode {
+    int currentIndex = _index;
+
+    //　最初のエピソード
+    if (currentIndex == 0) {
+      return null;
+    } else {
+      return _episodes[currentIndex - 1];
+    }
+  }
+
+  /// タイトルを表示するかどうか
+  bool get _isShownTitle {
+    int currentIndex = _episodes.indexWhere((episode) =>
+        episode.episodeIdentifier == _currentEpisode.episodeIdentifier);
+
+    // 閲覧している話が話一覧に含まれていないのでエラーを返却する
+    if (currentIndex == -1) {
+      throw Exception("Error. This episode is not contained.");
+    }
+
+    if (currentIndex == 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  _TextViewModel(this._episodes, this._currentEpisode) {
+    this._scrollController = PageController(initialPage: _index);
+  }
 
   void showTexts() {
-    _texts = RemoteNarouTextDataStore()
-        .findByEpisodeId(_episode.novelIdentifier, _episode.episodeIdentifier)
+    _texts = RepositoryFactory.shared
+        .getTextRepository()
+        .findByIdentifier(
+            _currentEpisode.novelIdentifier, _currentEpisode.episodeIdentifier)
         .then((text) {
       // 大量の文字列を一気に表示するとViewのサイズが大きすぎるためListViewで表示したい
       // そのため改行コードで分割する
-      List<String> texts = text.split("\n");
+      List<String> texts = text.episodeText.split("\n");
       return Future.value(texts);
     });
   }
@@ -74,33 +156,40 @@ class _TextViewModel {
 }
 
 class _TextState extends State<TextPage> with TickerProviderStateMixin {
-  final _TextViewModel _viewModel;
+  _TextViewModel _viewModel;
 
   _TextState(this._viewModel);
 
   @override
   void initState() {
+    super.initState();
+    print("initState");
     setState(() {
       _viewModel.showTexts();
       _viewModel._scrollController.addListener(this._scrollListener);
       // フルスクリーン
       SystemChrome.setEnabledSystemUIOverlays([]);
     });
-    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
   }
 
   @override
   void dispose() {
-    print("dispose");
-    _viewModel._scrollController.dispose();
-    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     super.dispose();
+    print("dispose");
   }
 
   _scrollListener() {
     setState(() {
       // スクロール検知時、SliderのUIを更新する
       // また、スクロールダウンした時はAppBarとSliderは非表示にする
+      if (!this.mounted) {
+        return;
+      }
       bool isScrollDown =
           _viewModel._scrollController.position.userScrollDirection ==
               ScrollDirection.reverse;
@@ -112,24 +201,54 @@ class _TextState extends State<TextPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Stack(
-          children: <Widget>[
-            Positioned.fill(
-                child: _buildTexts(),
-                top: _viewModel.shownOuterView ? kToolbarHeight : 0,
-                bottom: 0),
-            /*Below is the new AppBar code. Without Positioned widget AppBar will fill entire screen*/
-            Positioned(
-              top: 0.0,
-              left: 0.0,
-              right: 0.0,
-              child: _buildAppBar(),
-              /*You can't put null in the above line since Stack won't allow that*/
-            )
-          ],
-        ),
-        bottomNavigationBar: _buildBottomBar());
+    return WillPopScope(
+        child: Scaffold(
+//            body: PageView.builder(
+//                scrollDirection: Axis.vertical,
+//                controller: _viewModel._scrollController,
+//                itemCount: _viewModel._episodes.length,
+//                itemBuilder: (context, position) {
+//                  return Stack(
+//                    children: <Widget>[
+//                      Positioned.fill(
+//                          child: _buildTexts(),
+//                          top: _viewModel.shownOuterView ? kToolbarHeight : 0,
+//                          bottom: 0),
+//                      /*Below is the new AppBar code. Without Positioned widget AppBar will fill entire screen*/
+//                      Positioned(
+//                        top: 0.0,
+//                        left: 0.0,
+//                        right: 0.0,
+//                        child: _buildAppBar(),
+//                        /*You can't put null in the above line since Stack won't allow that*/
+//                      )
+//                    ],
+//                  );
+//                }),
+            body: Stack(children: <Widget>[
+              Positioned.fill(
+                  top: _viewModel.shownOuterView ? kToolbarHeight : 0,
+                  bottom: 0,
+                  child: PageView.builder(
+                      scrollDirection: Axis.vertical,
+                      controller: _viewModel._scrollController,
+                      itemCount: _viewModel._episodes.length,
+                      itemBuilder: (context, position) {
+                        return _buildTexts();
+                      })),
+              Positioned(
+                top: 0.0,
+                left: 0.0,
+                right: 0.0,
+                child: _buildAppBar(),
+                /*You can't put null in the above line since Stack won't allow that*/
+              )
+            ]),
+            bottomNavigationBar: _buildBottomBar()),
+        onWillPop: () {
+          SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+          Navigator.of(context).pop();
+        });
   }
 
   Widget _buildAppBar() {
@@ -170,7 +289,7 @@ class _TextState extends State<TextPage> with TickerProviderStateMixin {
                 children: <Widget>[
                   Column(
                     children: <Widget>[
-                      Text(_viewModel._episode.episodeName,
+                      Text(_viewModel._currentEpisode.episodeName,
                           style: TextStyle(fontSize: 11.0)),
                       Slider(
                           inactiveColor: sNMAccentColor,
@@ -213,38 +332,148 @@ class _TextState extends State<TextPage> with TickerProviderStateMixin {
           return Center(child: CircularProgressIndicator());
         }
 
+        if (snapShot.hasError) {
+          return Text("エラーが発生しました");
+        }
+
         return Scrollbar(
+//            child: SmartRefresher(
+//                enablePullDown: _viewModel._prevEpisode != null,
+//                enablePullUp: _viewModel._nextEpisode != null,
+//                headerBuilder: (context, index) {
+//                  if (_viewModel._prevEpisode != null) {
+//                    return SafeArea(
+//                        child: Container(
+//                            color: sNMAccentColor,
+//                            padding: EdgeInsets.fromLTRB(
+//                                16, kToolbarHeight + 32, 16, 16),
+//                            child: Column(
+//                              crossAxisAlignment: CrossAxisAlignment.stretch,
+//                              children: <Widget>[
+//                                Text("前のエピソードへ",
+//                                    style: TextStyle(
+//                                        color: Colors.black, fontSize: 12.0)),
+//                                Text(_viewModel._prevEpisode.episodeName,
+//                                    style: TextStyle(
+//                                        color: Colors.black,
+//                                        fontSize: 14.0,
+//                                        fontWeight: FontWeight.bold)),
+//                                IconButton(
+//                                    onPressed: () {},
+//                                    icon: Icon(Icons.arrow_upward)),
+//                              ],
+//                            )));
+//                  } else {
+//                    return Container(height: 0);
+//                  }
+//                },
+//                footerConfig: RefreshConfig(triggerDistance: 50.0),
+//                headerConfig: RefreshConfig(triggerDistance: 50.0),
+//                // 更新時の処理
+//                onRefresh: (isUp) {
+//                  if (isUp) {
+//                    setState(() {
+////                      _viewModel = _TextViewModel(
+////                          _viewModel._episodes, _viewModel._prevEpisode);
+//                    });
+//                    print("show previous episode!!");
+//                  } else {
+//                    setState(() {
+////                      _viewModel = _TextViewModel(
+////                          _viewModel._episodes, _viewModel._nextEpisode);
+//                    });
+//                    print("show next episode!!");
+//                  }
+//
+////                  _viewModel._scrollController = ScrollController();
+////                  _viewModel.showTexts();
+//                },
+//                footerBuilder: (context, index) {
+//                  if (_viewModel._nextEpisode != null) {
+//                    return Container(
+//                        color: sNMAccentColor,
+//                        padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+//                        child: Column(
+//                          crossAxisAlignment: CrossAxisAlignment.stretch,
+//                          children: <Widget>[
+//                            Text("前のエピソードへ",
+//                                style: TextStyle(
+//                                    color: Colors.black, fontSize: 12.0)),
+//                            Text(_viewModel._nextEpisode.episodeName,
+//                                style: TextStyle(
+//                                    color: Colors.black,
+//                                    fontSize: 14.0,
+//                                    fontWeight: FontWeight.bold)),
+//                            IconButton(
+//                                onPressed: () {},
+//                                icon: Icon(Icons.arrow_downward)),
+//                          ],
+//                        ));
+//                  } else {
+//                    return Container(height: 0);
+//                  }
+//                },
             child: ListView.builder(
-                controller: _viewModel._scrollController,
+                controller: ScrollController(),
+                shrinkWrap: true,
                 itemBuilder: (context, index) {
                   final text = snapShot.data[index];
 
-                  final textWidget = GestureDetector(
+                  Widget textWidget;
+                  bool isLastLength = index == snapShot.data.length - 1;
+                  bool isFirstLength = index == 0;
+                  if (isLastLength) {
+                    textWidget = Container(
+                        child: Column(
+                          children: <Widget>[
+                            Text(text),
+                            // 最後は余白を付ける
+                            Container(height: 64),
+                            RaisedButton(
+                              onPressed: () {
+                                setState(() {
+                                  this
+                                      ._viewModel
+                                      ._scrollController
+                                      .animateToPage(1,
+                                          duration: Duration(milliseconds: 500),
+                                          curve: Curves.easeInBack);
+                                });
+                              },
+                              child: Text("hoge"),
+                            )
+                          ],
+                        ),
+                        padding: EdgeInsets.fromLTRB(16, 0, 16, 0));
+                  } else if (isFirstLength) {
+                    textWidget = Container(
+                        child: Column(
+                          children: <Widget>[
+                            // 最初は余白を付ける
+                            Container(height: 32),
+                            Text(_viewModel._currentEpisode.episodeName,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20.0)),
+                            Container(height: 32),
+                            Text(text),
+                          ],
+                        ),
+                        padding: EdgeInsets.fromLTRB(16, 0, 16, 0));
+                  } else {
+                    textWidget = Container(
+                      child: Text(text),
+                      padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+                    );
+                  }
+                  return GestureDetector(
                     onTap: () {
                       setState(() {
-                        _viewModel.toggleOuterView();
+//                            _viewModel.toggleOuterView();
                       });
                     },
-                    child: Container(
-                        child: Text(text),
-                        padding: EdgeInsets.fromLTRB(16, 0, 16, 0)),
+                    child: textWidget,
                   );
-
-                  bool isLastLength = index == snapShot.data.length - 1;
-                  if (isLastLength) {
-                    return Column(
-                      children: <Widget>[
-                        textWidget,
-                        Container(
-                            height: 150,
-                            child: Center(
-                                child: RaisedButton(
-                                    onPressed: () {}, child: Text("続きをみる"))))
-                      ],
-                    );
-                  } else {
-                    return textWidget;
-                  }
                 },
                 physics: BouncingScrollPhysics(),
                 itemCount: snapShot.data.length));
