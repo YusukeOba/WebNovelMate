@@ -123,9 +123,10 @@ class _TextPageViewModel {
 
     double firstScrollPos = 0;
     if (_firstScrollPosition == FirstScrollPosition.bottom) {
-      firstScrollPos = 30000; // TODO: 初期表示位置が最後の場合は、明らかに大きすぎる位置としておく
+//      firstScrollPos = 999999; // TODO: 初期表示位置が最後の場合は、明らかに大きすぎる位置としておく
     }
-    _scrollController = ScrollController(initialScrollOffset: firstScrollPos);
+    _scrollController = ScrollController(
+        initialScrollOffset: firstScrollPos, keepScrollOffset: false);
   }
 }
 
@@ -138,15 +139,26 @@ class _TextPageState extends State<TextPage> {
     bool isScrollDown =
         _viewModel._scrollController.position.userScrollDirection ==
             ScrollDirection.reverse;
-    if (isScrollDown) {
-      // FIXME: ひとまずタップイベントを発火しておくが、本来はScrollDownCallback等を実装するべき
-//      _viewModel._onTapCallback();
+
+    /// FIXME: 上からスクロールしたとき、Sliderの値をMAXまで持っていった状態にしたい
+    /// そのため、max, offsetをマイナス変換した上でSliderに伝達する
+    if (_viewModel._firstScrollPosition == FirstScrollPosition.bottom) {
+      _viewModel._sliderConfigCallback(
+          -_viewModel._scrollController.position.maxScrollExtent,
+          -_viewModel._scrollController.offset,
+          _viewModel._scrollController.position.minScrollExtent);
+    } else {
+      _viewModel._sliderConfigCallback(
+          _viewModel._scrollController.position.minScrollExtent,
+          _viewModel._scrollController.offset,
+          _viewModel._scrollController.position.maxScrollExtent);
     }
 
-    _viewModel._sliderConfigCallback(
-        _viewModel._scrollController.position.minScrollExtent,
-        _viewModel._scrollController.offset,
-        _viewModel._scrollController.position.maxScrollExtent);
+    print("min = " +
+        _viewModel._scrollController.position.minScrollExtent.toString());
+    print("max = " +
+        _viewModel._scrollController.position.maxScrollExtent.toString());
+    print("current = " + _viewModel._scrollController.offset.toString());
   }
 
   _manualScrollValueListener() {
@@ -154,7 +166,13 @@ class _TextPageState extends State<TextPage> {
       print("Client not found.");
       return;
     }
-    _viewModel._scrollController.jumpTo(_viewModel.manualScrollOffset.value);
+
+    if (_viewModel._firstScrollPosition == FirstScrollPosition.bottom) {
+      // 逆順の場合
+      _viewModel._scrollController.jumpTo(-_viewModel.manualScrollOffset.value);
+    } else {
+      _viewModel._scrollController.jumpTo(_viewModel.manualScrollOffset.value);
+    }
   }
 
   @override
@@ -175,9 +193,15 @@ class _TextPageState extends State<TextPage> {
     return Scrollbar(
         child: ListView.builder(
             controller: _viewModel._scrollController,
+            reverse:
+                _viewModel._firstScrollPosition == FirstScrollPosition.bottom,
             itemBuilder: (context, index) {
+              if (_viewModel._firstScrollPosition ==
+                  FirstScrollPosition.bottom) {
+                return _buildByBottom(
+                    _viewModel.texts.reversed.toList(), index);
+              }
               final text = _viewModel.texts[index];
-
               Widget textWidget;
               bool isLastLength = index == _viewModel.texts.length - 1;
               bool isFirstLength = index == 0;
@@ -239,6 +263,66 @@ class _TextPageState extends State<TextPage> {
             itemCount: _viewModel.texts.length));
   }
 
+  /// 上から下にスワイプした場合は逆順になる
+  Widget _buildByBottom(List<String> texts, int index) {
+    final text = texts[index];
+    Widget textWidget;
+    bool isLastLength = index == _viewModel.texts.length - 1;
+    bool isFirstLength = index == 0;
+    if (isLastLength) {
+      textWidget = Container(
+        child: Column(
+          children: <Widget>[
+            _buildPreviousEpisode(),
+            Container(
+                color: sNMBackgroundColor,
+                padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+                child: Column(
+                  children: <Widget>[
+                    Container(height: 32),
+                    Text(_viewModel.episodeName,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 20.0)),
+                    Container(height: 32),
+                  ],
+                )),
+          ],
+        ),
+      );
+    } else if (isFirstLength) {
+      textWidget = Container(
+        color: sNMBackgroundColor,
+        child: Column(
+          children: <Widget>[
+            Container(
+                padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+                child: Column(
+                  children: <Widget>[
+                    Text(text),
+                    Container(height: 64),
+                  ],
+                )),
+            _buildNextEpisode()
+          ],
+        ),
+      );
+    } else {
+      textWidget = Container(
+        color: sNMBackgroundColor,
+        child: Text(text),
+        padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+      );
+    }
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _viewModel._onTapCallback();
+        });
+      },
+      child: textWidget,
+    );
+  }
+
   Widget _buildNextEpisode() {
     if (_viewModel._nextEpisodeName != null) {
       return Container(
@@ -279,7 +363,7 @@ class _TextPageState extends State<TextPage> {
               child: Column(
                 children: <Widget>[
                   Container(height: 16.0),
-                  Text("次の話: " + _viewModel._prevEpisodeName),
+                  Text("前の話: " + _viewModel._prevEpisodeName),
                   Container(height: 16.0),
                   IconButton(
                       color: sNMPrimaryColor,

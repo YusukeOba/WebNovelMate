@@ -55,11 +55,14 @@ class _TextPagerViewModel {
 
   /// Sliderに表示するスクロール位置
   double get sliderOffset {
+    print("sliderMax = " + _sliderMax.toString());
+    print("sliderMin = " + _sliderMin.toString());
+    print("sliderOffset = " + _rawSliderOffset.toString());
     // 下にオーバースクロールしている
     bool overScrollDown = _rawSliderOffset > _sliderMax;
 
     // 上にオーバースクロールしている
-    bool overScrollUp = _rawSliderOffset < 0;
+    bool overScrollUp = _rawSliderOffset < _sliderMin;
 
     if (overScrollDown) {
       print("over scroll down.");
@@ -67,7 +70,7 @@ class _TextPagerViewModel {
     }
     if (overScrollUp) {
       print("over scroll up.");
-      return 0;
+      return _sliderMin;
     }
 
     // 通常スクロール中
@@ -112,7 +115,7 @@ class _TextPagerViewModel {
     return _episodes[_nextEpisodeIndex].episodeName;
   }
 
-   String get _prevEpisodeName {
+  String get _prevEpisodeName {
     if (_prevEpisodeIndex == null) {
       return null;
     }
@@ -187,7 +190,8 @@ class _TextPagerState extends State<TextPagerPage>
                       controller: _viewModel._pageController,
                       itemCount: _viewModel._episodes.length,
                       itemBuilder: (context, position) {
-                        return Container(color: sNMAccentColor, child: _buildTexts());
+                        return Container(
+                            color: sNMAccentColor, child: _buildTexts());
                       })),
               Positioned(
                 top: 0.0,
@@ -346,8 +350,7 @@ class _TextPagerState extends State<TextPagerPage>
           .animateToPage(_viewModel._index,
               duration: Duration(milliseconds: 500), curve: Curves.easeInSine)
           .then((_) {
-        setState(() {
-        });
+        setState(() {});
       });
     }
   }
