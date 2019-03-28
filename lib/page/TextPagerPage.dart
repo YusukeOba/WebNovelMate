@@ -53,6 +53,8 @@ class _TextPagerViewModel {
 
   ValueNotifier<double> _sliderValueNotifier = ValueNotifier(0);
 
+  bool _pageAnimating = false;
+
   /// Sliderに表示するスクロール位置
   double get sliderOffset {
     print("sliderMax = " + _sliderMax.toString());
@@ -185,14 +187,16 @@ class _TextPagerState extends State<TextPagerPage>
               Positioned.fill(
                   top: _viewModel._shownOuterView ? kToolbarHeight : 0,
                   bottom: 0,
-                  child: PageView.builder(
-                      scrollDirection: Axis.vertical,
-                      controller: _viewModel._pageController,
-                      itemCount: _viewModel._episodes.length,
-                      itemBuilder: (context, position) {
-                        return Container(
-                            color: sNMAccentColor, child: _buildTexts());
-                      })),
+                  child: IgnorePointer(
+                      ignoring: _viewModel._pageAnimating,
+                      child: PageView.builder(
+                          scrollDirection: Axis.vertical,
+                          controller: _viewModel._pageController,
+                          itemCount: _viewModel._episodes.length,
+                          itemBuilder: (context, position) {
+                            return Container(
+                                color: sNMAccentColor, child: _buildTexts());
+                          }))),
               Positioned(
                 top: 0.0,
                 left: 0.0,
@@ -326,6 +330,9 @@ class _TextPagerState extends State<TextPagerPage>
 
   void showNextPage() async {
     if (_viewModel._nextEpisodeIndex != null) {
+      setState(() {
+        _viewModel._pageAnimating = true;
+      });
       _viewModel._index = _viewModel._nextEpisodeIndex;
       _viewModel._firstScrollPosition = FirstScrollPosition.first;
       print((_viewModel._index).toString());
@@ -334,8 +341,7 @@ class _TextPagerState extends State<TextPagerPage>
               duration: Duration(milliseconds: 500), curve: Curves.easeInSine)
           .then((_) {
         setState(() {
-          // 下から上にいくのでスライダー位置を最初に戻す
-          _viewModel._rawSliderOffset = 0;
+          _viewModel._pageAnimating = false;
         });
       });
     }
@@ -343,6 +349,9 @@ class _TextPagerState extends State<TextPagerPage>
 
   void showPrevPage() async {
     if (_viewModel._prevEpisodeIndex != null) {
+      setState(() {
+        _viewModel._pageAnimating = true;
+      });
       _viewModel._index = _viewModel._prevEpisodeIndex;
       _viewModel._firstScrollPosition = FirstScrollPosition.bottom;
       print((_viewModel._index).toString());
@@ -350,7 +359,9 @@ class _TextPagerState extends State<TextPagerPage>
           .animateToPage(_viewModel._index,
               duration: Duration(milliseconds: 500), curve: Curves.easeInSine)
           .then((_) {
-        setState(() {});
+        setState(() {
+          _viewModel._pageAnimating = false;
+        });
       });
     }
   }
