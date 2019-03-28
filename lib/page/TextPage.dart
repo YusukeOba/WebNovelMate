@@ -2,6 +2,7 @@ import 'package:NovelMate/common/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter/scheduler.dart';
 
 /// 初期スクロール位置
 enum FirstScrollPosition { first, bottom }
@@ -120,13 +121,21 @@ class _TextPageViewModel {
     _prevEpisodeName = prevEpisodeName;
     _nextActionCallback = nextActionCallback;
     _prevActionCallback = prevActionCallback;
+    _scrollController = ScrollController();
+  }
 
-    double firstScrollPos = 0;
+  void notifySliderConfig() {
+    /// FIXME: 上からスクロールしたとき、Sliderの値をMAXまで持っていった状態にしたい
+    /// そのため、max, offsetをマイナス変換した上でSliderに伝達する
     if (_firstScrollPosition == FirstScrollPosition.bottom) {
-//      firstScrollPos = 999999; // TODO: 初期表示位置が最後の場合は、明らかに大きすぎる位置としておく
+      _sliderConfigCallback(
+          -_scrollController.position.maxScrollExtent,
+          -_scrollController.offset,
+          _scrollController.position.minScrollExtent);
+    } else {
+      _sliderConfigCallback(_scrollController.position.minScrollExtent,
+          _scrollController.offset, _scrollController.position.maxScrollExtent);
     }
-    _scrollController = ScrollController(
-        initialScrollOffset: firstScrollPos, keepScrollOffset: false);
   }
 }
 
@@ -136,24 +145,7 @@ class _TextPageState extends State<TextPage> {
   _TextPageState(this._viewModel);
 
   _scrollListener() {
-    bool isScrollDown =
-        _viewModel._scrollController.position.userScrollDirection ==
-            ScrollDirection.reverse;
-
-    /// FIXME: 上からスクロールしたとき、Sliderの値をMAXまで持っていった状態にしたい
-    /// そのため、max, offsetをマイナス変換した上でSliderに伝達する
-    if (_viewModel._firstScrollPosition == FirstScrollPosition.bottom) {
-      _viewModel._sliderConfigCallback(
-          -_viewModel._scrollController.position.maxScrollExtent,
-          -_viewModel._scrollController.offset,
-          _viewModel._scrollController.position.minScrollExtent);
-    } else {
-      _viewModel._sliderConfigCallback(
-          _viewModel._scrollController.position.minScrollExtent,
-          _viewModel._scrollController.offset,
-          _viewModel._scrollController.position.maxScrollExtent);
-    }
-
+    _viewModel.notifySliderConfig();
     print("min = " +
         _viewModel._scrollController.position.minScrollExtent.toString());
     print("max = " +
@@ -180,6 +172,17 @@ class _TextPageState extends State<TextPage> {
     super.initState();
     _viewModel._scrollController.addListener(this._scrollListener);
     _viewModel.manualScrollOffset.addListener(_manualScrollValueListener);
+
+    // viewのbuild完了時に一度だけ呼ばれる.
+    // ScrollViewの準備完了時、Sliderのmin,maxを伝えるため。
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      print("now mounted.");
+      if (_viewModel._scrollController.hasClients) {
+        _viewModel.notifySliderConfig();
+      } else {
+        print("scrollview is not mounted...");
+      }
+    });
   }
 
   @override

@@ -66,7 +66,7 @@ class _TextPagerViewModel {
 
     if (overScrollDown) {
       print("over scroll down.");
-      return _sliderMax;
+      return _sliderMax - 1;
     }
     if (overScrollUp) {
       print("over scroll up.");
