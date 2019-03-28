@@ -1,6 +1,10 @@
+import 'package:NovelMate/common/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+
+/// 初期スクロール位置
+enum FirstScrollPosition { first, bottom }
 
 class TextPage extends StatefulWidget {
   /// 話の名前
@@ -15,7 +19,10 @@ class TextPage extends StatefulWidget {
   /// ページがタップされた
   final OnTapCallback _onTapCallback;
 
-  /// スクロール位置
+  /// 初期スクロール位置
+  FirstScrollPosition _firstScrollPosition;
+
+  /// 現在のスクロール位置
   ValueNotifier<double> manualScrollOffset;
 
   /// 次の話の名前
@@ -30,8 +37,13 @@ class TextPage extends StatefulWidget {
   /// 前の話を表示する
   PrevActionCallback _prevActionCallback;
 
-  TextPage(this.episodeName, this.texts, this._onTapCallback,
-      this._sliderConfigCallback, this.manualScrollOffset,
+  TextPage(
+      this.episodeName,
+      this.texts,
+      this._onTapCallback,
+      this._sliderConfigCallback,
+      this.manualScrollOffset,
+      this._firstScrollPosition,
       {String nextEpisodeName,
       String prevEpisodeName,
       NextActionCallback nextActionCallback,
@@ -45,7 +57,7 @@ class TextPage extends StatefulWidget {
   @override
   _TextPageState createState() {
     return _TextPageState(_TextPageViewModel(episodeName, texts, _onTapCallback,
-        _sliderConfigCallback, manualScrollOffset,
+        _sliderConfigCallback, manualScrollOffset, _firstScrollPosition,
         nextEpisodeName: _nextEpisodeName,
         prevEpisodeName: _prevEpisodeName,
         nextActionCallback: _nextActionCallback,
@@ -72,7 +84,10 @@ class _TextPageViewModel {
   /// ページがタップされた
   final OnTapCallback _onTapCallback;
 
-  /// スクロール位置
+  /// 初期スクロール位置
+  FirstScrollPosition _firstScrollPosition;
+
+  /// 現在のスクロール位置
   ValueNotifier<double> manualScrollOffset;
 
   /// 次の話の名前
@@ -87,10 +102,15 @@ class _TextPageViewModel {
   /// 前の話を表示する
   PrevActionCallback _prevActionCallback;
 
-  ScrollController _scrollController = ScrollController();
+  ScrollController _scrollController;
 
-  _TextPageViewModel(this.episodeName, this.texts, this._onTapCallback,
-      this._sliderConfigCallback, this.manualScrollOffset,
+  _TextPageViewModel(
+      this.episodeName,
+      this.texts,
+      this._onTapCallback,
+      this._sliderConfigCallback,
+      this.manualScrollOffset,
+      this._firstScrollPosition,
       {String nextEpisodeName,
       String prevEpisodeName,
       NextActionCallback nextActionCallback,
@@ -100,6 +120,12 @@ class _TextPageViewModel {
     _prevEpisodeName = prevEpisodeName;
     _nextActionCallback = nextActionCallback;
     _prevActionCallback = prevActionCallback;
+
+    double firstScrollPos = 0;
+    if (_firstScrollPosition == FirstScrollPosition.bottom) {
+      firstScrollPos = 30000; // TODO: 初期表示位置が最後の場合は、明らかに大きすぎる位置としておく
+    }
+    _scrollController = ScrollController(initialScrollOffset: firstScrollPos);
   }
 }
 
@@ -121,10 +147,6 @@ class _TextPageState extends State<TextPage> {
         _viewModel._scrollController.position.minScrollExtent,
         _viewModel._scrollController.offset,
         _viewModel._scrollController.position.maxScrollExtent);
-    print("min = " +
-        _viewModel._scrollController.position.minScrollExtent.toString());
-    print("max = " +
-        _viewModel._scrollController.position.maxScrollExtent.toString());
   }
 
   _manualScrollValueListener() {
@@ -161,51 +183,45 @@ class _TextPageState extends State<TextPage> {
               bool isFirstLength = index == 0;
               if (isLastLength) {
                 textWidget = Container(
-                    child: Column(
-                      children: <Widget>[
-                        Text(text),
-                        // 最後は余白を付ける
-                        Container(height: 64),
-                        RaisedButton(
-                          onPressed: () {
-//                              this._viewModel.showByDown();
-//                              this._viewModel._pageController.animateToPage(
-//                                  this._viewModel._index,
-//                                  duration: Duration(milliseconds: 500),
-//                                  curve: Curves.easeInSine);
-                            _viewModel._nextActionCallback();
-                          },
-                          child: Text("hoge"),
-                        )
-                      ],
-                    ),
-                    padding: EdgeInsets.fromLTRB(16, 0, 16, 0));
+                  color: sNMBackgroundColor,
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                          padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+                          child: Column(
+                            children: <Widget>[
+                              Text(text),
+                              Container(height: 64),
+                            ],
+                          )),
+                      _buildNextEpisode()
+                    ],
+                  ),
+                );
               } else if (isFirstLength) {
                 textWidget = Container(
-                    child: Column(
-                      children: <Widget>[
-                        // 最初は余白を付ける
-                        Container(height: 32),
-                        Text(_viewModel.episodeName,
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 20.0)),
-                        Container(height: 32),
-                        RaisedButton(
-                            onPressed: () {
-                              _viewModel._prevActionCallback();
-//                                this._viewModel.showByUp();
-//                                this._viewModel._pageController.animateToPage(
-//                                    this._viewModel._index,
-//                                    duration: Duration(milliseconds: 500),
-//                                    curve: Curves.easeInSine);
-                            },
-                            child: Text("hoge")),
-                        Text(text),
-                      ],
-                    ),
-                    padding: EdgeInsets.fromLTRB(16, 0, 16, 0));
+                  child: Column(
+                    children: <Widget>[
+                      _buildPreviousEpisode(),
+                      Container(
+                          color: sNMBackgroundColor,
+                          padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+                          child: Column(
+                            children: <Widget>[
+                              Container(height: 32),
+                              Text(_viewModel.episodeName,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20.0)),
+                              Container(height: 32),
+                            ],
+                          )),
+                    ],
+                  ),
+                );
               } else {
                 textWidget = Container(
+                  color: sNMBackgroundColor,
                   child: Text(text),
                   padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
                 );
@@ -221,5 +237,63 @@ class _TextPageState extends State<TextPage> {
             },
             physics: BouncingScrollPhysics(),
             itemCount: _viewModel.texts.length));
+  }
+
+  Widget _buildNextEpisode() {
+    if (_viewModel._nextEpisodeName != null) {
+      return Container(
+          child: Column(
+        children: <Widget>[
+          Container(height: 32),
+          Container(
+              color: sNMAccentColor,
+              child: Column(
+                children: <Widget>[
+                  Container(height: 16.0),
+                  Text("次の話: " + _viewModel._nextEpisodeName),
+                  Container(height: 16.0),
+                  IconButton(
+                      color: sNMPrimaryColor,
+                      icon: Icon(Icons.arrow_downward),
+                      onPressed: () {
+                        _viewModel._nextActionCallback();
+                      }),
+                  Container(height: 16),
+                ],
+              ))
+        ],
+      ));
+    } else {
+      return Container();
+    }
+  }
+
+  Widget _buildPreviousEpisode() {
+    if (_viewModel._prevEpisodeName != null) {
+      return Container(
+          child: Column(
+        children: <Widget>[
+          Container(height: 32),
+          Container(
+              color: sNMAccentColor,
+              child: Column(
+                children: <Widget>[
+                  Container(height: 16.0),
+                  Text("次の話: " + _viewModel._prevEpisodeName),
+                  Container(height: 16.0),
+                  IconButton(
+                      color: sNMPrimaryColor,
+                      icon: Icon(Icons.arrow_upward),
+                      onPressed: () {
+                        _viewModel._prevActionCallback();
+                      }),
+                  Container(height: 16),
+                ],
+              ))
+        ],
+      ));
+    } else {
+      return Container();
+    }
   }
 }

@@ -49,6 +49,8 @@ class _TextPagerViewModel {
   double _sliderMin = 0;
   double _sliderMax = 0;
 
+  FirstScrollPosition _firstScrollPosition = FirstScrollPosition.first;
+
   ValueNotifier<double> _sliderValueNotifier = ValueNotifier(0);
 
   /// Sliderに表示するスクロール位置
@@ -103,6 +105,20 @@ class _TextPagerViewModel {
     }
   }
 
+  String get _nextEpisodeName {
+    if (_nextEpisodeIndex == null) {
+      return null;
+    }
+    return _episodes[_nextEpisodeIndex].episodeName;
+  }
+
+   String get _prevEpisodeName {
+    if (_prevEpisodeIndex == null) {
+      return null;
+    }
+    return _episodes[_prevEpisodeIndex].episodeName;
+  }
+
   _TextPagerViewModel(this._episodes, this._index) {
     this._pageController = PageController(initialPage: _index);
   }
@@ -119,24 +135,6 @@ class _TextPagerViewModel {
       List<String> texts = text.episodeText.split("\n");
       return Future.value(texts);
     });
-  }
-
-  /// 上スクロールから表示する
-  void showByUp() {
-    if (_prevEpisodeIndex == null) {
-      return;
-    }
-    _index = _prevEpisodeIndex;
-    showByContinue();
-  }
-
-  /// 下スクロールから表示する
-  void showByDown() {
-    if (_nextEpisodeIndex == null) {
-      return;
-    }
-    _index = _nextEpisodeIndex;
-    showByContinue();
   }
 
   void toggleOuterView() {
@@ -189,7 +187,7 @@ class _TextPagerState extends State<TextPagerPage>
                       controller: _viewModel._pageController,
                       itemCount: _viewModel._episodes.length,
                       itemBuilder: (context, position) {
-                        return _buildTexts();
+                        return Container(color: sNMAccentColor, child: _buildTexts());
                       })),
               Positioned(
                 top: 0.0,
@@ -304,6 +302,7 @@ class _TextPagerState extends State<TextPagerPage>
             });
           },
           _viewModel._sliderValueNotifier,
+          _viewModel._firstScrollPosition,
           nextActionCallback: () {
             setState(() {
               showNextPage();
@@ -314,6 +313,8 @@ class _TextPagerState extends State<TextPagerPage>
               showPrevPage();
             });
           },
+          nextEpisodeName: _viewModel._nextEpisodeName,
+          prevEpisodeName: _viewModel._prevEpisodeName,
         );
       },
     );
@@ -322,12 +323,14 @@ class _TextPagerState extends State<TextPagerPage>
   void showNextPage() async {
     if (_viewModel._nextEpisodeIndex != null) {
       _viewModel._index = _viewModel._nextEpisodeIndex;
+      _viewModel._firstScrollPosition = FirstScrollPosition.first;
       print((_viewModel._index).toString());
       await _viewModel._pageController
           .animateToPage(_viewModel._index,
               duration: Duration(milliseconds: 500), curve: Curves.easeInSine)
           .then((_) {
         setState(() {
+          // 下から上にいくのでスライダー位置を最初に戻す
           _viewModel._rawSliderOffset = 0;
         });
       });
@@ -337,13 +340,13 @@ class _TextPagerState extends State<TextPagerPage>
   void showPrevPage() async {
     if (_viewModel._prevEpisodeIndex != null) {
       _viewModel._index = _viewModel._prevEpisodeIndex;
+      _viewModel._firstScrollPosition = FirstScrollPosition.bottom;
       print((_viewModel._index).toString());
       await _viewModel._pageController
           .animateToPage(_viewModel._index,
               duration: Duration(milliseconds: 500), curve: Curves.easeInSine)
           .then((_) {
         setState(() {
-          _viewModel._rawSliderOffset = 0;
         });
       });
     }
