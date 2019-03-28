@@ -1,19 +1,11 @@
-import 'dart:convert';
-import 'dart:math';
-
 import 'package:NovelMate/common/colors.dart';
-import 'package:NovelMate/common/datastore/narou/RemoteNarouBookshelfDataStore.dart';
-import 'package:NovelMate/common/datastore/narou/RemoteNarouEpisodeDataStore.dart';
 import 'package:NovelMate/common/entities/domain/EpisodeEntity.dart';
 import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
 import 'package:NovelMate/common/entities/domain/SubscribedNovelEntity.dart';
 import 'package:NovelMate/common/repository/BookshelfRepository.dart';
-import 'package:NovelMate/common/repository/EpisodeRepository.dart';
 import 'package:NovelMate/common/repository/RepositoryFactory.dart';
-import 'package:NovelMate/page/TextPage.dart';
-import 'package:collection/collection.dart';
+import 'package:NovelMate/page/TextPagerPage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 /// 小説の話一覧ページ
@@ -196,12 +188,15 @@ class _EpisodeIndexState extends State<EpisodeIndexPage> {
           listTargetWidgets.add(Divider());
 
           episodes.sort((lhs, rhs) => lhs.firstWriteAt - rhs.firstWriteAt);
-          Map<String, List<EpisodeEntity>> chapterEpisodeMaps = groupBy(
-              episodes, (EpisodeEntity episode) => episode.nullableChapterName);
 
-          chapterEpisodeMaps.forEach((chapter, episodesOfChapter) {
-            // チャプタ名の追加
-            if (chapter != null && chapter.isNotEmpty) {
+          String candidateChapterName = "";
+
+          episodes.asMap().forEach((index, episode) {
+            // 新規チャプター
+            if (episode.nullableChapterName.isNotEmpty &&
+                episode.nullableChapterName != candidateChapterName) {
+              candidateChapterName = episode.nullableChapterName;
+              final chapter = episode.nullableChapterName;
               listTargetWidgets.add(
                 Container(
                     decoration: new BoxDecoration(
@@ -216,76 +211,74 @@ class _EpisodeIndexState extends State<EpisodeIndexPage> {
               );
             }
 
-            // 話の一覧を構築
-            List<Widget> episodeWidgets = episodesOfChapter.map((episode) {
-              final postDate =
-                  DateTime.fromMillisecondsSinceEpoch(episode.firstWriteAt);
-              final lastUpdateDate =
-                  DateTime.fromMillisecondsSinceEpoch(episode.lastUpdateAt);
+            // エピソード
+            final postDate =
+                DateTime.fromMillisecondsSinceEpoch(episode.firstWriteAt);
+            final lastUpdateDate =
+                DateTime.fromMillisecondsSinceEpoch(episode.lastUpdateAt);
 
-              return InkWell(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) {
-                              return TextPage(episodes, episode);
-                            },
-                            fullscreenDialog: true));
-                  },
-                  child: Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 8, horizontal: 16.0),
-                      decoration: new BoxDecoration(
-                          border: new Border(
-                              bottom: BorderSide(
-                                  width: 0.5, color: Colors.black26))),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            episode.episodeName,
-                            maxLines: 1,
+            Widget episodeWidget = InkWell(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) {
+                            return TextPagerPage(episodes, index);
+                          },
+                          fullscreenDialog: true));
+                },
+                child: Container(
+                    padding:
+                        EdgeInsets.symmetric(vertical: 8, horizontal: 16.0),
+                    decoration: new BoxDecoration(
+                        border: new Border(
+                            bottom:
+                                BorderSide(width: 0.5, color: Colors.black26))),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          episode.episodeName,
+                          maxLines: 1,
+                          style: TextStyle(
+                              fontSize: 12.0,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        Container(height: 4),
+                        Text(
+                            "投稿時刻: " +
+                                postDate.year.toString() +
+                                "年" +
+                                postDate.month.toString() +
+                                "月" +
+                                postDate.day.toString() +
+                                "日" +
+                                postDate.hour.toString() +
+                                "時" +
+                                postDate.minute.toString() +
+                                "分",
                             style: TextStyle(
-                                fontSize: 12.0,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          Container(height: 4),
-                          Text(
-                              "投稿時刻: " +
-                                  postDate.year.toString() +
-                                  "年" +
-                                  postDate.month.toString() +
-                                  "月" +
-                                  postDate.day.toString() +
-                                  "日" +
-                                  postDate.hour.toString() +
-                                  "時" +
-                                  postDate.minute.toString() +
-                                  "分",
-                              style: TextStyle(
-                                  fontSize: 11.0, color: Colors.black87)),
-                          Container(height: 4),
-                          Text(
-                              "改稿時刻: " +
-                                  lastUpdateDate.year.toString() +
-                                  "年" +
-                                  lastUpdateDate.month.toString() +
-                                  "月" +
-                                  lastUpdateDate.day.toString() +
-                                  "日" +
-                                  lastUpdateDate.hour.toString() +
-                                  "時" +
-                                  lastUpdateDate.minute.toString() +
-                                  "分",
-                              style: TextStyle(
-                                  fontSize: 11.0, color: Colors.black87))
-                        ],
-                      )));
-            }).toList();
+                                fontSize: 11.0, color: Colors.black87)),
+                        Container(height: 4),
+                        Text(
+                            "改稿時刻: " +
+                                lastUpdateDate.year.toString() +
+                                "年" +
+                                lastUpdateDate.month.toString() +
+                                "月" +
+                                lastUpdateDate.day.toString() +
+                                "日" +
+                                lastUpdateDate.hour.toString() +
+                                "時" +
+                                lastUpdateDate.minute.toString() +
+                                "分",
+                            style: TextStyle(
+                                fontSize: 11.0, color: Colors.black87))
+                      ],
+                    )));
 
-            listTargetWidgets.addAll(episodeWidgets);
+            listTargetWidgets.add(episodeWidget);
           });
 
           return SliverList(

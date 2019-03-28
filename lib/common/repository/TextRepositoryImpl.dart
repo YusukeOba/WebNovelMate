@@ -20,7 +20,7 @@ class TextRepositoryImpl extends TextRepository {
         return Future.value();
       }
 
-      return cache.delete(novelIdentifier,
+      return cache.delete(novelIdentifier.siteOfIdentifier,
           episodeIdentifier: episodeIdentifier);
     });
   }
@@ -34,7 +34,7 @@ class TextRepositoryImpl extends TextRepository {
         return Future.value();
       }
 
-      return cache.delete(novelIdentifier);
+      return cache.delete(novelIdentifier.siteOfIdentifier);
     });
   }
 
@@ -50,9 +50,11 @@ class TextRepositoryImpl extends TextRepository {
         throw Exception("findEpisodesByNovel error. Found unavailable site.");
       }
 
-      if (await cache.hasCache(novelIdentifier, episodeIdentifier)) {
+      if (await cache.hasCache(
+          novelIdentifier.siteOfIdentifier, episodeIdentifier)) {
         print("fetch text by cache. text id = " + episodeIdentifier);
-        return cache.findByEpisodeId(novelIdentifier, episodeIdentifier);
+        return cache.findByEpisodeId(
+            novelIdentifier.siteOfIdentifier, episodeIdentifier);
       } else {
         print("fetch text by remote. text id = " + episodeIdentifier);
         return remote

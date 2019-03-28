@@ -1,16 +1,14 @@
 import 'package:NovelMate/common/datastore/CachedTextDataStore.dart';
 import 'package:NovelMate/common/entities/DatabaseSchema.dart';
-import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
 import 'package:NovelMate/common/entities/domain/TextEntity.dart';
 
 class CachedNarouTextDataStore extends CachedTextDataStore {
   @override
   Future<TextEntity> findByEpisodeId(
-      NovelIdentifier identifier, String episodeIdentifier) {
+      String siteOfIdentifier, String episodeIdentifier) {
     print("start find by episode id." + episodeIdentifier);
     return (Database().select(Database().cachedNarouTextEntity)
-          ..where((text) =>
-              text.siteOfIdentifier.equals(identifier.siteOfIdentifier))
+          ..where((text) => text.siteOfIdentifier.equals(siteOfIdentifier))
           ..where((text) => text.episodeIdentifier.equals(episodeIdentifier)))
         .get()
         .then((textEntities) {
@@ -26,47 +24,59 @@ class CachedNarouTextDataStore extends CachedTextDataStore {
   }
 
   @override
-  Future<void> delete(NovelIdentifier identifier,
+  Future<void> delete(String siteOfIdentifier,
       {String episodeIdentifier = ""}) {
     print("start text delete.");
     if (episodeIdentifier.isEmpty) {
       return (Database().delete(Database().cachedNarouTextEntity)
-            ..where((text) =>
-                text.siteOfIdentifier.equals(identifier.siteOfIdentifier)))
+            ..where((text) => text.siteOfIdentifier.equals(siteOfIdentifier)))
           .go();
     } else {
       return (Database().delete(Database().cachedNarouTextEntity)
-            ..where((text) =>
-                text.siteOfIdentifier.equals(identifier.siteOfIdentifier))
+            ..where((text) => text.siteOfIdentifier.equals(siteOfIdentifier))
             ..where((text) => text.episodeIdentifier.equals(episodeIdentifier)))
           .go();
     }
   }
 
   @override
-  Future<void> insertOrUpdate(List<TextEntity> textEntities) {
+  Future<void> insertOrUpdate(List<TextEntity> textEntities) async {
     print("start text insert.");
-    List<Future<void>> insertResult = textEntities.map((text) {
-      return Database().update(Database().cachedNarouTextEntity).replace(
-          CachedNarouTextEntityData(
-              siteOfIdentifier: text.siteOfIdentifier,
-              episodeIdentifier: text.episodeOfIdentifier,
-              episodeText: text.episodeText));
+    List<Future<void>> insertResult = textEntities.map((text) async {
+      final rawHasCache =
+          await hasCache(text.siteOfIdentifier, text.episodeOfIdentifier);
+      if (rawHasCache) {
+        print("cache not found. start insert.");
+
+        return Database().into(Database().cachedNarouTextEntity).insert(
+            CachedNarouTextEntityData(
+                siteOfIdentifier: text.siteOfIdentifier,
+                episodeIdentifier: text.episodeOfIdentifier,
+                episodeText: text.episodeText));
+      } else {
+        print("cache found. start replace");
+
+        return Database().update(Database().cachedNarouTextEntity).replace(
+            CachedNarouTextEntityData(
+                siteOfIdentifier: text.siteOfIdentifier,
+                episodeIdentifier: text.episodeOfIdentifier,
+                episodeText: text.episodeText));
+      }
     }).toList();
 
     return Future.wait(insertResult);
   }
 
   @override
-  Future<bool> hasCache(NovelIdentifier identifier, String episodeIdentifier) {
+  Future<bool> hasCache(String siteOfIdentifier, String episodeIdentifier) {
     print("start hasCache." + episodeIdentifier);
     return (Database().select(Database().cachedNarouTextEntity)
-          ..where((text) =>
-              text.siteOfIdentifier.equals(identifier.siteOfIdentifier))
+          ..where((text) => text.siteOfIdentifier.equals(siteOfIdentifier))
           ..where((text) => text.episodeIdentifier.equals(episodeIdentifier))
           ..limit(1))
         .get()
         .then((episode) {
+      print("hasCache result = " + episode.toString());
       return Future.value(episode != null && episode.length > 0);
     });
   }
