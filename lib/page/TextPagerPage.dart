@@ -301,6 +301,7 @@ class _TextPagerState extends State<TextPagerPage>
                 _viewModel.toggleOuterView();
               });
             },
+            // ScrollViewからの通知をSliderに反映
             (min, currentOffset, max) {
               setState(() {
                 _viewModel._sliderMin = min;
@@ -308,6 +309,7 @@ class _TextPagerState extends State<TextPagerPage>
                 _viewModel._sliderMax = max;
               });
             },
+            // Sliderからの通知をScrollViewに反映
             _viewModel._sliderValueNotifier,
             _viewModel._firstScrollPosition,
             nextActionCallback: () {
@@ -337,9 +339,10 @@ class _TextPagerState extends State<TextPagerPage>
       setState(() {
         _viewModel._pageAnimating = true;
         _viewModel._index = _viewModel._nextEpisodeIndex;
+        _viewModel._firstScrollPosition = FirstScrollPosition.first;
         _viewModel.showByContinue();
       });
-      _viewModel._firstScrollPosition = FirstScrollPosition.first;
+
       print((_viewModel._index).toString());
       await _viewModel._pageController
           .animateToPage(_viewModel._index,
@@ -357,9 +360,9 @@ class _TextPagerState extends State<TextPagerPage>
       setState(() {
         _viewModel._pageAnimating = true;
         _viewModel._index = _viewModel._prevEpisodeIndex;
+        _viewModel._firstScrollPosition = FirstScrollPosition.bottom;
         _viewModel.showByContinue();
       });
-      _viewModel._firstScrollPosition = FirstScrollPosition.bottom;
       print((_viewModel._index).toString());
       await _viewModel._pageController
           .animateToPage(_viewModel._index,

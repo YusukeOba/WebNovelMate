@@ -77,7 +77,6 @@ class CachedNarouTextDataStore extends CachedTextDataStore {
           ..limit(1))
         .get()
         .then((episode) {
-      print("hasCache result = " + episode.toString());
       return Future.value(episode != null && episode.length > 0);
     });
   }

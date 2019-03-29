@@ -1,8 +1,11 @@
 import 'package:NovelMate/common/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
+import 'package:flutter_easyrefresh/ball_pulse_header.dart';
+import 'package:flutter_easyrefresh/easy_refresh.dart';
 
 /// 初期スクロール位置
 enum FirstScrollPosition { first, bottom }
@@ -125,17 +128,8 @@ class _TextPageViewModel {
   }
 
   void notifySliderConfig() {
-    /// FIXME: 上からスクロールしたとき、Sliderの値をMAXまで持っていった状態にしたい
-    /// そのため、max, offsetをマイナス変換した上でSliderに伝達する
-    if (_firstScrollPosition == FirstScrollPosition.bottom) {
-      _sliderConfigCallback(
-          -_scrollController.position.maxScrollExtent,
-          -_scrollController.offset,
-          _scrollController.position.minScrollExtent);
-    } else {
-      _sliderConfigCallback(_scrollController.position.minScrollExtent,
-          _scrollController.offset, _scrollController.position.maxScrollExtent);
-    }
+    _sliderConfigCallback(_scrollController.position.minScrollExtent,
+        _scrollController.offset, _scrollController.position.maxScrollExtent);
   }
 }
 
@@ -143,6 +137,13 @@ class _TextPageState extends State<TextPage> {
   final _TextPageViewModel _viewModel;
 
   _TextPageState(this._viewModel);
+
+  GlobalKey<EasyRefreshState> _easyRefreshKey =
+      new GlobalKey<EasyRefreshState>();
+  GlobalKey<RefreshHeaderState> _headerKey =
+      new GlobalKey<RefreshHeaderState>();
+  GlobalKey<RefreshFooterState> _footerKey =
+      new GlobalKey<RefreshFooterState>();
 
   _scrollListener() {
     _viewModel.notifySliderConfig();
@@ -159,12 +160,7 @@ class _TextPageState extends State<TextPage> {
       return;
     }
 
-    if (_viewModel._firstScrollPosition == FirstScrollPosition.bottom) {
-      // 逆順の場合
-      _viewModel._scrollController.jumpTo(-_viewModel.manualScrollOffset.value);
-    } else {
-      _viewModel._scrollController.jumpTo(_viewModel.manualScrollOffset.value);
-    }
+    _viewModel._scrollController.jumpTo(_viewModel.manualScrollOffset.value);
   }
 
   @override
@@ -191,138 +187,91 @@ class _TextPageState extends State<TextPage> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scrollbar(
-        child: ListView.builder(
-            controller: _viewModel._scrollController,
-            reverse:
-                _viewModel._firstScrollPosition == FirstScrollPosition.bottom,
-            itemBuilder: (context, index) {
-              if (_viewModel._firstScrollPosition ==
-                  FirstScrollPosition.bottom) {
-                return _buildByBottom(
-                    _viewModel.texts.reversed.toList(), index);
-              }
-              final text = _viewModel.texts[index];
-              Widget textWidget;
-              bool isLastLength = index == _viewModel.texts.length - 1;
-              bool isFirstLength = index == 0;
-              if (isLastLength) {
-                textWidget = Container(
-                  color: sNMBackgroundColor,
-                  child: Column(
-                    children: <Widget>[
-                      Container(
-                          padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
-                          child: Column(
-                            children: <Widget>[
-                              Text(text),
-                              Container(height: 64),
-                            ],
-                          )),
-                      _buildNextEpisode()
-                    ],
-                  ),
-                );
-              } else if (isFirstLength) {
-                textWidget = Container(
-                  child: Column(
-                    children: <Widget>[
-                      _buildPreviousEpisode(),
-                      Container(
-                          color: sNMBackgroundColor,
-                          padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
-                          child: Column(
-                            children: <Widget>[
-                              Container(height: 32),
-                              Text(_viewModel.episodeName,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20.0)),
-                              Container(height: 32),
-                            ],
-                          )),
-                    ],
-                  ),
-                );
-              } else {
-                textWidget = Container(
-                  color: sNMBackgroundColor,
-                  child: Text(text),
-                  padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
-                );
-              }
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _viewModel._onTapCallback();
-                  });
-                },
-                child: textWidget,
-              );
-            },
-            physics: BouncingScrollPhysics(),
-            itemCount: _viewModel.texts.length));
+  Future<void> onRefresh() {
+    return Future.value(_viewModel._prevActionCallback());
   }
 
-  /// 上から下にスワイプした場合は逆順になる
-  Widget _buildByBottom(List<String> texts, int index) {
-    final text = texts[index];
-    Widget textWidget;
-    bool isLastLength = index == _viewModel.texts.length - 1;
-    bool isFirstLength = index == 0;
-    if (isLastLength) {
-      textWidget = Container(
-        child: Column(
-          children: <Widget>[
-            _buildPreviousEpisode(),
-            Container(
+  Future<void> loadMore() {
+    return Future.value(_viewModel._nextActionCallback());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return EasyRefresh(
+      key: _easyRefreshKey,
+      onRefresh: _viewModel._prevEpisodeName != null ? onRefresh : null,
+      loadMore: _viewModel._nextEpisodeName != null ? loadMore : null,
+      refreshHeader: BallPulseHeader(
+        key: _headerKey,
+        color: sNMPrimaryColor,
+      ),
+      refreshFooter: BallPulseFooter(
+        key: _footerKey,
+        color: sNMPrimaryColor,
+      ),
+      child: ListView.builder(
+          controller: _viewModel._scrollController,
+          itemBuilder: (context, index) {
+            final text = _viewModel.texts[index];
+            Widget textWidget;
+            bool isLastLength = index == _viewModel.texts.length - 1;
+            bool isFirstLength = index == 0;
+            if (isLastLength) {
+              textWidget = Container(
                 color: sNMBackgroundColor,
-                padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
                 child: Column(
                   children: <Widget>[
-                    Container(height: 32),
-                    Text(_viewModel.episodeName,
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 20.0)),
-                    Container(height: 32),
+                    Container(
+                        padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+                        child: Column(
+                          children: <Widget>[
+                            Text(text),
+                            Container(height: 64),
+                          ],
+                        )),
+                    _buildNextEpisode()
                   ],
-                )),
-          ],
-        ),
-      );
-    } else if (isFirstLength) {
-      textWidget = Container(
-        color: sNMBackgroundColor,
-        child: Column(
-          children: <Widget>[
-            Container(
-                padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+                ),
+              );
+            } else if (isFirstLength) {
+              textWidget = Container(
                 child: Column(
                   children: <Widget>[
-                    Text(text),
-                    Container(height: 64),
+                    _buildPreviousEpisode(),
+                    Container(
+                        color: sNMBackgroundColor,
+                        padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+                        child: Column(
+                          children: <Widget>[
+                            Container(height: 32),
+                            Text(_viewModel.episodeName,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20.0)),
+                            Container(height: 32),
+                          ],
+                        )),
                   ],
-                )),
-            _buildNextEpisode()
-          ],
-        ),
-      );
-    } else {
-      textWidget = Container(
-        color: sNMBackgroundColor,
-        child: Text(text),
-        padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
-      );
-    }
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _viewModel._onTapCallback();
-        });
-      },
-      child: textWidget,
+                ),
+              );
+            } else {
+              textWidget = Container(
+                color: sNMBackgroundColor,
+                child: Text(text),
+                padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+              );
+            }
+            return GestureDetector(
+              onTap: () {
+                setState(() {
+                  _viewModel._onTapCallback();
+                });
+              },
+              child: textWidget,
+            );
+          },
+          physics: BouncingScrollPhysics(),
+          itemCount: _viewModel.texts.length),
     );
   }
 
@@ -337,15 +286,13 @@ class _TextPageState extends State<TextPage> {
               child: Column(
                 children: <Widget>[
                   Container(height: 16.0),
-                  Text("次の話: " + _viewModel._nextEpisodeName),
+                  Text("次の話: "),
+                  Container(
+                    child: Text(_viewModel._nextEpisodeName,
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  ),
                   Container(height: 16.0),
-                  IconButton(
-                      color: sNMPrimaryColor,
-                      icon: Icon(Icons.arrow_downward),
-                      onPressed: () {
-                        _viewModel._nextActionCallback();
-                      }),
-                  Container(height: 16),
                 ],
               ))
         ],
@@ -360,21 +307,18 @@ class _TextPageState extends State<TextPage> {
       return Container(
           child: Column(
         children: <Widget>[
-          Container(height: 32),
           Container(
               color: sNMAccentColor,
               child: Column(
                 children: <Widget>[
                   Container(height: 16.0),
-                  Text("前の話: " + _viewModel._prevEpisodeName),
+                  Text("前の話: "),
+                  Container(
+                    child: Text(_viewModel._prevEpisodeName,
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  ),
                   Container(height: 16.0),
-                  IconButton(
-                      color: sNMPrimaryColor,
-                      icon: Icon(Icons.arrow_upward),
-                      onPressed: () {
-                        _viewModel._prevActionCallback();
-                      }),
-                  Container(height: 16),
                 ],
               ))
         ],

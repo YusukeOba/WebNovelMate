@@ -153,6 +153,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_easyrefresh:
+    dependency: "direct main"
+    description:
+      name: flutter_easyrefresh
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.2.7"
   flutter_localizations:
     dependency: "direct main"
     description: flutter
@@ -253,7 +260,7 @@ packages:
       name: json_rpc_2
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.9"
+    version: "2.0.10"
   json_serializable:
     dependency: "direct dev"
     description:
@@ -309,21 +316,21 @@ packages:
       name: moor
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.1"
+    version: "1.2.0"
   moor_flutter:
     dependency: "direct main"
     description:
       name: moor_flutter
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.0"
+    version: "1.2.0"
   moor_generator:
     dependency: "direct dev"
     description:
       name: moor_generator
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.1"
+    version: "1.2.1"
   multi_server_socket:
     dependency: transitive
     description:
@@ -394,15 +401,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.4"
-  pull_to_refresh:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: bfac5f8c59d3426497eafae4482bde3017a6be20
-      resolved-ref: bfac5f8c59d3426497eafae4482bde3017a6be20
-      url: "https://github.com/peng8350/flutter_pulltorefresh.git"
-    source: git
-    version: "1.1.6"
   quiver:
     dependency: transitive
     description:
@@ -423,7 +421,7 @@ packages:
       name: shelf
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.7.4"
+    version: "0.7.4+1"
   shelf_packages_handler:
     dependency: transitive
     description:
@@ -444,7 +442,7 @@ packages:
       name: shelf_web_socket
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.2.2+4"
+    version: "0.2.2+5"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -582,7 +580,7 @@ packages:
       name: vm_service_client
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.2.6"
+    version: "0.2.6+1"
   watcher:
     dependency: transitive
     description:
@@ -596,7 +594,7 @@ packages:
       name: web_socket_channel
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.11"
+    version: "1.0.12"
   yaml:
     dependency: transitive
     description:
