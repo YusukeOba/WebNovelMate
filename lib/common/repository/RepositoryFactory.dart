@@ -13,8 +13,10 @@ import 'package:NovelMate/common/repository/EpisodeRepository.dart';
 import 'package:NovelMate/common/repository/EpisodeRepositoryImpl.dart';
 import 'package:NovelMate/common/repository/RankingRepository.dart';
 import 'package:NovelMate/common/repository/RankingRepositoryImpl.dart';
-import 'package:NovelMate/common/repository/TextRepositoryImpl.dart';
+import 'package:NovelMate/common/repository/SettingRepository.dart';
+import 'package:NovelMate/common/repository/SettingRepositoryImpl.dart';
 import 'package:NovelMate/common/repository/TextRepository.dart';
+import 'package:NovelMate/common/repository/TextRepositoryImpl.dart';
 
 /// DIコンテナ
 class RepositoryFactory {
@@ -28,6 +30,7 @@ class RepositoryFactory {
   RankingRepository _rankingRepository;
   EpisodeRepository _episodeRepository;
   TextRepository _textRepository;
+  SettingRepository _settingRepository;
 
   /// 実装クラスの解決
   RepositoryFactory._internal() {
@@ -43,6 +46,7 @@ class RepositoryFactory {
     _textRepository = TextRepositoryImpl(
         {AvailableSites.narou: CachedNarouTextDataStore()},
         {AvailableSites.narou: RemoteNarouTextDataStore()});
+    _settingRepository = SettingRepositoryImpl();
   }
 
   /// 実装は隠して外部クラスに公開する
@@ -53,4 +57,6 @@ class RepositoryFactory {
   EpisodeRepository getEpisodeRepository() => _episodeRepository;
 
   TextRepository getTextRepository() => _textRepository;
+
+  SettingRepository getSettingRepository() => _settingRepository;
 }
