@@ -7,6 +7,7 @@ import 'package:NovelMate/common/datastore/narou/RemoteNarouRankingDataStore.dar
 import 'package:NovelMate/common/repository/RankingRepositoryImpl.dart';
 import 'package:NovelMate/page/BookshelfTabPage.dart';
 import 'package:NovelMate/page/SearchPage.dart';
+import 'package:NovelMate/page/SettingPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -101,7 +102,7 @@ class _MainPageState extends State<MainPage> {
       case 1:
         return BookshelfTabPage();
       case 2:
-        return Text("NO PAGE 2");
+        return SettingPage();
       default:
         break;
     }

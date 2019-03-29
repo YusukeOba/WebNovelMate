@@ -7,8 +7,45 @@ import 'package:flutter/widgets.dart';
 typedef OnSettingChanged = void Function(
     double fontSize, ColorPattern _colorPattern, bool _isGothic);
 
+/// 設定ページ
+class SettingPage extends StatefulWidget {
+  @override
+  SettingState createState() {
+    return SettingState();
+  }
+}
+
+/// 設定ページ
+class SettingState extends State<SettingPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("設定"),
+      ),
+      body: Column(
+        children: <Widget>[
+          SettingContainer((fontSize, colorPattern, isGothic) {
+            save(fontSize, colorPattern, isGothic);
+          }),
+          // TODO: プレビュー実装
+        ],
+      ),
+    );
+  }
+
+  /// 設定値の保存
+  save(double fontSize, ColorPattern colorPattern, bool isGothic) async {
+    final repository = RepositoryFactory.shared.getSettingRepository();
+    repository.setColorPattern(colorPattern);
+    repository.setFontSize(fontSize);
+    repository.setGothic(isGothic);
+  }
+}
+
+/// 小説ページからでもつかえるように外部公開する
 class SettingContainer extends StatefulWidget {
-  OnSettingChanged _onSettingChanged;
+  final OnSettingChanged _onSettingChanged;
 
   SettingContainer(this._onSettingChanged);
 
