@@ -24,9 +24,6 @@ class TextPage extends StatefulWidget {
   final OnTapCallback _onTapCallback;
 
   /// 初期スクロール位置
-  FirstScrollPosition _firstScrollPosition;
-
-  /// 現在のスクロール位置
   ValueNotifier<double> manualScrollOffset;
 
   /// 次の話の名前
@@ -41,13 +38,20 @@ class TextPage extends StatefulWidget {
   /// 前の話を表示する
   PrevActionCallback _prevActionCallback;
 
+  /// 背景色
+  ValueNotifier<Color> _color;
+
+  /// テキスト設定
+  ValueNotifier<TextStyle> _textStyle;
+
   TextPage(
       this.episodeName,
       this.texts,
       this._onTapCallback,
       this._sliderConfigCallback,
       this.manualScrollOffset,
-      this._firstScrollPosition,
+      this._color,
+      this._textStyle,
       {String nextEpisodeName,
       String prevEpisodeName,
       NextActionCallback nextActionCallback,
@@ -61,7 +65,7 @@ class TextPage extends StatefulWidget {
   @override
   _TextPageState createState() {
     return _TextPageState(_TextPageViewModel(episodeName, texts, _onTapCallback,
-        _sliderConfigCallback, manualScrollOffset, _firstScrollPosition,
+        _sliderConfigCallback, manualScrollOffset, _color, _textStyle,
         nextEpisodeName: _nextEpisodeName,
         prevEpisodeName: _prevEpisodeName,
         nextActionCallback: _nextActionCallback,
@@ -80,16 +84,13 @@ class _TextPageViewModel {
   final String episodeName;
 
   /// 実際の話
-  final List<String> texts;
+  List<String> texts;
 
   /// スクロールの最小、最大値
   SliderConfigCallback _sliderConfigCallback;
 
   /// ページがタップされた
   final OnTapCallback _onTapCallback;
-
-  /// 初期スクロール位置
-  FirstScrollPosition _firstScrollPosition;
 
   /// 現在のスクロール位置
   ValueNotifier<double> manualScrollOffset;
@@ -106,6 +107,12 @@ class _TextPageViewModel {
   /// 前の話を表示する
   PrevActionCallback _prevActionCallback;
 
+  /// 背景色
+  ValueNotifier<Color> _color;
+
+  /// テキスト設定
+  ValueNotifier<TextStyle> _textStyle;
+
   ScrollController _scrollController;
 
   _TextPageViewModel(
@@ -114,7 +121,8 @@ class _TextPageViewModel {
       this._onTapCallback,
       this._sliderConfigCallback,
       this.manualScrollOffset,
-      this._firstScrollPosition,
+      this._color,
+      this._textStyle,
       {String nextEpisodeName,
       String prevEpisodeName,
       NextActionCallback nextActionCallback,
@@ -198,81 +206,82 @@ class _TextPageState extends State<TextPage> {
   @override
   Widget build(BuildContext context) {
     return EasyRefresh(
-      key: _easyRefreshKey,
-      onRefresh: _viewModel._prevEpisodeName != null ? onRefresh : null,
-      loadMore: _viewModel._nextEpisodeName != null ? loadMore : null,
-      refreshHeader: BallPulseHeader(
-        key: _headerKey,
-        color: sNMPrimaryColor,
-      ),
-      refreshFooter: BallPulseFooter(
-        key: _footerKey,
-        color: sNMPrimaryColor,
-      ),
-      child: ListView.builder(
-          controller: _viewModel._scrollController,
-          itemBuilder: (context, index) {
-            final text = _viewModel.texts[index];
-            Widget textWidget;
-            bool isLastLength = index == _viewModel.texts.length - 1;
-            bool isFirstLength = index == 0;
-            if (isLastLength) {
-              textWidget = Container(
-                color: sNMBackgroundColor,
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                        padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
-                        child: Column(
-                          children: <Widget>[
-                            Text(text),
-                            Container(height: 64),
-                          ],
-                        )),
-                    _buildNextEpisode()
-                  ],
-                ),
+        key: _easyRefreshKey,
+        onRefresh: _viewModel._prevEpisodeName != null ? onRefresh : null,
+        loadMore: _viewModel._nextEpisodeName != null ? loadMore : null,
+        refreshHeader: BallPulseHeader(
+          key: _headerKey,
+          color: sNMPrimaryColor,
+        ),
+        refreshFooter: BallPulseFooter(
+          key: _footerKey,
+          color: sNMPrimaryColor,
+        ),
+        child: ListView.builder(
+            controller: _viewModel._scrollController,
+            itemBuilder: (context, index) {
+              final text = _viewModel.texts[index];
+              Widget textWidget;
+              bool isLastLength = index == _viewModel.texts.length - 1;
+              bool isFirstLength = index == 0;
+              if (isLastLength) {
+                textWidget = Container(
+                  color: _viewModel._color.value,
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                          padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+                          child: Column(
+                            children: <Widget>[
+                              Text(text, style: _viewModel._textStyle.value),
+                              Container(height: 64),
+                            ],
+                          )),
+                      _buildNextEpisode()
+                    ],
+                  ),
+                );
+              } else if (isFirstLength) {
+                textWidget = Container(
+                  child: Column(
+                    children: <Widget>[
+                      _buildPreviousEpisode(),
+                      Container(
+                          color: _viewModel._color.value,
+                          padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+                          child: Column(
+                            children: <Widget>[
+                              Container(height: 32),
+                              Text(_viewModel.episodeName,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20.0,
+                                      color:
+                                          _viewModel._textStyle.value.color)),
+                              Container(height: 32),
+                            ],
+                          )),
+                    ],
+                  ),
+                );
+              } else {
+                textWidget = Container(
+                  color: _viewModel._color.value,
+                  child: Text(text, style: _viewModel._textStyle.value),
+                  padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+                );
+              }
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _viewModel._onTapCallback();
+                  });
+                },
+                child: textWidget,
               );
-            } else if (isFirstLength) {
-              textWidget = Container(
-                child: Column(
-                  children: <Widget>[
-                    _buildPreviousEpisode(),
-                    Container(
-                        color: sNMBackgroundColor,
-                        padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
-                        child: Column(
-                          children: <Widget>[
-                            Container(height: 32),
-                            Text(_viewModel.episodeName,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20.0)),
-                            Container(height: 32),
-                          ],
-                        )),
-                  ],
-                ),
-              );
-            } else {
-              textWidget = Container(
-                color: sNMBackgroundColor,
-                child: Text(text),
-                padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
-              );
-            }
-            return GestureDetector(
-              onTap: () {
-                setState(() {
-                  _viewModel._onTapCallback();
-                });
-              },
-              child: textWidget,
-            );
-          },
-          physics: BouncingScrollPhysics(),
-          itemCount: _viewModel.texts.length),
-    );
+            },
+            physics: BouncingScrollPhysics(),
+            itemCount: _viewModel.texts.length));
   }
 
   Widget _buildNextEpisode() {

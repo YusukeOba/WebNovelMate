@@ -7,9 +7,10 @@ class SettingRepositoryImpl extends SettingRepository {
   final String keyIsGothic = "key_is_gothic";
 
   @override
-  Future<double> getFontSize() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getDouble(keyFontSize);
+  Future<double> getFontSize() {
+    return SharedPreferences.getInstance().then((prefs) {
+      return prefs.getDouble(keyFontSize) ?? 12;
+    });
   }
 
   @override
@@ -21,7 +22,7 @@ class SettingRepositoryImpl extends SettingRepository {
   @override
   Future<ColorPattern> getColorPattern() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    final rawColorPattern = prefs.getInt(keyColorPattern);
+    final rawColorPattern = prefs.getInt(keyColorPattern) ?? 0;
     return ColorPattern.values[rawColorPattern];
   }
 
@@ -34,7 +35,7 @@ class SettingRepositoryImpl extends SettingRepository {
   @override
   Future<bool> isGothic() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(keyIsGothic);
+    return prefs.getBool(keyIsGothic) ?? true;
   }
 
   @override

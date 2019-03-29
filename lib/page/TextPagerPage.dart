@@ -1,6 +1,8 @@
 import 'package:NovelMate/common/colors.dart';
 import 'package:NovelMate/common/entities/domain/EpisodeEntity.dart';
 import 'package:NovelMate/common/repository/RepositoryFactory.dart';
+import 'package:NovelMate/common/repository/SettingRepository.dart';
+import 'package:NovelMate/page/SettingPage.dart';
 import 'package:NovelMate/page/TextPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -54,6 +56,12 @@ class _TextPagerViewModel {
   ValueNotifier<double> _sliderValueNotifier = ValueNotifier(0);
 
   bool _pageAnimating = false;
+
+  /// 文字色
+  ValueNotifier<TextStyle> _textStyle = ValueNotifier(TextStyle());
+
+  /// 背景色
+  ValueNotifier<Color> _backgroundColor = ValueNotifier(sNMBackgroundColor);
 
   /// Sliderに表示するスクロール位置
   double get sliderOffset {
@@ -149,6 +157,48 @@ class _TextPagerViewModel {
   void setOuterViewVisibility(bool visibility) {
     _shownOuterView = visibility;
   }
+
+  /// フォント設定の変更
+  void changeTextStyle(
+      double fontSize, ColorPattern colorPattern, bool isGothic) {
+    Color textColor;
+    switch (colorPattern) {
+      case ColorPattern.white:
+        textColor = Colors.black;
+        _backgroundColor.value = Colors.white;
+        break;
+      case ColorPattern.black:
+        textColor = Colors.white;
+        _backgroundColor.value = Colors.black;
+        break;
+      case ColorPattern.sepia:
+        textColor = Colors.black;
+        _backgroundColor.value = sSepiaColor;
+        break;
+    }
+
+    TextStyle style = TextStyle(
+        fontSize: fontSize,
+        fontFamily: isGothic ? "" : "sans-serif",
+        color: textColor);
+    _textStyle.value = style;
+
+    print("change. textStyle = " + style.toString());
+
+    final repository = RepositoryFactory.shared.getSettingRepository();
+    repository.setColorPattern(colorPattern);
+    repository.setFontSize(fontSize);
+    repository.setGothic(isGothic);
+  }
+
+  /// フォント設定の読み込み
+  void loadInitialTextStyle() async {
+    final repository = RepositoryFactory.shared.getSettingRepository();
+    double fontSize = await repository.getFontSize();
+    ColorPattern colorPattern = await repository.getColorPattern();
+    bool isGothic = await repository.isGothic();
+    changeTextStyle(fontSize, colorPattern, isGothic);
+  }
 }
 
 class _TextPagerState extends State<TextPagerPage>
@@ -162,7 +212,9 @@ class _TextPagerState extends State<TextPagerPage>
     super.initState();
     print("initState");
     setState(() {
+      _viewModel.loadInitialTextStyle();
       _viewModel.showByContinue();
+
       // フルスクリーン
       SystemChrome.setEnabledSystemUIOverlays([]);
     });
@@ -220,7 +272,7 @@ class _TextPagerState extends State<TextPagerPage>
             icon: Image.asset("images/font_sizing.png",
                 width: 28, height: 28, color: Colors.white),
             onPressed: () {
-              // TODO: implement
+              _showSetting();
             }),
         centerTitle: false,
       );
@@ -283,18 +335,18 @@ class _TextPagerState extends State<TextPagerPage>
       future: _viewModel._texts,
       builder: (context, snapShot) {
         Widget rowWidget;
-
         // 読み込み中
         if (!snapShot.hasData ||
             snapShot.connectionState == ConnectionState.active ||
             snapShot.connectionState == ConnectionState.none ||
             snapShot.connectionState == ConnectionState.waiting) {
           rowWidget = Container(
-              color: sNMBackgroundColor,
+              color: _viewModel._backgroundColor.value,
               child: Center(child: CircularProgressIndicator()));
         } else {
           rowWidget = TextPage(
-            _viewModel._currentEpisode.episodeName, snapShot.data,
+            _viewModel._currentEpisode.episodeName,
+            snapShot.data,
             // toggle tap
             () {
               setState(() {
@@ -311,7 +363,8 @@ class _TextPagerState extends State<TextPagerPage>
             },
             // Sliderからの通知をScrollViewに反映
             _viewModel._sliderValueNotifier,
-            _viewModel._firstScrollPosition,
+            _viewModel._backgroundColor,
+            _viewModel._textStyle,
             nextActionCallback: () {
               setState(() {
                 showNextPage();
@@ -373,5 +426,18 @@ class _TextPagerState extends State<TextPagerPage>
         });
       });
     }
+  }
+
+  void _showSetting() {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return SettingContainer(
+              (double fontSize, ColorPattern colorPattern, bool isGothic) {
+            setState(() {
+              _viewModel.changeTextStyle(fontSize, colorPattern, isGothic);
+            });
+          });
+        });
   }
 }
