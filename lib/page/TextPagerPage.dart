@@ -282,48 +282,52 @@ class _TextPagerState extends State<TextPagerPage>
     return FutureBuilder<List<String>>(
       future: _viewModel._texts,
       builder: (context, snapShot) {
+        Widget rowWidget;
+
         // 読み込み中
         if (!snapShot.hasData ||
             snapShot.connectionState == ConnectionState.active ||
             snapShot.connectionState == ConnectionState.none ||
             snapShot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          rowWidget = Container(
+              color: sNMBackgroundColor,
+              child: Center(child: CircularProgressIndicator()));
+        } else {
+          rowWidget = TextPage(
+            _viewModel._currentEpisode.episodeName, snapShot.data,
+            // toggle tap
+            () {
+              setState(() {
+                _viewModel.toggleOuterView();
+              });
+            },
+            (min, currentOffset, max) {
+              setState(() {
+                _viewModel._sliderMin = min;
+                _viewModel._rawSliderOffset = currentOffset;
+                _viewModel._sliderMax = max;
+              });
+            },
+            _viewModel._sliderValueNotifier,
+            _viewModel._firstScrollPosition,
+            nextActionCallback: () {
+              setState(() {
+                showNextPage();
+              });
+            },
+            prevActionCallback: () {
+              setState(() {
+                showPrevPage();
+              });
+            },
+            nextEpisodeName: _viewModel._nextEpisodeName,
+            prevEpisodeName: _viewModel._prevEpisodeName,
+          );
         }
 
-        if (snapShot.hasError) {
-          return Text("エラーが発生しました");
-        }
-
-        return TextPage(
-          _viewModel._currentEpisode.episodeName, snapShot.data,
-          // toggle tap
-          () {
-            setState(() {
-              _viewModel.toggleOuterView();
-            });
-          },
-          (min, currentOffset, max) {
-            setState(() {
-              _viewModel._sliderMin = min;
-              _viewModel._rawSliderOffset = currentOffset;
-              _viewModel._sliderMax = max;
-            });
-          },
-          _viewModel._sliderValueNotifier,
-          _viewModel._firstScrollPosition,
-          nextActionCallback: () {
-            setState(() {
-              showNextPage();
-            });
-          },
-          prevActionCallback: () {
-            setState(() {
-              showPrevPage();
-            });
-          },
-          nextEpisodeName: _viewModel._nextEpisodeName,
-          prevEpisodeName: _viewModel._prevEpisodeName,
-        );
+        // ちらつきを抑えるためクロスフェードで読み込み,実際のテキスト表示を切り替える
+        return AnimatedSwitcher(
+            child: rowWidget, duration: Duration(milliseconds: 200));
       },
     );
   }
@@ -332,13 +336,14 @@ class _TextPagerState extends State<TextPagerPage>
     if (_viewModel._nextEpisodeIndex != null) {
       setState(() {
         _viewModel._pageAnimating = true;
+        _viewModel._index = _viewModel._nextEpisodeIndex;
+        _viewModel.showByContinue();
       });
-      _viewModel._index = _viewModel._nextEpisodeIndex;
       _viewModel._firstScrollPosition = FirstScrollPosition.first;
       print((_viewModel._index).toString());
       await _viewModel._pageController
           .animateToPage(_viewModel._index,
-              duration: Duration(milliseconds: 500), curve: Curves.easeInSine)
+              duration: Duration(milliseconds: 350), curve: Curves.easeInSine)
           .then((_) {
         setState(() {
           _viewModel._pageAnimating = false;
@@ -351,13 +356,14 @@ class _TextPagerState extends State<TextPagerPage>
     if (_viewModel._prevEpisodeIndex != null) {
       setState(() {
         _viewModel._pageAnimating = true;
+        _viewModel._index = _viewModel._prevEpisodeIndex;
+        _viewModel.showByContinue();
       });
-      _viewModel._index = _viewModel._prevEpisodeIndex;
       _viewModel._firstScrollPosition = FirstScrollPosition.bottom;
       print((_viewModel._index).toString());
       await _viewModel._pageController
           .animateToPage(_viewModel._index,
-              duration: Duration(milliseconds: 500), curve: Curves.easeInSine)
+              duration: Duration(milliseconds: 350), curve: Curves.easeInSine)
           .then((_) {
         setState(() {
           _viewModel._pageAnimating = false;

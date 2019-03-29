@@ -48,7 +48,7 @@ class CachedNarouTextDataStore extends CachedTextDataStore {
       if (rawHasCache) {
         print("cache not found. start insert.");
 
-        return Database().into(Database().cachedNarouTextEntity).insert(
+        return Database().update(Database().cachedNarouTextEntity).replace(
             CachedNarouTextEntityData(
                 siteOfIdentifier: text.siteOfIdentifier,
                 episodeIdentifier: text.episodeOfIdentifier,
@@ -56,7 +56,7 @@ class CachedNarouTextDataStore extends CachedTextDataStore {
       } else {
         print("cache found. start replace");
 
-        return Database().update(Database().cachedNarouTextEntity).replace(
+        return Database().into(Database().cachedNarouTextEntity).insert(
             CachedNarouTextEntityData(
                 siteOfIdentifier: text.siteOfIdentifier,
                 episodeIdentifier: text.episodeOfIdentifier,
@@ -69,7 +69,8 @@ class CachedNarouTextDataStore extends CachedTextDataStore {
 
   @override
   Future<bool> hasCache(String siteOfIdentifier, String episodeIdentifier) {
-    print("start hasCache." + episodeIdentifier);
+    print("start hasCache. siteOfIdentifier = " + siteOfIdentifier);
+    print("start hasCache. episodeIdentifier = " + episodeIdentifier);
     return (Database().select(Database().cachedNarouTextEntity)
           ..where((text) => text.siteOfIdentifier.equals(siteOfIdentifier))
           ..where((text) => text.episodeIdentifier.equals(episodeIdentifier))
