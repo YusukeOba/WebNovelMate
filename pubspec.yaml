@@ -42,6 +42,7 @@ dependencies:
   # ios style pull to refresh
   flutter_easyrefresh: ^1.2.7
 
+  shared_preferences: ^0.5.1+2
 
 dev_dependencies:
   flutter_test:
