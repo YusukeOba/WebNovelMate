@@ -99,12 +99,12 @@ class RemoteNarouEpisodeDataStore extends RemoteEpisodeDataStore {
         print("lastWriteDate = " + lastUpdate.trim());
 
         // 投稿時刻をDate型へ
-        int firstWriteDateLong = new DateFormat("yyyy/MM/dd HH:mm")
+        int firstWriteDateLong = DateFormat("yyyy/MM/dd HH:mm")
             .parse(firstWriteDate.trim())
             .millisecondsSinceEpoch;
 
         // 改稿時刻をDate型へ
-        int lastUpdateDateLong = new DateFormat("yyyy/MM/dd HH:mm")
+        int lastUpdateDateLong = DateFormat("yyyy/MM/dd HH:mm")
             .parse(lastUpdate.trim())
             .millisecondsSinceEpoch;
 

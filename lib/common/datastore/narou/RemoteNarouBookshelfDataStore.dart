@@ -83,18 +83,19 @@ class RemoteNarouBookshelfDataStore extends RemoteBookshelfDataStore {
 
         // 最新情報をマッピングした小説情報を作成する
         updateTargetNovels[remoteNovel.ncode] = SubscribedNovelEntity(
-            NovelHeader(
-                NovelIdentifier(AvailableSites.narou, remoteNovel.ncode),
-                remoteNovel.title,
-                remoteNovel.story,
-                remoteNovel.writer,
-                remoteNovel.end == 0,
-                lastUpTime,
-                remoteNovel.length,
-                remoteNovel.general_all_no),
-            cachedNovel.lastReadAt,
-            correctUnreadCount,
-            remoteEpisodeCount);
+          NovelHeader(
+              NovelIdentifier(AvailableSites.narou, remoteNovel.ncode),
+              remoteNovel.title,
+              remoteNovel.story,
+              remoteNovel.writer,
+              remoteNovel.end == 0,
+              lastUpTime,
+              remoteNovel.length,
+              remoteNovel.general_all_no),
+          cachedNovel.lastReadAt,
+          correctUnreadCount,
+          remoteEpisodeCount,
+        );
       });
 
       return updateTargetNovels.values.toList();

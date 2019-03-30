@@ -1,6 +1,7 @@
 import 'package:NovelMate/common/Sites.dart';
 import 'package:NovelMate/common/datastore/CachedBookshelfDataStore.dart';
 import 'package:NovelMate/common/datastore/RemoteBookshelfDataStore.dart';
+import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
 import 'package:NovelMate/common/entities/domain/SubscribedNovelEntity.dart';
 import 'package:NovelMate/common/repository/BookshelfRepository.dart';
 
@@ -28,6 +29,19 @@ class BookshelfRepositoryImpl extends BookshelfRepository {
           // へとflatMap
           .then((findAll) =>
               findAll.expand((fetchResult) => fetchResult).toList());
+    });
+  }
+
+  @override
+  Future<SubscribedNovelEntity> find(NovelIdentifier novelIdentifier) {
+    return findAll().then((novels) {
+      print("find equals novel.");
+      return novels.firstWhere((novel) =>
+          // サイト、サイト中の固有IDが一致しているものを抽出
+          novel.novelHeader.identifier.siteOfIdentifier ==
+              novelIdentifier.siteOfIdentifier &&
+          novel.novelHeader.identifier.site.identifier ==
+              novelIdentifier.site.identifier);
     });
   }
 
@@ -81,6 +95,8 @@ class BookshelfRepositoryImpl extends BookshelfRepository {
 
   @override
   Future<void> updateAll() async {
+    print("update All!!!");
+
     /// 自分のキャッシュを読み出す
     return findAll().then((novels) {
       // 一括で更新させたほうが早く終わる上に通信コストも掛からないので、
@@ -120,6 +136,27 @@ class BookshelfRepositoryImpl extends BookshelfRepository {
     }).then((updatedNovels) {
       // 再保存
       return this.save(updatedNovels);
+    });
+  }
+
+  @override
+  Future<void> updateReadingEpisode(
+      NovelIdentifier novelIdentifier, String episodeIdentifier) {
+    return findAll().then((novels) {
+      print("find equals novel.");
+      return novels.firstWhere((novel) =>
+          // サイト、サイト中の固有IDが一致しているものを抽出
+          novel.novelHeader.identifier.siteOfIdentifier ==
+              novelIdentifier.siteOfIdentifier &&
+          novel.novelHeader.identifier.site.identifier ==
+              novelIdentifier.site.identifier);
+    }).then((novel) {
+      print("try update reading episode variable.");
+      // 値の書き込み
+      return novel..readingEpisodeIdentifier = episodeIdentifier;
+    }).then((novel) {
+      print("try cache update reading episode.");
+      return this.save([novel].toList());
     });
   }
 }

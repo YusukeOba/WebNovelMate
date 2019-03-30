@@ -17,6 +17,7 @@ class CachedNarouSubscribedNovelEntityData {
   final int textLength;
   final int episodeCount;
   final int lastReadAt;
+  final String readingEpisodeIdentifier;
   CachedNarouSubscribedNovelEntityData(
       {this.identifier,
       this.novelName,
@@ -27,7 +28,8 @@ class CachedNarouSubscribedNovelEntityData {
       this.lastUpdatedAt,
       this.textLength,
       this.episodeCount,
-      this.lastReadAt});
+      this.lastReadAt,
+      this.readingEpisodeIdentifier});
   factory CachedNarouSubscribedNovelEntityData.fromData(
       Map<String, dynamic> data, GeneratedDatabase db) {
     final stringType = db.typeSystem.forDartType<String>();
@@ -44,8 +46,42 @@ class CachedNarouSubscribedNovelEntityData {
       textLength: intType.mapFromDatabaseResponse(data['text_length']),
       episodeCount: intType.mapFromDatabaseResponse(data['episode_count']),
       lastReadAt: intType.mapFromDatabaseResponse(data['last_read_at']),
+      readingEpisodeIdentifier: stringType
+          .mapFromDatabaseResponse(data['reading_episode_identifier']),
     );
   }
+  factory CachedNarouSubscribedNovelEntityData.fromJson(
+      Map<String, dynamic> json) {
+    return CachedNarouSubscribedNovelEntityData(
+      identifier: json['identifier'] as String,
+      novelName: json['novelName'] as String,
+      novelStory: json['novelStory'] as String,
+      writer: json['writer'] as String,
+      unreadCount: json['unreadCount'] as int,
+      isComplete: json['isComplete'] as bool,
+      lastUpdatedAt: json['lastUpdatedAt'] as int,
+      textLength: json['textLength'] as int,
+      episodeCount: json['episodeCount'] as int,
+      lastReadAt: json['lastReadAt'] as int,
+      readingEpisodeIdentifier: json['readingEpisodeIdentifier'] as String,
+    );
+  }
+  Map<String, dynamic> toJson() {
+    return {
+      'identifier': identifier,
+      'novelName': novelName,
+      'novelStory': novelStory,
+      'writer': writer,
+      'unreadCount': unreadCount,
+      'isComplete': isComplete,
+      'lastUpdatedAt': lastUpdatedAt,
+      'textLength': textLength,
+      'episodeCount': episodeCount,
+      'lastReadAt': lastReadAt,
+      'readingEpisodeIdentifier': readingEpisodeIdentifier,
+    };
+  }
+
   CachedNarouSubscribedNovelEntityData copyWith(
           {String identifier,
           String novelName,
@@ -56,7 +92,8 @@ class CachedNarouSubscribedNovelEntityData {
           int lastUpdatedAt,
           int textLength,
           int episodeCount,
-          int lastReadAt}) =>
+          int lastReadAt,
+          String readingEpisodeIdentifier}) =>
       CachedNarouSubscribedNovelEntityData(
         identifier: identifier ?? this.identifier,
         novelName: novelName ?? this.novelName,
@@ -68,6 +105,8 @@ class CachedNarouSubscribedNovelEntityData {
         textLength: textLength ?? this.textLength,
         episodeCount: episodeCount ?? this.episodeCount,
         lastReadAt: lastReadAt ?? this.lastReadAt,
+        readingEpisodeIdentifier:
+            readingEpisodeIdentifier ?? this.readingEpisodeIdentifier,
       );
   @override
   String toString() {
@@ -81,30 +120,33 @@ class CachedNarouSubscribedNovelEntityData {
           ..write('lastUpdatedAt: $lastUpdatedAt, ')
           ..write('textLength: $textLength, ')
           ..write('episodeCount: $episodeCount, ')
-          ..write('lastReadAt: $lastReadAt')
+          ..write('lastReadAt: $lastReadAt, ')
+          ..write('readingEpisodeIdentifier: $readingEpisodeIdentifier')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode =>
-      (((((((((identifier.hashCode) * 31 + novelName.hashCode) * 31 +
-                                                              novelStory
-                                                                  .hashCode) *
+      ((((((((((identifier.hashCode) * 31 + novelName.hashCode) * 31 +
+                                                                      novelStory
+                                                                          .hashCode) *
+                                                                  31 +
+                                                              writer.hashCode) *
                                                           31 +
-                                                      writer.hashCode) *
+                                                      unreadCount.hashCode) *
                                                   31 +
-                                              unreadCount.hashCode) *
+                                              isComplete.hashCode) *
                                           31 +
-                                      isComplete.hashCode) *
+                                      lastUpdatedAt.hashCode) *
                                   31 +
-                              lastUpdatedAt.hashCode) *
+                              textLength.hashCode) *
                           31 +
-                      textLength.hashCode) *
+                      episodeCount.hashCode) *
                   31 +
-              episodeCount.hashCode) *
+              lastReadAt.hashCode) *
           31 +
-      lastReadAt.hashCode;
+      readingEpisodeIdentifier.hashCode;
   @override
   bool operator ==(other) =>
       identical(this, other) ||
@@ -118,7 +160,8 @@ class CachedNarouSubscribedNovelEntityData {
           other.lastUpdatedAt == lastUpdatedAt &&
           other.textLength == textLength &&
           other.episodeCount == episodeCount &&
-          other.lastReadAt == lastReadAt);
+          other.lastReadAt == lastReadAt &&
+          other.readingEpisodeIdentifier == readingEpisodeIdentifier);
 }
 
 class $CachedNarouSubscribedNovelEntityTable
@@ -128,55 +171,72 @@ class $CachedNarouSubscribedNovelEntityTable
             CachedNarouSubscribedNovelEntityData> {
   final GeneratedDatabase _db;
   $CachedNarouSubscribedNovelEntityTable(this._db);
+  GeneratedTextColumn _identifier;
   @override
-  GeneratedTextColumn get identifier => GeneratedTextColumn(
+  GeneratedTextColumn get identifier => _identifier ??= GeneratedTextColumn(
         'identifier',
         false,
       );
+  GeneratedTextColumn _novelName;
   @override
-  GeneratedTextColumn get novelName => GeneratedTextColumn(
+  GeneratedTextColumn get novelName => _novelName ??= GeneratedTextColumn(
         'novel_name',
         false,
       );
+  GeneratedTextColumn _novelStory;
   @override
-  GeneratedTextColumn get novelStory => GeneratedTextColumn(
+  GeneratedTextColumn get novelStory => _novelStory ??= GeneratedTextColumn(
         'novel_story',
         false,
       );
+  GeneratedTextColumn _writer;
   @override
-  GeneratedTextColumn get writer => GeneratedTextColumn(
+  GeneratedTextColumn get writer => _writer ??= GeneratedTextColumn(
         'writer',
         false,
       );
+  GeneratedIntColumn _unreadCount;
   @override
-  GeneratedIntColumn get unreadCount => GeneratedIntColumn(
+  GeneratedIntColumn get unreadCount => _unreadCount ??= GeneratedIntColumn(
         'unread_count',
         false,
       );
+  GeneratedBoolColumn _isComplete;
   @override
-  GeneratedBoolColumn get isComplete => GeneratedBoolColumn(
+  GeneratedBoolColumn get isComplete => _isComplete ??= GeneratedBoolColumn(
         'is_complete',
         false,
       );
+  GeneratedIntColumn _lastUpdatedAt;
   @override
-  GeneratedIntColumn get lastUpdatedAt => GeneratedIntColumn(
+  GeneratedIntColumn get lastUpdatedAt => _lastUpdatedAt ??= GeneratedIntColumn(
         'last_updated_at',
         false,
       );
+  GeneratedIntColumn _textLength;
   @override
-  GeneratedIntColumn get textLength => GeneratedIntColumn(
+  GeneratedIntColumn get textLength => _textLength ??= GeneratedIntColumn(
         'text_length',
         false,
       );
+  GeneratedIntColumn _episodeCount;
   @override
-  GeneratedIntColumn get episodeCount => GeneratedIntColumn(
+  GeneratedIntColumn get episodeCount => _episodeCount ??= GeneratedIntColumn(
         'episode_count',
         false,
       );
+  GeneratedIntColumn _lastReadAt;
   @override
-  GeneratedIntColumn get lastReadAt => GeneratedIntColumn(
+  GeneratedIntColumn get lastReadAt => _lastReadAt ??= GeneratedIntColumn(
         'last_read_at',
         false,
+      );
+  GeneratedTextColumn _readingEpisodeIdentifier;
+  @override
+  GeneratedTextColumn get readingEpisodeIdentifier =>
+      _readingEpisodeIdentifier ??= GeneratedTextColumn(
+        'reading_episode_identifier',
+        true,
       );
   @override
   List<GeneratedColumn> get $columns => [
@@ -189,7 +249,8 @@ class $CachedNarouSubscribedNovelEntityTable
         lastUpdatedAt,
         textLength,
         episodeCount,
-        lastReadAt
+        lastReadAt,
+        readingEpisodeIdentifier
       ];
   @override
   CachedNarouSubscribedNovelEntity get asDslTable => this;
@@ -207,7 +268,9 @@ class $CachedNarouSubscribedNovelEntityTable
       lastUpdatedAt.isAcceptableValue(instance.lastUpdatedAt, isInserting) &&
       textLength.isAcceptableValue(instance.textLength, isInserting) &&
       episodeCount.isAcceptableValue(instance.episodeCount, isInserting) &&
-      lastReadAt.isAcceptableValue(instance.lastReadAt, isInserting);
+      lastReadAt.isAcceptableValue(instance.lastReadAt, isInserting) &&
+      readingEpisodeIdentifier.isAcceptableValue(
+          instance.readingEpisodeIdentifier, isInserting);
   @override
   Set<GeneratedColumn> get $primaryKey => {identifier};
   @override
@@ -249,6 +312,10 @@ class $CachedNarouSubscribedNovelEntityTable
     if (d.lastReadAt != null || includeNulls) {
       map['last_read_at'] = Variable<int, IntType>(d.lastReadAt);
     }
+    if (d.readingEpisodeIdentifier != null || includeNulls) {
+      map['reading_episode_identifier'] =
+          Variable<String, StringType>(d.readingEpisodeIdentifier);
+    }
     return map;
   }
 }
@@ -283,6 +350,27 @@ class CachedNarouEpisodeEntityData {
       episodeName: stringType.mapFromDatabaseResponse(data['episode_name']),
     );
   }
+  factory CachedNarouEpisodeEntityData.fromJson(Map<String, dynamic> json) {
+    return CachedNarouEpisodeEntityData(
+      siteOfIdentifier: json['siteOfIdentifier'] as String,
+      episodeIdentifier: json['episodeIdentifier'] as String,
+      firstWriteAt: json['firstWriteAt'] as int,
+      lastUpdateAt: json['lastUpdateAt'] as int,
+      nullableChapterName: json['nullableChapterName'] as String,
+      episodeName: json['episodeName'] as String,
+    );
+  }
+  Map<String, dynamic> toJson() {
+    return {
+      'siteOfIdentifier': siteOfIdentifier,
+      'episodeIdentifier': episodeIdentifier,
+      'firstWriteAt': firstWriteAt,
+      'lastUpdateAt': lastUpdateAt,
+      'nullableChapterName': nullableChapterName,
+      'episodeName': episodeName,
+    };
+  }
+
   CachedNarouEpisodeEntityData copyWith(
           {String siteOfIdentifier,
           String episodeIdentifier,
@@ -338,33 +426,42 @@ class $CachedNarouEpisodeEntityTable extends CachedNarouEpisodeEntity
         TableInfo<CachedNarouEpisodeEntity, CachedNarouEpisodeEntityData> {
   final GeneratedDatabase _db;
   $CachedNarouEpisodeEntityTable(this._db);
+  GeneratedTextColumn _siteOfIdentifier;
   @override
-  GeneratedTextColumn get siteOfIdentifier => GeneratedTextColumn(
+  GeneratedTextColumn get siteOfIdentifier =>
+      _siteOfIdentifier ??= GeneratedTextColumn(
         'site_of_identifier',
         false,
       );
+  GeneratedTextColumn _episodeIdentifier;
   @override
-  GeneratedTextColumn get episodeIdentifier => GeneratedTextColumn(
+  GeneratedTextColumn get episodeIdentifier =>
+      _episodeIdentifier ??= GeneratedTextColumn(
         'episode_identifier',
         false,
       );
+  GeneratedIntColumn _firstWriteAt;
   @override
-  GeneratedIntColumn get firstWriteAt => GeneratedIntColumn(
+  GeneratedIntColumn get firstWriteAt => _firstWriteAt ??= GeneratedIntColumn(
         'first_write_at',
         false,
       );
+  GeneratedIntColumn _lastUpdateAt;
   @override
-  GeneratedIntColumn get lastUpdateAt => GeneratedIntColumn(
+  GeneratedIntColumn get lastUpdateAt => _lastUpdateAt ??= GeneratedIntColumn(
         'last_update_at',
         false,
       );
+  GeneratedTextColumn _nullableChapterName;
   @override
-  GeneratedTextColumn get nullableChapterName => GeneratedTextColumn(
+  GeneratedTextColumn get nullableChapterName =>
+      _nullableChapterName ??= GeneratedTextColumn(
         'nullable_chapter_name',
         true,
       );
+  GeneratedTextColumn _episodeName;
   @override
-  GeneratedTextColumn get episodeName => GeneratedTextColumn(
+  GeneratedTextColumn get episodeName => _episodeName ??= GeneratedTextColumn(
         'episode_name',
         false,
       );
@@ -446,6 +543,21 @@ class CachedNarouTextEntityData {
       episodeText: stringType.mapFromDatabaseResponse(data['episode_text']),
     );
   }
+  factory CachedNarouTextEntityData.fromJson(Map<String, dynamic> json) {
+    return CachedNarouTextEntityData(
+      siteOfIdentifier: json['siteOfIdentifier'] as String,
+      episodeIdentifier: json['episodeIdentifier'] as String,
+      episodeText: json['episodeText'] as String,
+    );
+  }
+  Map<String, dynamic> toJson() {
+    return {
+      'siteOfIdentifier': siteOfIdentifier,
+      'episodeIdentifier': episodeIdentifier,
+      'episodeText': episodeText,
+    };
+  }
+
   CachedNarouTextEntityData copyWith(
           {String siteOfIdentifier,
           String episodeIdentifier,
@@ -482,18 +594,23 @@ class $CachedNarouTextEntityTable extends CachedNarouTextEntity
     implements TableInfo<CachedNarouTextEntity, CachedNarouTextEntityData> {
   final GeneratedDatabase _db;
   $CachedNarouTextEntityTable(this._db);
+  GeneratedTextColumn _siteOfIdentifier;
   @override
-  GeneratedTextColumn get siteOfIdentifier => GeneratedTextColumn(
+  GeneratedTextColumn get siteOfIdentifier =>
+      _siteOfIdentifier ??= GeneratedTextColumn(
         'site_of_identifier',
         false,
       );
+  GeneratedTextColumn _episodeIdentifier;
   @override
-  GeneratedTextColumn get episodeIdentifier => GeneratedTextColumn(
+  GeneratedTextColumn get episodeIdentifier =>
+      _episodeIdentifier ??= GeneratedTextColumn(
         'episode_identifier',
         false,
       );
+  GeneratedTextColumn _episodeText;
   @override
-  GeneratedTextColumn get episodeText => GeneratedTextColumn(
+  GeneratedTextColumn get episodeText => _episodeText ??= GeneratedTextColumn(
         'episode_text',
         false,
       );
@@ -540,12 +657,16 @@ class $CachedNarouTextEntityTable extends CachedNarouTextEntity
 
 abstract class _$Database extends GeneratedDatabase {
   _$Database(QueryExecutor e) : super(const SqlTypeSystem.withDefaults(), e);
+  $CachedNarouSubscribedNovelEntityTable _cachedNarouSubscribedNovelEntity;
   $CachedNarouSubscribedNovelEntityTable get cachedNarouSubscribedNovelEntity =>
-      $CachedNarouSubscribedNovelEntityTable(this);
+      _cachedNarouSubscribedNovelEntity ??=
+          $CachedNarouSubscribedNovelEntityTable(this);
+  $CachedNarouEpisodeEntityTable _cachedNarouEpisodeEntity;
   $CachedNarouEpisodeEntityTable get cachedNarouEpisodeEntity =>
-      $CachedNarouEpisodeEntityTable(this);
+      _cachedNarouEpisodeEntity ??= $CachedNarouEpisodeEntityTable(this);
+  $CachedNarouTextEntityTable _cachedNarouTextEntity;
   $CachedNarouTextEntityTable get cachedNarouTextEntity =>
-      $CachedNarouTextEntityTable(this);
+      _cachedNarouTextEntity ??= $CachedNarouTextEntityTable(this);
   @override
   List<TableInfo> get allTables => [
         cachedNarouSubscribedNovelEntity,

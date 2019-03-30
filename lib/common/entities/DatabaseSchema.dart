@@ -40,6 +40,9 @@ class CachedNarouSubscribedNovelEntity extends Table {
   /// 最終閲覧日時
   IntColumn get lastReadAt => integer()();
 
+  /// 最後に読んだ話
+  TextColumn get readingEpisodeIdentifier => text().nullable()();
+
   @override
   Set<TextColumn> get primaryKey => {identifier};
 }

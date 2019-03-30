@@ -9,6 +9,9 @@ abstract class CachedBookshelfDataStore {
   /// DBを更新する
   Future<void> insertOrUpdate(List<SubscribedNovelEntity> records);
 
+  /// キャッシュがあるかどうか
+  Future<bool> hasCache(SubscribedNovelEntity record);
+
   /// 削除する
   Future<void> delete(List<SubscribedNovelEntity> records);
 }

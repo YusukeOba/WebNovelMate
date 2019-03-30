@@ -43,7 +43,7 @@ class _TextPagerViewModel {
   int _index;
 
   /// AppBar, BottomBarを出すかどうか
-  bool _shownOuterView = true;
+  bool _shownOuterView = false;
 
   PageController _pageController;
 
@@ -199,6 +199,13 @@ class _TextPagerViewModel {
     bool isGothic = await repository.isGothic();
     changeTextStyle(fontSize, colorPattern, isGothic);
   }
+
+  /// 最後に読んだエピソードの保存
+  Future<void> updateReadingEpisode() {
+    final repository = RepositoryFactory.shared.getBookshelfRepository();
+    return repository.updateReadingEpisode(
+        _currentEpisode.novelIdentifier, _currentEpisode.episodeIdentifier);
+  }
 }
 
 class _TextPagerState extends State<TextPagerPage>
@@ -258,9 +265,10 @@ class _TextPagerState extends State<TextPagerPage>
               )
             ]),
             bottomNavigationBar: _buildBottomBar()),
-        onWillPop: () {
+        onWillPop: () async {
           SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
-          Navigator.of(context).pop();
+          await _viewModel.updateReadingEpisode();
+          return Future.value(true);
         });
   }
 
@@ -363,6 +371,7 @@ class _TextPagerState extends State<TextPagerPage>
             },
             // Sliderからの通知をScrollViewに反映
             _viewModel._sliderValueNotifier,
+            _viewModel._firstScrollPosition,
             _viewModel._backgroundColor,
             _viewModel._textStyle,
             nextActionCallback: () {
@@ -402,6 +411,7 @@ class _TextPagerState extends State<TextPagerPage>
               duration: Duration(milliseconds: 350), curve: Curves.easeInSine)
           .then((_) {
         setState(() {
+          _viewModel._rawSliderOffset = 0;
           _viewModel._pageAnimating = false;
         });
       });
@@ -422,6 +432,7 @@ class _TextPagerState extends State<TextPagerPage>
               duration: Duration(milliseconds: 350), curve: Curves.easeInSine)
           .then((_) {
         setState(() {
+          _viewModel._rawSliderOffset = 0;
           _viewModel._pageAnimating = false;
         });
       });

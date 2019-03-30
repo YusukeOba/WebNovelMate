@@ -13,11 +13,17 @@ class SubscribedNovelEntity {
   /// 話数
   final int episodeCount;
 
+  /// 現在読んでいる話
+  String readingEpisodeIdentifier;
+
   SubscribedNovelEntity(
-      this.novelHeader, this.lastReadAt, this.unreadCount, this.episodeCount);
+      this.novelHeader, this.lastReadAt, this.unreadCount, this.episodeCount,
+      {String readingEpisodeIdentifier}) {
+    this.readingEpisodeIdentifier = readingEpisodeIdentifier;
+  }
 
   @override
   String toString() {
-    return 'SubscribedNovelEntity{novelHeader: $novelHeader, lastReadAt: $lastReadAt, unreadCount: $unreadCount, episodeCount: $episodeCount}';
+    return 'SubscribedNovelEntity{novelHeader: $novelHeader, lastReadAt: $lastReadAt, unreadCount: $unreadCount, episodeCount: $episodeCount, readingEpisodeIdentifier: $readingEpisodeIdentifier}';
   }
 }
