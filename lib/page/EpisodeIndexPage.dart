@@ -84,26 +84,11 @@ class _EpisodeIndexState extends State<EpisodeIndexPage> {
   @override
   void initState() {
     super.initState();
-    _testRegist();
 
     setState(() {
       this._viewModel.showEpisodes();
       this._viewModel.showReadingContinue();
     });
-  }
-
-  /// TODO: 抹消
-  _testRegist() async {
-    BookshelfRepository bkRepository =
-        RepositoryFactory.shared.getBookshelfRepository();
-
-    await bkRepository.save([
-      SubscribedNovelEntity(
-          _viewModel._novelHeader,
-          DateTime.now().millisecondsSinceEpoch,
-          _viewModel._novelHeader.episodeCount,
-          _viewModel._novelHeader.episodeCount)
-    ]);
   }
 
   @override

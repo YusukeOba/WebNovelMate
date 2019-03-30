@@ -5,7 +5,7 @@ class SubscribedNovelEntity {
   final NovelHeader novelHeader;
 
   /// 最終閲覧日時
-  final int lastReadAt;
+  int lastReadAt;
 
   /// 未読数
   final int unreadCount;

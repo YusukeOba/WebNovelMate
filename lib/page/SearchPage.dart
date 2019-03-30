@@ -5,6 +5,7 @@ import 'package:NovelMate/common/datastore/narou/CachedNarouBookshelfDataStore.d
 import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
 import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
 import 'package:NovelMate/common/entities/domain/SubscribedNovelEntity.dart';
+import 'package:NovelMate/common/repository/BookshelfRepository.dart';
 import 'package:NovelMate/common/repository/RankingRepository.dart';
 import 'package:NovelMate/common/repository/RepositoryFactory.dart';
 import 'package:NovelMate/page/EpisodeIndexPage.dart';
@@ -187,26 +188,38 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                       overflow: TextOverflow.ellipsis,
                     ),
                     onTap: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) {
-                        return EpisodeIndexPage(novel.novelHeader);
-                      }));
+                      _showDetailPage(novel.novelHeader);
                     },
                   ),
                   Divider()
                 ]);
               }).toList(),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                FlatButton(
-                  child: Text("もっと見る"),
-                  onPressed: () {},
-                )
-              ],
-            )
+// TODO: もっと見る対応
+//            Row(
+//              mainAxisAlignment: MainAxisAlignment.end,
+//              children: <Widget>[
+//                FlatButton(
+//                  child: Text("もっと見る"),
+//                  onPressed: () {},
+//                )
+//              ],
+//            )
           ]);
         });
+  }
+
+  _showDetailPage(NovelHeader novelHeader) async {
+    BookshelfRepository bkRepository =
+        RepositoryFactory.shared.getBookshelfRepository();
+
+    await bkRepository.save([
+      SubscribedNovelEntity(novelHeader, DateTime.now().millisecondsSinceEpoch,
+          novelHeader.episodeCount, novelHeader.episodeCount)
+    ]);
+
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return EpisodeIndexPage(novelHeader);
+    }));
   }
 }

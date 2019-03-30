@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:NovelMate/common/Sites.dart';
 import 'package:NovelMate/common/colors.dart';
+import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
 import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
 import 'package:NovelMate/common/entities/domain/SubscribedNovelEntity.dart';
 import 'package:NovelMate/common/repository/BookshelfRepository.dart';
@@ -181,9 +182,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
 
             return InkWell(
                 onTap: () async {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return EpisodeIndexPage(novel.novelHeader);
-                  }));
+                  _showDetailPage(novel.novelHeader);
                 },
                 child: Container(
                     padding: EdgeInsets.symmetric(vertical: 8.0),
@@ -261,5 +260,19 @@ class _SearchResultPageState extends State<SearchResultPage> {
                     )));
           }, childCount: snapShot.data.length));
         });
+  }
+
+  _showDetailPage(NovelHeader novelHeader) async {
+    BookshelfRepository bkRepository =
+        RepositoryFactory.shared.getBookshelfRepository();
+
+    await bkRepository.save([
+      SubscribedNovelEntity(novelHeader, DateTime.now().millisecondsSinceEpoch,
+          novelHeader.episodeCount, novelHeader.episodeCount)
+    ]);
+
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return EpisodeIndexPage(novelHeader);
+    }));
   }
 }

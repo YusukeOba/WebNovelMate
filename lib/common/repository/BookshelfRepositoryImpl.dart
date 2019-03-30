@@ -153,7 +153,8 @@ class BookshelfRepositoryImpl extends BookshelfRepository {
     }).then((novel) {
       print("try update reading episode variable.");
       // 値の書き込み
-      return novel..readingEpisodeIdentifier = episodeIdentifier;
+      novel.readingEpisodeIdentifier = episodeIdentifier;
+      return novel..lastReadAt = DateTime.now().millisecondsSinceEpoch;
     }).then((novel) {
       print("try cache update reading episode.");
       return this.save([novel].toList());

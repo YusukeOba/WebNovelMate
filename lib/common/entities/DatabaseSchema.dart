@@ -29,7 +29,7 @@ class CachedNarouSubscribedNovelEntity extends Table {
   BoolColumn get isComplete => boolean()();
 
   /// 最終更新日時
-  IntColumn get lastUpdatedAt => integer()();
+  IntColumn get lastUpdatedAt => integer().nullable()();
 
   /// 文字数
   IntColumn get textLength => integer()();

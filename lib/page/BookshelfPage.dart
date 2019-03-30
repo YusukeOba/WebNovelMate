@@ -121,7 +121,11 @@ class _BookshelfState extends State<BookshelfPage> {
         onTap: () {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
             return EpisodeIndexPage(novel.novelHeader);
-          }));
+          })).then((_) {
+            setState(() {
+              _viewModel.refreshLists();
+            });
+          });
         },
         child: Container(
             padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),

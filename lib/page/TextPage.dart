@@ -249,6 +249,7 @@ class _TextPageState extends State<TextPage> {
                     textWidget = Container(
                       color: _viewModel._color.value,
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Container(
                               padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
@@ -256,7 +257,7 @@ class _TextPageState extends State<TextPage> {
                                 children: <Widget>[
                                   Text(text,
                                       style: _viewModel._textStyle.value),
-                                  Container(height: 64),
+                                  Container(height: 164),
                                 ],
                               )),
                           _buildNextEpisode()
@@ -273,7 +274,7 @@ class _TextPageState extends State<TextPage> {
                               padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
                               child: Column(
                                 children: <Widget>[
-                                  Container(height: 32),
+                                  Container(height: 128),
                                   Text(_viewModel.episodeName,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
