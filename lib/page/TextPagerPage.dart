@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:NovelMate/common/colors.dart';
 import 'package:NovelMate/common/entities/domain/EpisodeEntity.dart';
 import 'package:NovelMate/common/repository/RepositoryFactory.dart';
@@ -159,8 +161,8 @@ class _TextPagerViewModel {
   }
 
   /// フォント設定の変更
-  void changeTextStyle(
-      double fontSize, ColorPattern colorPattern, bool isGothic) {
+  void changeTextStyle(double fontSize, ColorPattern colorPattern,
+      bool isGothic, double lineHeight) {
     Color textColor;
     switch (colorPattern) {
       case ColorPattern.white:
@@ -177,10 +179,26 @@ class _TextPagerViewModel {
         break;
     }
 
+    String fontFamily;
+    if (isGothic) {
+      if (Platform.isAndroid) {
+        fontFamily = "";
+      } else if (Platform.isIOS) {
+        fontFamily = "Hiragino";
+      }
+    } else {
+      if (Platform.isAndroid) {
+        fontFamily = "SawarabiMincho";
+      } else if (Platform.isIOS) {
+        fontFamily = "Hiragino Mincho ProN";
+      }
+    }
+
     TextStyle style = TextStyle(
         fontSize: fontSize,
-        fontFamily: isGothic ? "" : "sans-serif",
-        color: textColor);
+        fontFamily: fontFamily,
+        color: textColor,
+        height: lineHeight);
     _textStyle.value = style;
 
     print("change. textStyle = " + style.toString());
@@ -197,7 +215,8 @@ class _TextPagerViewModel {
     double fontSize = await repository.getFontSize();
     ColorPattern colorPattern = await repository.getColorPattern();
     bool isGothic = await repository.isGothic();
-    changeTextStyle(fontSize, colorPattern, isGothic);
+    double lineHeight = await repository.getLineHeight();
+    changeTextStyle(fontSize, colorPattern, isGothic, lineHeight);
   }
 
   /// 最後に読んだエピソードの保存
@@ -254,7 +273,8 @@ class _TextPagerState extends State<TextPagerPage>
                           itemCount: _viewModel._episodes.length,
                           itemBuilder: (context, position) {
                             return Container(
-                                color: sNMAccentColor, child: _buildTexts());
+                                color: _viewModel._backgroundColor.value,
+                                child: _buildTexts());
                           }))),
               Positioned(
                 top: 0.0,
@@ -443,12 +463,13 @@ class _TextPagerState extends State<TextPagerPage>
     showModalBottomSheet(
         context: context,
         builder: (context) {
-          return SettingContainer(
-              (double fontSize, ColorPattern colorPattern, bool isGothic) {
+          return Scaffold(body: SettingContainer((double fontSize,
+              ColorPattern colorPattern, bool isGothic, double lineHeight) {
             setState(() {
-              _viewModel.changeTextStyle(fontSize, colorPattern, isGothic);
+              _viewModel.changeTextStyle(
+                  fontSize, colorPattern, isGothic, lineHeight);
             });
-          });
+          }));
         });
   }
 }

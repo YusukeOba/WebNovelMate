@@ -5,6 +5,7 @@ class SettingRepositoryImpl extends SettingRepository {
   final String keyFontSize = "key_font_size";
   final String keyColorPattern = "key_color_pattern";
   final String keyIsGothic = "key_is_gothic";
+  final String keyLineHeight = "key_line_height";
 
   @override
   Future<double> getFontSize() {
@@ -42,5 +43,17 @@ class SettingRepositoryImpl extends SettingRepository {
   Future<void> setFontSize(double fontSize) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.setDouble(keyFontSize, fontSize);
+  }
+
+  @override
+  Future<double> getLineHeight() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getDouble(keyLineHeight) ?? 1.0;
+  }
+
+  @override
+  Future<void> setLineHeight(double lineHeight) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setDouble(keyLineHeight, lineHeight);
   }
 }

@@ -232,11 +232,11 @@ class _TextPageState extends State<TextPage> {
             loadMore: _viewModel._nextEpisodeName != null ? loadMore : null,
             refreshHeader: BallPulseHeader(
               key: _headerKey,
-              color: sNMPrimaryColor,
+              color: _viewModel._textStyle.value.color,
             ),
             refreshFooter: BallPulseFooter(
               key: _footerKey,
-              color: sNMPrimaryColor,
+              color: _viewModel._textStyle.value.color,
             ),
             child: ListView.builder(
                 controller: _viewModel._scrollController,

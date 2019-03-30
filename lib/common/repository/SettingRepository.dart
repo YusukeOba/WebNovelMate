@@ -21,4 +21,10 @@ abstract class SettingRepository {
 
   /// 色テーマの設定
   Future<void> setColorPattern(ColorPattern colorPattern);
+
+  /// 行間の設定
+  Future<void> setLineHeight(double lineHeight);
+
+  /// 行間の取得
+  Future<double> getLineHeight();
 }
