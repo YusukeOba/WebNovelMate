@@ -176,8 +176,8 @@ class _BookshelfState extends State<BookshelfPage> {
                   Wrap(
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: <Widget>[
-                      // 未読数
-                      _buildUnreadChip(novel),
+//                      // 未読数
+//                      _buildUnreadChip(novel),
                       // 完結済かどうか
                       Text(
                         novel.novelHeader.isComplete ? "完結済" : "連載中",
@@ -197,6 +197,7 @@ class _BookshelfState extends State<BookshelfPage> {
                 ])));
   }
 
+  /// TODO: 対応
   /// 未読数の生成
   Widget _buildUnreadChip(SubscribedNovelEntity novel) {
     if (novel.unreadCount > 0) {
