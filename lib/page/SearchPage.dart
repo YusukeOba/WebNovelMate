@@ -45,6 +45,10 @@ class _SearchPageViewModel {
   inputText(String text, BuildContext context) {
     inputtedText = text;
     print("inputed = $text");
+    // 空の時は遷移させない
+    if (text == null || text.isEmpty) {
+      return;
+    }
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return SearchResultPage(inputtedText);
     }));
