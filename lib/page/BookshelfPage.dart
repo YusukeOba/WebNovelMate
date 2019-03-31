@@ -5,6 +5,7 @@ import 'package:NovelMate/common/entities/domain/SubscribedNovelEntity.dart';
 import 'package:NovelMate/common/repository/RepositoryFactory.dart';
 import 'package:NovelMate/page/BookshelfTabPage.dart';
 import 'package:NovelMate/page/EpisodeIndexPage.dart';
+import 'package:NovelMate/page/SearchPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -104,6 +105,30 @@ class _BookshelfState extends State<BookshelfPage> {
         // エラーケース
         if (snapShot.hasError) {
           return Text("Error Occured.");
+        }
+
+        if (snapShot.data == null || snapShot.data.isEmpty) {
+          return SliverList(
+              delegate: SliverChildListDelegate(<Widget>[
+            Container(
+              height: 256,
+              child: Center(
+                  child: RaisedButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                fullscreenDialog: true,
+                                builder: (context) {
+                                  return SearchPage();
+                                })).then((_) {
+                          // 検索から戻ってきたら本棚を更新する
+                          this._viewModel.refreshLists();
+                        });
+                      },
+                      child: Text("まずは小説を検索してみましょう！"))),
+            )
+          ]));
         }
 
         // データが存在する

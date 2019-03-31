@@ -317,14 +317,14 @@ class _TextPageState extends State<TextPage> {
               color: sNMAccentColor,
               child: Column(
                 children: <Widget>[
-                  Container(height: 16.0),
+                  Container(height: 32.0),
                   Text("次の話: "),
                   Container(
                     child: Text(_viewModel._nextEpisodeName,
                         style: TextStyle(fontWeight: FontWeight.bold)),
                     padding: EdgeInsets.symmetric(horizontal: 16.0),
                   ),
-                  Container(height: 16.0),
+                  Container(height: 32.0),
                 ],
               ))
         ],
@@ -343,14 +343,14 @@ class _TextPageState extends State<TextPage> {
               color: sNMAccentColor,
               child: Column(
                 children: <Widget>[
-                  Container(height: 16.0),
+                  Container(height: 32.0),
                   Text("前の話: "),
                   Container(
                     child: Text(_viewModel._prevEpisodeName,
                         style: TextStyle(fontWeight: FontWeight.bold)),
                     padding: EdgeInsets.symmetric(horizontal: 16.0),
                   ),
-                  Container(height: 16.0),
+                  Container(height: 32.0),
                 ],
               ))
         ],

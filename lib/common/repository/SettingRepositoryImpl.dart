@@ -10,7 +10,7 @@ class SettingRepositoryImpl extends SettingRepository {
   @override
   Future<double> getFontSize() {
     return SharedPreferences.getInstance().then((prefs) {
-      return prefs.getDouble(keyFontSize) ?? 12;
+      return prefs.getDouble(keyFontSize) ?? 14;
     });
   }
 
@@ -42,6 +42,9 @@ class SettingRepositoryImpl extends SettingRepository {
   @override
   Future<void> setFontSize(double fontSize) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (fontSize < 5 || fontSize > 40) {
+      return Future.value();
+    }
     return prefs.setDouble(keyFontSize, fontSize);
   }
 
@@ -54,6 +57,9 @@ class SettingRepositoryImpl extends SettingRepository {
   @override
   Future<void> setLineHeight(double lineHeight) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (lineHeight < 0 || lineHeight > 3) {
+      return Future.value();
+    }
     return prefs.setDouble(keyLineHeight, lineHeight);
   }
 }
