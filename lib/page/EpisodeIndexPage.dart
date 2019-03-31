@@ -206,6 +206,7 @@ class _EpisodeIndexState extends State<EpisodeIndexPage> {
             );
           }
 
+          snapShot.data.sort((lhs, rhs) => lhs.displayOrder - rhs.displayOrder);
           final episodes = snapShot.data;
 
           return Scaffold(

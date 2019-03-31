@@ -40,6 +40,7 @@ class RemoteNarouEpisodeDataStore extends RemoteEpisodeDataStore {
 
     // 小説の解析処理
     var chapterTitle = "";
+    int displayOrder = 0;
     List<EpisodeEntity> episodeEntities = [];
     novelIndexElement.first.children.forEach((element) {
       // 新規チャプターを検出したのでこれを現在処理中のチャプターとする
@@ -108,6 +109,8 @@ class RemoteNarouEpisodeDataStore extends RemoteEpisodeDataStore {
             .parse(lastUpdate.trim())
             .millisecondsSinceEpoch;
 
+        displayOrder += 1;
+
         // Domain型に変換
         episodeEntities.add(EpisodeEntity(
             identifier,
@@ -115,6 +118,7 @@ class RemoteNarouEpisodeDataStore extends RemoteEpisodeDataStore {
             firstWriteDateLong,
             lastUpdateDateLong,
             chapterTitle.trim(),
+            displayOrder,
             episodeName.trim()));
       }
     });

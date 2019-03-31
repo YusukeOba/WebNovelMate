@@ -15,6 +15,7 @@ class CachedNarouEpisodeDataStore extends CachedEpisodeDataStore {
               firstWriteAt: episode.firstWriteAt,
               lastUpdateAt: episode.lastUpdateAt,
               nullableChapterName: episode.nullableChapterName,
+              displayOrder: episode.displayOrder,
               episodeName: episode.episodeName));
     }).toList();
 
@@ -58,6 +59,7 @@ class CachedNarouEpisodeDataStore extends CachedEpisodeDataStore {
               episode.firstWriteAt,
               episode.lastUpdateAt,
               episode.nullableChapterName,
+              episode.displayOrder,
               episode.episodeName);
         }).toList());
       }

@@ -30,14 +30,23 @@ class EpisodeEntity {
   /// チャプターを設定していない話の場合はnull
   final String nullableChapterName;
 
+  /// 表示順序
+  final int displayOrder;
+
   /// 話の名前
   final String episodeName;
 
-  EpisodeEntity(this.novelIdentifier, this.episodeIdentifier, this.firstWriteAt,
-      this.lastUpdateAt, this.nullableChapterName, this.episodeName);
+  EpisodeEntity(
+      this.novelIdentifier,
+      this.episodeIdentifier,
+      this.firstWriteAt,
+      this.lastUpdateAt,
+      this.nullableChapterName,
+      this.displayOrder,
+      this.episodeName);
 
   @override
   String toString() {
-    return 'EpisodeEntity{novelIdentifier: $novelIdentifier, episodeIdentifier: $episodeIdentifier, firstWriteAt: $firstWriteAt, lastUpdateAt: $lastUpdateAt, nullableChapterName: $nullableChapterName, episodeName: $episodeName}';
+    return 'EpisodeEntity{novelIdentifier: $novelIdentifier, episodeIdentifier: $episodeIdentifier, firstWriteAt: $firstWriteAt, lastUpdateAt: $lastUpdateAt, nullableChapterName: $nullableChapterName, displayOrder: $displayOrder, episodeName: $episodeName}';
   }
 }

@@ -65,6 +65,9 @@ class CachedNarouEpisodeEntity extends Table {
   /// チャプターを設定していない話の場合はnull
   TextColumn get nullableChapterName => text().nullable()();
 
+  /// 表示順序
+  IntColumn get displayOrder => integer()();
+
   /// 話の名前
   TextColumn get episodeName => text()();
 

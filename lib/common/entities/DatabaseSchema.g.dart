@@ -211,7 +211,7 @@ class $CachedNarouSubscribedNovelEntityTable
   @override
   GeneratedIntColumn get lastUpdatedAt => _lastUpdatedAt ??= GeneratedIntColumn(
         'last_updated_at',
-        false,
+        true,
       );
   GeneratedIntColumn _textLength;
   @override
@@ -326,6 +326,7 @@ class CachedNarouEpisodeEntityData {
   final int firstWriteAt;
   final int lastUpdateAt;
   final String nullableChapterName;
+  final int displayOrder;
   final String episodeName;
   CachedNarouEpisodeEntityData(
       {this.siteOfIdentifier,
@@ -333,6 +334,7 @@ class CachedNarouEpisodeEntityData {
       this.firstWriteAt,
       this.lastUpdateAt,
       this.nullableChapterName,
+      this.displayOrder,
       this.episodeName});
   factory CachedNarouEpisodeEntityData.fromData(
       Map<String, dynamic> data, GeneratedDatabase db) {
@@ -347,6 +349,7 @@ class CachedNarouEpisodeEntityData {
       lastUpdateAt: intType.mapFromDatabaseResponse(data['last_update_at']),
       nullableChapterName:
           stringType.mapFromDatabaseResponse(data['nullable_chapter_name']),
+      displayOrder: intType.mapFromDatabaseResponse(data['display_order']),
       episodeName: stringType.mapFromDatabaseResponse(data['episode_name']),
     );
   }
@@ -357,6 +360,7 @@ class CachedNarouEpisodeEntityData {
       firstWriteAt: json['firstWriteAt'] as int,
       lastUpdateAt: json['lastUpdateAt'] as int,
       nullableChapterName: json['nullableChapterName'] as String,
+      displayOrder: json['displayOrder'] as int,
       episodeName: json['episodeName'] as String,
     );
   }
@@ -367,6 +371,7 @@ class CachedNarouEpisodeEntityData {
       'firstWriteAt': firstWriteAt,
       'lastUpdateAt': lastUpdateAt,
       'nullableChapterName': nullableChapterName,
+      'displayOrder': displayOrder,
       'episodeName': episodeName,
     };
   }
@@ -377,6 +382,7 @@ class CachedNarouEpisodeEntityData {
           int firstWriteAt,
           int lastUpdateAt,
           String nullableChapterName,
+          int displayOrder,
           String episodeName}) =>
       CachedNarouEpisodeEntityData(
         siteOfIdentifier: siteOfIdentifier ?? this.siteOfIdentifier,
@@ -384,6 +390,7 @@ class CachedNarouEpisodeEntityData {
         firstWriteAt: firstWriteAt ?? this.firstWriteAt,
         lastUpdateAt: lastUpdateAt ?? this.lastUpdateAt,
         nullableChapterName: nullableChapterName ?? this.nullableChapterName,
+        displayOrder: displayOrder ?? this.displayOrder,
         episodeName: episodeName ?? this.episodeName,
       );
   @override
@@ -394,6 +401,7 @@ class CachedNarouEpisodeEntityData {
           ..write('firstWriteAt: $firstWriteAt, ')
           ..write('lastUpdateAt: $lastUpdateAt, ')
           ..write('nullableChapterName: $nullableChapterName, ')
+          ..write('displayOrder: $displayOrder, ')
           ..write('episodeName: $episodeName')
           ..write(')'))
         .toString();
@@ -401,12 +409,14 @@ class CachedNarouEpisodeEntityData {
 
   @override
   int get hashCode =>
-      (((((siteOfIdentifier.hashCode) * 31 + episodeIdentifier.hashCode) * 31 +
-                              firstWriteAt.hashCode) *
+      ((((((siteOfIdentifier.hashCode) * 31 + episodeIdentifier.hashCode) * 31 +
+                                      firstWriteAt.hashCode) *
+                                  31 +
+                              lastUpdateAt.hashCode) *
                           31 +
-                      lastUpdateAt.hashCode) *
+                      nullableChapterName.hashCode) *
                   31 +
-              nullableChapterName.hashCode) *
+              displayOrder.hashCode) *
           31 +
       episodeName.hashCode;
   @override
@@ -418,6 +428,7 @@ class CachedNarouEpisodeEntityData {
           other.firstWriteAt == firstWriteAt &&
           other.lastUpdateAt == lastUpdateAt &&
           other.nullableChapterName == nullableChapterName &&
+          other.displayOrder == displayOrder &&
           other.episodeName == episodeName);
 }
 
@@ -459,6 +470,12 @@ class $CachedNarouEpisodeEntityTable extends CachedNarouEpisodeEntity
         'nullable_chapter_name',
         true,
       );
+  GeneratedIntColumn _displayOrder;
+  @override
+  GeneratedIntColumn get displayOrder => _displayOrder ??= GeneratedIntColumn(
+        'display_order',
+        false,
+      );
   GeneratedTextColumn _episodeName;
   @override
   GeneratedTextColumn get episodeName => _episodeName ??= GeneratedTextColumn(
@@ -472,6 +489,7 @@ class $CachedNarouEpisodeEntityTable extends CachedNarouEpisodeEntity
         firstWriteAt,
         lastUpdateAt,
         nullableChapterName,
+        displayOrder,
         episodeName
       ];
   @override
@@ -489,6 +507,7 @@ class $CachedNarouEpisodeEntityTable extends CachedNarouEpisodeEntity
       lastUpdateAt.isAcceptableValue(instance.lastUpdateAt, isInserting) &&
       nullableChapterName.isAcceptableValue(
           instance.nullableChapterName, isInserting) &&
+      displayOrder.isAcceptableValue(instance.displayOrder, isInserting) &&
       episodeName.isAcceptableValue(instance.episodeName, isInserting);
   @override
   Set<GeneratedColumn> get $primaryKey => {siteOfIdentifier, episodeIdentifier};
@@ -518,6 +537,9 @@ class $CachedNarouEpisodeEntityTable extends CachedNarouEpisodeEntity
     if (d.nullableChapterName != null || includeNulls) {
       map['nullable_chapter_name'] =
           Variable<String, StringType>(d.nullableChapterName);
+    }
+    if (d.displayOrder != null || includeNulls) {
+      map['display_order'] = Variable<int, IntType>(d.displayOrder);
     }
     if (d.episodeName != null || includeNulls) {
       map['episode_name'] = Variable<String, StringType>(d.episodeName);
