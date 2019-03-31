@@ -154,10 +154,22 @@ class _TextPagerViewModel {
 
   void toggleOuterView() {
     _shownOuterView = !_shownOuterView;
+    if (_shownOuterView) {
+      SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+    } else {
+      // フルスクリーン
+      SystemChrome.setEnabledSystemUIOverlays([]);
+    }
   }
 
   void setOuterViewVisibility(bool visibility) {
     _shownOuterView = visibility;
+    if (_shownOuterView) {
+      SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+    } else {
+      // フルスクリーン
+      SystemChrome.setEnabledSystemUIOverlays([]);
+    }
   }
 
   /// フォント設定の変更
