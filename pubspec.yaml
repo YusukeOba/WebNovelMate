@@ -57,8 +57,20 @@ dev_dependencies:
   # DataBase
   moor_generator:
 
+  # App Icon
+  flutter_launcher_icons: "^0.7.0"
+
+
+
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "images/icon.png"
+  adaptive_icon_foreground: "images/adaptive_icon.png"
+  adaptive_icon_background: "#37818C"
 
 # The following section is specific to Flutter.
 flutter:
