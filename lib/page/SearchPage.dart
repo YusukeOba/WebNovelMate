@@ -32,15 +32,6 @@ class _SearchPageViewModel {
   /// 表示中のランキングデータ
   Future<List<RankingEntity>> rankings;
 
-  void showRankings() {
-    this.rankings = _repository.fetchLatest(showingSite).then((entities) {
-      entities.sort((lhs, rhs) {
-        return rhs.popularity - lhs.popularity;
-      });
-      return entities.sublist(0, 20);
-    });
-  }
-
   /// 文字列の入力
   inputText(String text, BuildContext context) {
     inputtedText = text;
@@ -56,7 +47,7 @@ class _SearchPageViewModel {
 
   void onRefresh() {
     this.rankings = _repository.setDirty(showingSite).then((_) {
-      return _repository.find(showingSite, 0, 50, inputtedText);
+      return _repository.find(showingSite, 0, 20, inputtedText);
     }).then((entities) {
       entities.sort((lhs, rhs) {
         return rhs.popularity - lhs.popularity;
@@ -93,7 +84,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _viewModel.showRankings();
+    _viewModel.onRefresh();
   }
 
   /// 検索ボックス
