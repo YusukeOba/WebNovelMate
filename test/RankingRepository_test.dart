@@ -4,25 +4,25 @@
 // find child widgets in the widget tree, read text, and verify that the values of widget properties
 // are correct.
 
-import 'package:NovelMate/common/datastore/CachedRankingDataStore.dart';
-import 'package:NovelMate/common/datastore/RemoteRankingDataStore.dart';
+import 'package:NovelMate/common/datastore/CachedIndexDataStore.dart';
+import 'package:NovelMate/common/datastore/RemoteIndexDataStore.dart';
 import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
 import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
-import 'package:NovelMate/common/repository/RankingRepository.dart';
-import 'package:NovelMate/common/repository/RankingRepositoryImpl.dart';
+import 'package:NovelMate/common/repository/IndexRepository.dart';
+import 'package:NovelMate/common/repository/IndexRepositoryImpl.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
 import 'Utils.dart';
 
-class MockCachedDataStore extends Mock implements CachedRankingDataStore {}
+class MockCachedDataStore extends Mock implements CachedIndexDataStore {}
 
-class MockRemoteDataStore extends Mock implements RemoteRankingDataStore {}
+class MockRemoteDataStore extends Mock implements RemoteIndexDataStore {}
 
 void main() {
-  CachedRankingDataStore _cache;
-  RemoteRankingDataStore _remote;
-  RankingRepository _subject;
+  CachedIndexDataStore _cache;
+  RemoteIndexDataStore _remote;
+  IndexRepository _subject;
 
   final subjectNovelIdentifier = "dummy_code_1";
 
@@ -41,7 +41,7 @@ void main() {
   setUp(() {
     _cache = MockCachedDataStore();
     _remote = MockRemoteDataStore();
-    _subject = RankingRepositoryImpl({dummySite: _cache}, {dummySite: _remote});
+    _subject = IndexRepositoryImpl({dummySite: _cache}, {dummySite: _remote});
   });
 
   group("fetchLatest", () {

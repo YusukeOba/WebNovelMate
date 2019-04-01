@@ -1,8 +1,8 @@
 import 'package:NovelMate/common/Sites.dart';
-import 'package:NovelMate/common/datastore/CachedRankingDataStore.dart';
+import 'package:NovelMate/common/datastore/CachedIndexDataStore.dart';
 import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
 
-class CachedNarouRankingDataStore extends CachedRankingDataStore {
+class CachedNarouIndexDataStore extends CachedIndexDataStore {
   List<RankingEntity> _cache;
 
   @override

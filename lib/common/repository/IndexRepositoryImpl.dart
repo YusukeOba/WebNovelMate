@@ -1,12 +1,12 @@
 import 'package:NovelMate/common/Sites.dart';
-import 'package:NovelMate/common/datastore/CachedRankingDataStore.dart';
-import 'package:NovelMate/common/datastore/RemoteRankingDataStore.dart';
+import 'package:NovelMate/common/datastore/CachedIndexDataStore.dart';
+import 'package:NovelMate/common/datastore/RemoteIndexDataStore.dart';
 import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
-import 'package:NovelMate/common/repository/RankingRepository.dart';
+import 'package:NovelMate/common/repository/IndexRepository.dart';
 
-class RankingRepositoryImpl extends RankingRepository {
-  RankingRepositoryImpl(Map<Site, CachedRankingDataStore> cacheDataStores,
-      Map<Site, RemoteRankingDataStore> remoteDataStores)
+class IndexRepositoryImpl extends IndexRepository {
+  IndexRepositoryImpl(Map<Site, CachedIndexDataStore> cacheDataStores,
+      Map<Site, RemoteIndexDataStore> remoteDataStores)
       : super(cacheDataStores, remoteDataStores);
 
   @override

@@ -6,7 +6,7 @@ import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
 import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
 import 'package:NovelMate/common/entities/domain/SubscribedNovelEntity.dart';
 import 'package:NovelMate/common/repository/BookshelfRepository.dart';
-import 'package:NovelMate/common/repository/RankingRepository.dart';
+import 'package:NovelMate/common/repository/IndexRepository.dart';
 import 'package:NovelMate/common/repository/RepositoryFactory.dart';
 import 'package:NovelMate/page/EpisodeIndexPage.dart';
 import 'package:NovelMate/page/SearchResultPage.dart';
@@ -20,8 +20,8 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageViewModel {
-  final RankingRepository _repository =
-      RepositoryFactory.shared.getRankingRepository();
+  final IndexRepository _repository =
+      RepositoryFactory.shared.getIndexRepository();
 
   /// 表示中のサイト種別
   Site showingSite = AvailableSites.narou;

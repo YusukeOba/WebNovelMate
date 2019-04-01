@@ -1,9 +1,9 @@
 import 'package:NovelMate/common/Sites.dart';
 import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
 
-/// ネットワークから小説のランキングを取得する処理の抽象化
+/// ネットワークから小説のインデックスを取得する処理の抽象化
 /// 対応サイトを追加する際、このインタフェースを実装すること
-abstract class RemoteRankingDataStore {
+abstract class RemoteIndexDataStore {
   /// 小説のランキングを取得する
   /// [start]から[end]で順位の取得範囲を決める
   /// [title]は小説のタイトル

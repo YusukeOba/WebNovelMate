@@ -1,18 +1,18 @@
 import 'package:NovelMate/common/Sites.dart';
 import 'package:NovelMate/common/datastore/narou/CachedNarouBookshelfDataStore.dart';
 import 'package:NovelMate/common/datastore/narou/CachedNarouEpisodeDataStore.dart';
-import 'package:NovelMate/common/datastore/narou/CachedNarouRankingDataStore.dart';
+import 'package:NovelMate/common/datastore/narou/CachedNarouIndexDataStore.dart';
 import 'package:NovelMate/common/datastore/narou/CachedNarouTextDataStore.dart';
 import 'package:NovelMate/common/datastore/narou/RemoteNarouBookshelfDataStore.dart';
 import 'package:NovelMate/common/datastore/narou/RemoteNarouEpisodeDataStore.dart';
-import 'package:NovelMate/common/datastore/narou/RemoteNarouRankingDataStore.dart';
+import 'package:NovelMate/common/datastore/narou/RemoteNarouIndexDataStore.dart';
 import 'package:NovelMate/common/datastore/narou/RemoteNarouTextDataStore.dart';
 import 'package:NovelMate/common/repository/BookshelfRepository.dart';
 import 'package:NovelMate/common/repository/BookshelfRepositoryImpl.dart';
 import 'package:NovelMate/common/repository/EpisodeRepository.dart';
 import 'package:NovelMate/common/repository/EpisodeRepositoryImpl.dart';
-import 'package:NovelMate/common/repository/RankingRepository.dart';
-import 'package:NovelMate/common/repository/RankingRepositoryImpl.dart';
+import 'package:NovelMate/common/repository/IndexRepository.dart';
+import 'package:NovelMate/common/repository/IndexRepositoryImpl.dart';
 import 'package:NovelMate/common/repository/SettingRepository.dart';
 import 'package:NovelMate/common/repository/SettingRepositoryImpl.dart';
 import 'package:NovelMate/common/repository/TextRepository.dart';
@@ -27,7 +27,7 @@ class RepositoryFactory {
   static RepositoryFactory get shared => _singleton;
 
   BookshelfRepository _bookshelfRepository;
-  RankingRepository _rankingRepository;
+  IndexRepository _indexRepository;
   EpisodeRepository _episodeRepository;
   TextRepository _textRepository;
   SettingRepository _settingRepository;
@@ -37,9 +37,9 @@ class RepositoryFactory {
     _bookshelfRepository = BookshelfRepositoryImpl(
         {AvailableSites.narou: CachedNarouBookshelfDataStore()},
         {AvailableSites.narou: RemoteNarouBookshelfDataStore()});
-    _rankingRepository = RankingRepositoryImpl(
-        {AvailableSites.narou: CachedNarouRankingDataStore()},
-        {AvailableSites.narou: RemoteNarouRankingDataStore()});
+    _indexRepository = IndexRepositoryImpl(
+        {AvailableSites.narou: CachedNarouIndexDataStore()},
+        {AvailableSites.narou: RemoteNarouIndexDataStore()});
     _episodeRepository = EpisodeRepositoryImpl(
         {AvailableSites.narou: CachedNarouEpisodeDataStore()},
         {AvailableSites.narou: RemoteNarouEpisodeDataStore()});
@@ -52,7 +52,7 @@ class RepositoryFactory {
   /// 実装は隠して外部クラスに公開する
   BookshelfRepository getBookshelfRepository() => _bookshelfRepository;
 
-  RankingRepository getRankingRepository() => _rankingRepository;
+  IndexRepository getIndexRepository() => _indexRepository;
 
   EpisodeRepository getEpisodeRepository() => _episodeRepository;
 

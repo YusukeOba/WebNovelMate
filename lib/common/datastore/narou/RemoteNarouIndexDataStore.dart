@@ -4,12 +4,12 @@ import 'dart:io';
 
 import 'package:NovelMate/common/HttpClient.dart';
 import 'package:NovelMate/common/Sites.dart';
-import 'package:NovelMate/common/datastore/RemoteRankingDataStore.dart';
+import 'package:NovelMate/common/datastore/RemoteIndexDataStore.dart';
 import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
 import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
 import 'package:NovelMate/common/entities/narou/NarouNovelListEntity.dart';
 
-class RemoteNarouRankingDataStore extends RemoteRankingDataStore {
+class RemoteNarouIndexDataStore extends RemoteIndexDataStore {
   /// 検索ワードを元に小説家になろうのタイトルを検索する
   @override
   Future<List<RankingEntity>> fetchRanking(int start, int end,
