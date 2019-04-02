@@ -24,7 +24,7 @@ class _SearchPageViewModel {
       RepositoryFactory.shared.getIndexRepository();
 
   /// 表示中のサイト種別
-  Site showingSite = AvailableSites.narou;
+  Site showingSite = AvailableSites.aozora;
 
   /// 入力中の文言
   String inputtedText = "";
@@ -142,8 +142,8 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                   style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
                 )),
             Container(
-              height: 32,
-              child: Divider(),
+              height: 16,
+              child: Divider(height: 1),
             ),
             this._buildListTiles()
           ]),
@@ -160,6 +160,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
             print("nodata");
             return Center(child: CircularProgressIndicator());
           }
+
           print("hasData");
           return Column(children: <Widget>[
             Column(
@@ -177,16 +178,12 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                           text: "／" + novel.novelHeader.writer,
                           style: TextStyle(color: Colors.black))
                     ])),
-                    subtitle: Text(
-                      novel.novelHeader.novelStory,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    subtitle: _buildStory(novel.novelHeader.novelStory),
                     onTap: () {
                       _showDetailPage(novel.novelHeader);
                     },
                   ),
-                  Divider()
+                  Divider(height: 1)
                 ]);
               }).toList(),
             ),
@@ -202,6 +199,18 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
 //            )
           ]);
         });
+  }
+
+  Widget _buildStory(String story) {
+    if (story.isEmpty) {
+      return null;
+    } else {
+      return Text(
+        story,
+        maxLines: 3,
+        overflow: TextOverflow.ellipsis,
+      );
+    }
   }
 
   _showDetailPage(NovelHeader novelHeader) async {

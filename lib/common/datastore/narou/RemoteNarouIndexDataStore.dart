@@ -69,4 +69,7 @@ class RemoteNarouIndexDataStore extends RemoteIndexDataStore {
       return Future.value(rankings);
     });
   }
+
+  @override
+  Future<List<RankingEntity>> fetchIndex(String title) {}
 }

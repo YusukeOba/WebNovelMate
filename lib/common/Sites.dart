@@ -30,6 +30,7 @@ abstract class Site {
 class AvailableSites {
   static final _Narou narou = _Narou();
   static final _Kakuyomu kakuyomu = _Kakuyomu();
+  static final _Aozora aozora = _Aozora();
 }
 
 /// 小説家になろう
@@ -75,5 +76,28 @@ class _Kakuyomu implements Site {
   @override
   String get siteName {
     return "カクヨム";
+  }
+}
+
+/// 青空文庫
+class _Aozora implements Site {
+  @override
+  String get identifier {
+    return "aozora";
+  }
+
+  @override
+  Color get siteColor {
+    return Colors.lightBlue;
+  }
+
+  @override
+  Color get textColor {
+    return Colors.black;
+  }
+
+  @override
+  String get siteName {
+    return "青空文庫";
   }
 }

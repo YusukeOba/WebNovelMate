@@ -17,4 +17,6 @@ abstract class RemoteIndexDataStore {
 
       /// ジャンル
       List<int> genres});
+
+  Future<List<RankingEntity>> fetchIndex(String title);
 }
