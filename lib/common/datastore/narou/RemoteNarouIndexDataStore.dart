@@ -20,7 +20,7 @@ class RemoteNarouIndexDataStore extends RemoteIndexDataStore {
         "&lim=" +
         end.toString() +
         "&word=" +
-        title +
+        (title ?? "") +
         "&gzip=5" +
         "&order=hyoka";
 

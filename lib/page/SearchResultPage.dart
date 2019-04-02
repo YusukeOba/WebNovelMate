@@ -120,9 +120,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
           body: RefreshIndicator(
               child: Scrollbar(
                   child: CustomScrollView(
-                slivers: <Widget>[
-                  _buildNovelLists()
-                ],
+                slivers: <Widget>[_buildNovelLists()],
               )),
               onRefresh: () {
                 return Future(() {
@@ -172,10 +170,6 @@ class _SearchResultPageState extends State<SearchResultPage> {
                 "時" +
                 date.minute.toString() +
                 "分 更新";
-
-            // 文字数
-            String textLength =
-                new NumberFormat().format(novel.novelHeader.textLength);
 
             return InkWell(
                 onTap: () async {
@@ -230,11 +224,8 @@ class _SearchResultPageState extends State<SearchResultPage> {
                                             style: TextStyle(
                                                 color: Colors.black,
                                                 fontSize: 11.0)),
-                                        TextSpan(
-                                            text: "／" + textLength + "文字",
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 11.0)),
+                                        _buildTextLength(
+                                            novel.novelHeader.textLength),
                                         TextSpan(
                                             text: "／" + formattedDate,
                                             style: TextStyle(
@@ -257,6 +248,18 @@ class _SearchResultPageState extends State<SearchResultPage> {
                     )));
           }, childCount: snapShot.data.length));
         });
+  }
+
+  TextSpan _buildTextLength(int textLength) {
+    if (textLength != null && textLength != 0) {
+      // 文字数
+      String formattedTextLength = new NumberFormat().format(textLength);
+      return TextSpan(
+          text: "／" + formattedTextLength + "文字",
+          style: TextStyle(color: Colors.black, fontSize: 11.0));
+    } else {
+      return TextSpan();
+    }
   }
 
   _showDetailPage(NovelHeader novelHeader) async {

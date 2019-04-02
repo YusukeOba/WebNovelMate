@@ -38,7 +38,7 @@ class IndexRepositoryImpl extends IndexRepository {
     }
 
     if (await cache.hasCache()) {
-      print("fetch by remote.");
+      print("fetch by cache.");
       return cache.fetchAll();
     } else {
       return remote.fetchRanking(0, 20).then((lists) async {

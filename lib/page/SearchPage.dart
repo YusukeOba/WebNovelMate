@@ -107,7 +107,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
       child: Column(
         children: <Widget>[
           Text(
-            "好きな小説を、様々な方法で探してみましょう！",
+            "好きな小説を探してみましょう！",
             style: TextStyle(fontSize: 16.0),
           ),
           Container(height: 8.0),
@@ -122,7 +122,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
             maxLines: 1,
             decoration: InputDecoration(
                 suffixIcon: Icon(Icons.search),
-                hintText: "小説名・ユーザーを検索...",
+                hintText: "小説名を入力...",
                 contentPadding: EdgeInsets.fromLTRB(8, 12, 8, 8),
                 fillColor: sNMBackgroundColor,
                 filled: true,
