@@ -95,7 +95,9 @@ class RemoteAozoraIndexDataStore extends RemoteIndexDataStore {
               // 必ず完結している
               lastUpTime,
               0,
-              1 // 必ず1話
+              1,
+              // 必ず1話
+              true // 必ず短編
               ));
       mappedEntities.add(ranking);
     });

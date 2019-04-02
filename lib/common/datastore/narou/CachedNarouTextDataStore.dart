@@ -1,3 +1,4 @@
+import 'package:NovelMate/common/Sites.dart';
 import 'package:NovelMate/common/datastore/CachedTextDataStore.dart';
 import 'package:NovelMate/common/entities/DatabaseSchema.dart';
 import 'package:NovelMate/common/entities/domain/TextEntity.dart';
@@ -7,7 +8,9 @@ class CachedNarouTextDataStore extends CachedTextDataStore {
   Future<TextEntity> findByEpisodeId(
       String siteOfIdentifier, String episodeIdentifier) {
     print("start find by episode id." + episodeIdentifier);
-    return (Database().select(Database().cachedNarouTextEntity)
+    return (Database().select(Database().cachedTextEntity)
+          ..where((text) =>
+              text.siteIdentifier.equals(AvailableSites.narou.identifier))
           ..where((text) => text.siteOfIdentifier.equals(siteOfIdentifier))
           ..where((text) => text.episodeIdentifier.equals(episodeIdentifier)))
         .get()
@@ -28,11 +31,15 @@ class CachedNarouTextDataStore extends CachedTextDataStore {
       {String episodeIdentifier = ""}) {
     print("start text delete.");
     if (episodeIdentifier.isEmpty) {
-      return (Database().delete(Database().cachedNarouTextEntity)
+      return (Database().delete(Database().cachedTextEntity)
+            ..where((text) =>
+                text.siteIdentifier.equals(AvailableSites.narou.identifier))
             ..where((text) => text.siteOfIdentifier.equals(siteOfIdentifier)))
           .go();
     } else {
-      return (Database().delete(Database().cachedNarouTextEntity)
+      return (Database().delete(Database().cachedTextEntity)
+            ..where((text) =>
+                text.siteIdentifier.equals(AvailableSites.narou.identifier))
             ..where((text) => text.siteOfIdentifier.equals(siteOfIdentifier))
             ..where((text) => text.episodeIdentifier.equals(episodeIdentifier)))
           .go();
@@ -43,25 +50,12 @@ class CachedNarouTextDataStore extends CachedTextDataStore {
   Future<void> insertOrUpdate(List<TextEntity> textEntities) async {
     print("start text insert.");
     List<Future<void>> insertResult = textEntities.map((text) async {
-      final rawHasCache =
-          await hasCache(text.siteOfIdentifier, text.episodeOfIdentifier);
-      if (rawHasCache) {
-        print("cache not found. start insert.");
-
-        return Database().update(Database().cachedNarouTextEntity).replace(
-            CachedNarouTextEntityData(
-                siteOfIdentifier: text.siteOfIdentifier,
-                episodeIdentifier: text.episodeOfIdentifier,
-                episodeText: text.episodeText));
-      } else {
-        print("cache found. start replace");
-
-        return Database().into(Database().cachedNarouTextEntity).insert(
-            CachedNarouTextEntityData(
-                siteOfIdentifier: text.siteOfIdentifier,
-                episodeIdentifier: text.episodeOfIdentifier,
-                episodeText: text.episodeText));
-      }
+      return Database().into(Database().cachedTextEntity).insertOrReplace(
+          CachedTextEntityData(
+              siteIdentifier: AvailableSites.narou.identifier,
+              siteOfIdentifier: text.siteOfIdentifier,
+              episodeIdentifier: text.episodeOfIdentifier,
+              episodeText: text.episodeText));
     }).toList();
 
     return Future.wait(insertResult);
@@ -71,7 +65,9 @@ class CachedNarouTextDataStore extends CachedTextDataStore {
   Future<bool> hasCache(String siteOfIdentifier, String episodeIdentifier) {
     print("start hasCache. siteOfIdentifier = " + siteOfIdentifier);
     print("start hasCache. episodeIdentifier = " + episodeIdentifier);
-    return (Database().select(Database().cachedNarouTextEntity)
+    return (Database().select(Database().cachedTextEntity)
+          ..where((text) =>
+              text.siteIdentifier.equals(AvailableSites.narou.identifier))
           ..where((text) => text.siteOfIdentifier.equals(siteOfIdentifier))
           ..where((text) => text.episodeIdentifier.equals(episodeIdentifier))
           ..limit(1))

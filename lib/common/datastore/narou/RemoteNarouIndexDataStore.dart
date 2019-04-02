@@ -62,7 +62,8 @@ class RemoteNarouIndexDataStore extends RemoteIndexDataStore {
               isCompleted,
               lastUpTime,
               entity.length,
-              entity.general_all_no),
+              entity.general_all_no,
+              entity.novel_type == 2), // 短編の場合はnovel_typeが2
         ));
       });
       return Future.value(rankings);

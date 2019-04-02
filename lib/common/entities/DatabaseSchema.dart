@@ -7,11 +7,14 @@ part 'DatabaseSchema.g.dart';
 ///
 
 ///
-/// なろうの本棚
+/// 本棚
 ///
-class CachedNarouSubscribedNovelEntity extends Table {
+class CachedSubscribedNovelEntity extends Table {
+  /// 対応サイト
+  TextColumn get siteIdentifier => text()();
+
   /// 対応サイトの中のID
-  TextColumn get identifier => text()();
+  TextColumn get siteOfIdentifier => text()();
 
   /// 小説名
   TextColumn get novelName => text()();
@@ -43,12 +46,18 @@ class CachedNarouSubscribedNovelEntity extends Table {
   /// 最後に読んだ話
   TextColumn get readingEpisodeIdentifier => text().nullable()();
 
+  /// 短編かどうか
+  BoolColumn get isShortStory => boolean()();
+
   @override
-  Set<TextColumn> get primaryKey => {identifier};
+  Set<TextColumn> get primaryKey => {siteIdentifier, siteOfIdentifier};
 }
 
-/// なろうの小説の話情報
-class CachedNarouEpisodeEntity extends Table {
+/// 小説の話情報
+class CachedEpisodeEntity extends Table {
+  /// 対応サイト
+  TextColumn get siteIdentifier => text()();
+
   /// 対応サイトの中のID
   TextColumn get siteOfIdentifier => text()();
 
@@ -72,11 +81,15 @@ class CachedNarouEpisodeEntity extends Table {
   TextColumn get episodeName => text()();
 
   @override
-  Set<TextColumn> get primaryKey => {siteOfIdentifier, episodeIdentifier};
+  Set<TextColumn> get primaryKey =>
+      {siteIdentifier, siteOfIdentifier, episodeIdentifier};
 }
 
-/// なろうの小説本文情報
-class CachedNarouTextEntity extends Table {
+/// 小説本文情報
+class CachedTextEntity extends Table {
+  /// 対応サイト
+  TextColumn get siteIdentifier => text()();
+
   /// 対応サイトの中のID
   TextColumn get siteOfIdentifier => text()();
 
@@ -87,17 +100,18 @@ class CachedNarouTextEntity extends Table {
   TextColumn get episodeText => text()();
 
   @override
-  Set<TextColumn> get primaryKey => {siteOfIdentifier, episodeIdentifier};
+  Set<TextColumn> get primaryKey =>
+      {siteIdentifier, siteOfIdentifier, episodeIdentifier};
 }
 
 @UseMoor(tables: [
-  CachedNarouSubscribedNovelEntity,
-  CachedNarouEpisodeEntity,
-  CachedNarouTextEntity
+  CachedSubscribedNovelEntity,
+  CachedEpisodeEntity,
+  CachedTextEntity
 ])
 class Database extends _$Database {
   Database()
-      : super(FlutterQueryExecutor.inDatabaseFolder(path: 'database.sqlite'));
+      : super(FlutterQueryExecutor.inDatabaseFolder(path: 'novelmate.sqlite'));
 
   @override
   int get schemaVersion {
