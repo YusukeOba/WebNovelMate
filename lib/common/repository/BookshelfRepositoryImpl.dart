@@ -35,7 +35,7 @@ class BookshelfRepositoryImpl extends BookshelfRepository {
   @override
   Future<SubscribedNovelEntity> find(NovelIdentifier novelIdentifier) {
     return findAll().then((novels) {
-      print("find equals novel.");
+      print("find equals novel." + novels.toList().toString());
       return novels.firstWhere((novel) =>
           // サイト、サイト中の固有IDが一致しているものを抽出
           novel.novelHeader.identifier.siteOfIdentifier ==
