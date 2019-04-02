@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:NovelMate/common/HttpClient.dart';
 import 'package:NovelMate/common/Sites.dart';
@@ -71,5 +70,8 @@ class RemoteNarouIndexDataStore extends RemoteIndexDataStore {
   }
 
   @override
-  Future<List<RankingEntity>> fetchIndex(String title) {}
+  Future<List<RankingEntity>> fetchIndex(String title) {
+    // 内部的に検索API = ランキング取得APIは同一
+    return fetchRanking(0, 100, title: title);
+  }
 }

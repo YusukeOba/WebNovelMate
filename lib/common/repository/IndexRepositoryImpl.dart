@@ -11,54 +11,41 @@ class IndexRepositoryImpl extends IndexRepository {
 
   @override
   Future<void> setDirty(Site site) {
+    print("called dirty");
     return cacheDataStores[site].clearAll();
   }
 
   @override
-  Future<List<RankingEntity>> find(
-      Site site, int start, int end, String freeWord) async {
-    final cache = cacheDataStores[site];
-
+  Future<List<RankingEntity>> find(Site site, String freeWord) async {
     final remote = remoteRankingDataStores[site];
-
-    if (cache == null || remote == null) {
-      // 非対応サイト
+    final cache = cacheDataStores[site];
+    if (remote == null || cache == null) {
       throw Exception(
-          "Error. this novel is unavailable site. Please implements.");
+          "Error. this novel is unavailable site. Please implements");
     }
 
-    // キャッシュがなければリモート経由で取りに行く、あればキャッシュで取りに行く
-    if (await cache.hasCache()) {
-      print("find with cache");
-      return cache.fetchAll().then((rankings) {
-        if (rankings.length == 0) {
-          return Future.value([]);
-        }
-        if (rankings.length < end) {
-          return Future.value(rankings.sublist(0, rankings.length));
-        }
-
-        return Future.value(rankings.sublist(0, end));
-      });
-    } else {
-      print("find with remote");
-      return remote.fetchRanking(start, end, title: freeWord).then((rankings) {
-        cache.save(rankings);
-        if (rankings.length == 0) {
-          return Future.value([]);
-        }
-        if (rankings.length < end) {
-          return Future.value(rankings.sublist(0, rankings.length));
-        }
-
-        return Future.value(rankings.sublist(0, end));
-      });
-    }
+    // 検索は常に最新を参照したい
+    return remote.fetchIndex(freeWord);
   }
 
   @override
-  Future<List<RankingEntity>> fetchLatest(Site site) {
-    // 20件のみ取得
-    return find(site, 0, 20, "");
+  Future<List<RankingEntity>> fetchRanking(Site site) async {
+    final remote = remoteRankingDataStores[site];
+    final cache = cacheDataStores[site];
+    if (remote == null || cache == null) {
+      throw Exception(
+          "Error. this novel is unavailable site. Please implements");
+    }
+
+    if (await cache.hasCache()) {
+      print("fetch by remote.");
+      return cache.fetchAll();
+    } else {
+      return remote.fetchRanking(0, 20).then((lists) async {
+        await cache.save(lists);
+        print("cache saved.");
+        return lists;
+      });
+    }
   }
 }

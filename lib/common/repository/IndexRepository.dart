@@ -10,18 +10,16 @@ abstract class IndexRepository {
 
   IndexRepository(this.cacheDataStores, this.remoteRankingDataStores);
 
-  /// インデックスの取得
+  /// ランキングの取得
   /// [site]で対応するサイト
-  Future<List<RankingEntity>> fetchLatest(Site site);
+  Future<List<RankingEntity>> fetchRanking(Site site);
 
   /// 条件付でインデックスを取得
   ///
-  /// [site]で対応するサイト
-  /// [start]で開始index位置
   /// [end]で取得する最後のindex位置
   /// [freeWord]は自由な文言
   Future<List<RankingEntity>> find(
-      Site site, int start, int end, String freeWord);
+      Site site, String freeWord);
 
   /// インデックスの削除
   Future<void> setDirty(Site site);

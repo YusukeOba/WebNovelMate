@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:NovelMate/common/Sites.dart';
 import 'package:NovelMate/common/colors.dart';
 import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
@@ -15,20 +13,27 @@ import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 
 class SearchResultPage extends StatefulWidget {
+  /// 検索サイト
+  final Site _searchSite;
+
   /// 検索キーワード
   final String _searchWord;
 
-  SearchResultPage(this._searchWord);
+  SearchResultPage(this._searchSite, this._searchWord);
 
   @override
   State createState() {
-    return _SearchResultPageState(_SearchResultPageViewModel(_searchWord));
+    return _SearchResultPageState(
+        _SearchResultPageViewModel(_searchSite, _searchWord));
   }
 }
 
 class _SearchResultPageViewModel {
   /// 検索キーワード
   final String _searchWord;
+
+  /// 表示中のサイト
+  Site _showningSite;
 
   /// 対応リポジトリ
   final IndexRepository _repository =
@@ -40,12 +45,9 @@ class _SearchResultPageViewModel {
   /// 選択中タブ
   int _currentSelectedTabIndex = 0;
 
-  /// 表示中のサイト
-  Site _showningSite = AvailableSites.narou;
-
-  _SearchResultPageViewModel(this._searchWord);
-
   bool visibleFav = false;
+
+  _SearchResultPageViewModel(this._showningSite, this._searchWord);
 
   String pageTitle() {
     return "$_searchWordを含む小説";
@@ -53,9 +55,8 @@ class _SearchResultPageViewModel {
 
   /// 人気順にソートする
   void showPopularity() {
-    _novels = _repository.setDirty(this._showningSite).then((_) {
-      return _repository.find(this._showningSite, 0, 500, this._searchWord);
-    }).then((novels) {
+    _novels =
+        _repository.find(this._showningSite, this._searchWord).then((novels) {
       // 人気順にソート
       novels.sort((lhs, rhs) {
         return rhs.popularity - lhs.popularity;
@@ -66,9 +67,8 @@ class _SearchResultPageViewModel {
 
   /// 更新日時順にソートする
   void showUpdatedAt() {
-    _novels = _repository.setDirty(this._showningSite).then((_) {
-      return _repository.find(this._showningSite, 0, 500, this._searchWord);
-    }).then((novels) {
+    _novels =
+        _repository.find(this._showningSite, this._searchWord).then((novels) {
       // 更新日時順にソート
       novels.sort((lhs, rhs) {
         return rhs.novelHeader.lastUpdatedAt - lhs.novelHeader.lastUpdatedAt;
@@ -105,25 +105,22 @@ class _SearchResultPageState extends State<SearchResultPage> {
         length: 2,
         initialIndex: _viewModel._currentSelectedTabIndex,
         child: Scaffold(
+          appBar: AppBar(
+            title: Text(_viewModel.pageTitle()),
+            bottom: TabBar(
+              tabs: [new Tab(text: "人気順"), new Tab(text: "更新順")].toList(),
+              indicatorColor: Colors.white,
+              onTap: (index) {
+                setState(() {
+                  _viewModel._showWithSelectedTabIndex(index);
+                });
+              },
+            ),
+          ),
           body: RefreshIndicator(
               child: Scrollbar(
                   child: CustomScrollView(
                 slivers: <Widget>[
-                  SliverAppBar(
-                    title: Text(_viewModel.pageTitle()),
-                    pinned: true,
-                    bottom: TabBar(
-                      tabs:
-                          [new Tab(text: "人気順"), new Tab(text: "更新順")].toList(),
-                      indicatorColor: Colors.white,
-                      onTap: (index) {
-                        setState(() {
-                          _viewModel._showWithSelectedTabIndex(index);
-                        });
-                      },
-                    ),
-                  ),
-                  SliverPadding(padding: EdgeInsets.symmetric(vertical: 8.0)),
                   _buildNovelLists()
                 ],
               )),

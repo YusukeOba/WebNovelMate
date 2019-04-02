@@ -32,15 +32,13 @@ class AozoraNovelListEntity {
   /// アクセス数
   int access;
 
-  AozoraNovelListEntity(
-      this.book_id,
-      this.title,
-      this.release_date,
-      this.last_modified,
-      this.html_url,
-      this.text_url,
-      this.copyright,
-      this.access);
+  /// 初出
+  String first_appearance;
+
+
+  AozoraNovelListEntity(this.book_id, this.title, this.release_date,
+      this.last_modified, this.html_url, this.text_url, this.authors,
+      this.copyright, this.access, this.first_appearance);
 
   factory AozoraNovelListEntity.fromJson(Map<String, dynamic> json) =>
       _$AozoraNovelListEntityFromJson(json);

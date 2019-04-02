@@ -15,13 +15,14 @@ AozoraNovelListEntity _$AozoraNovelListEntityFromJson(
       json['last_modified'] as String,
       json['html_url'] as String,
       json['text_url'] as String,
+      (json['authors'] as List)
+          ?.map((e) => e == null
+              ? null
+              : AozoraAuthors.fromJson(e as Map<String, dynamic>))
+          ?.toList(),
       json['copyright'] as bool,
-      json['access'] as int)
-    ..authors = (json['authors'] as List)
-        ?.map((e) => e == null
-            ? null
-            : AozoraAuthors.fromJson(e as Map<String, dynamic>))
-        ?.toList();
+      json['access'] as int,
+      json['first_appearance'] as String);
 }
 
 Map<String, dynamic> _$AozoraNovelListEntityToJson(
@@ -35,7 +36,8 @@ Map<String, dynamic> _$AozoraNovelListEntityToJson(
       'text_url': instance.text_url,
       'authors': instance.authors,
       'copyright': instance.copyright,
-      'access': instance.access
+      'access': instance.access,
+      'first_appearance': instance.first_appearance
     };
 
 AozoraAuthors _$AozoraAuthorsFromJson(Map<String, dynamic> json) {

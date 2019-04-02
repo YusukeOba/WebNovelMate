@@ -1,7 +1,5 @@
 import 'package:NovelMate/common/Sites.dart';
 import 'package:NovelMate/common/colors.dart';
-import 'package:NovelMate/common/datastore/CachedBookshelfDataStore.dart';
-import 'package:NovelMate/common/datastore/narou/CachedNarouBookshelfDataStore.dart';
 import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
 import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
 import 'package:NovelMate/common/entities/domain/SubscribedNovelEntity.dart';
@@ -13,6 +11,10 @@ import 'package:NovelMate/page/SearchResultPage.dart';
 import 'package:flutter/material.dart';
 
 class SearchPage extends StatefulWidget {
+  SearchPage();
+
+  SearchPage.forDesignTime();
+
   @override
   _SearchPageState createState() {
     return new _SearchPageState(_SearchPageViewModel());
@@ -41,13 +43,13 @@ class _SearchPageViewModel {
       return;
     }
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return SearchResultPage(inputtedText);
+      return SearchResultPage(showingSite, inputtedText);
     }));
   }
 
   void onRefresh() {
     this.rankings = _repository.setDirty(showingSite).then((_) {
-      return _repository.find(showingSite, 0, 20, inputtedText);
+      return _repository.fetchRanking(showingSite);
     }).then((entities) {
       entities.sort((lhs, rhs) {
         return rhs.popularity - lhs.popularity;
@@ -55,6 +57,16 @@ class _SearchPageViewModel {
       return entities;
     });
   }
+
+    // 初期表示
+    void shownFirst() {
+      this.rankings = _repository.fetchRanking(showingSite).then((entities) {
+        entities.sort((lhs, rhs) {
+          return rhs.popularity - lhs.popularity;
+        });
+        return entities;
+      });
+    }
 }
 
 class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
@@ -84,7 +96,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _viewModel.onRefresh();
+    _viewModel.shownFirst();
   }
 
   /// 検索ボックス
