@@ -8,6 +8,7 @@ import 'package:NovelMate/common/repository/IndexRepository.dart';
 import 'package:NovelMate/common/repository/RepositoryFactory.dart';
 import 'package:NovelMate/page/EpisodeIndexPage.dart';
 import 'package:NovelMate/page/SearchResultPage.dart';
+import 'package:NovelMate/page/WebViewTextPage.dart';
 import 'package:flutter/material.dart';
 
 class SearchPage extends StatefulWidget {
@@ -235,7 +236,8 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
     ]);
 
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return EpisodeIndexPage(novelHeader);
+//      return EpisodeIndexPage(novelHeader);
+    return WebViewExample();
     }));
   }
 }

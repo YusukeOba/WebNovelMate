@@ -1,8 +1,10 @@
 import 'package:NovelMate/common/Sites.dart';
 import 'package:NovelMate/common/datastore/aozora/CachedAozoraBookshelfDataStore.dart';
 import 'package:NovelMate/common/datastore/aozora/CachedAozoraIndexDataStore.dart';
+import 'package:NovelMate/common/datastore/aozora/CachedAozoraTextDataStore.dart';
 import 'package:NovelMate/common/datastore/aozora/RemoteAozoraBookshelfDataStore.dart';
 import 'package:NovelMate/common/datastore/aozora/RemoteAozoraIndexDataStore.dart';
+import 'package:NovelMate/common/datastore/aozora/RemoteAozoraTextDataStore.dart';
 import 'package:NovelMate/common/datastore/narou/CachedNarouBookshelfDataStore.dart';
 import 'package:NovelMate/common/datastore/narou/CachedNarouEpisodeDataStore.dart';
 import 'package:NovelMate/common/datastore/narou/CachedNarouIndexDataStore.dart';
@@ -55,9 +57,13 @@ class RepositoryFactory {
     _episodeRepository = EpisodeRepositoryImpl(
         {AvailableSites.narou: CachedNarouEpisodeDataStore()},
         {AvailableSites.narou: RemoteNarouEpisodeDataStore()});
-    _textRepository = TextRepositoryImpl(
-        {AvailableSites.narou: CachedNarouTextDataStore()},
-        {AvailableSites.narou: RemoteNarouTextDataStore()});
+    _textRepository = TextRepositoryImpl({
+      AvailableSites.narou: CachedNarouTextDataStore(),
+      AvailableSites.aozora: CachedAozoraTextDataStore()
+    }, {
+      AvailableSites.narou: RemoteNarouTextDataStore(),
+      AvailableSites.aozora: RemoteAozoraTextDataStore()
+    });
     _settingRepository = SettingRepositoryImpl();
   }
 

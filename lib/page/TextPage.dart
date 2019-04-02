@@ -1,11 +1,12 @@
+import 'dart:async';
+
 import 'package:NovelMate/common/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_easyrefresh/ball_pulse_footer.dart';
-import 'package:flutter_easyrefresh/ball_pulse_header.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 /// 初期スクロール位置
 enum FirstScrollPosition { first, bottom }
@@ -91,6 +92,9 @@ typedef SliderConfigCallback = Function(
     double min, double current, double value);
 
 class _TextPageViewModel {
+  final Completer<WebViewController> _webViewController =
+      Completer<WebViewController>();
+
   /// 話の名前
   final String episodeName;
 
@@ -148,6 +152,14 @@ class _TextPageViewModel {
     _nextActionCallback = nextActionCallback;
     _prevActionCallback = prevActionCallback;
     _scrollController = ScrollController(keepScrollOffset: false);
+
+    _webViewController.future.then((controller) {
+      print("finish!!!");
+      final text = this.texts.join();
+//      final replaced = text.replaceAll("\r", "<br>").replaceAll("\n", "\\n");
+      controller
+          .evaluateJavascript("window.setText('" + "aaaa" + "');");
+    });
   }
 
   void notifySliderConfig() {
@@ -225,86 +237,106 @@ class _TextPageState extends State<TextPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scrollbar(
-        child: EasyRefresh(
-            key: _easyRefreshKey,
-            onRefresh: _viewModel._prevEpisodeName != null ? onRefresh : null,
-            loadMore: _viewModel._nextEpisodeName != null ? loadMore : null,
-            refreshHeader: BallPulseHeader(
-              key: _headerKey,
-              color: _viewModel._textStyle.value.color,
-            ),
-            refreshFooter: BallPulseFooter(
-              key: _footerKey,
-              color: _viewModel._textStyle.value.color,
-            ),
-            child: ListView.builder(
-                controller: _viewModel._scrollController,
-                itemBuilder: (context, index) {
-                  final text = _viewModel.texts[index];
-                  Widget textWidget;
-                  bool isLastLength = index == _viewModel.texts.length - 1;
-                  bool isFirstLength = index == 0;
-                  if (isLastLength) {
-                    textWidget = Container(
-                      color: _viewModel._color.value,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Container(
-                              padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
-                              child: Column(
-                                children: <Widget>[
-                                  Text(text,
-                                      style: _viewModel._textStyle.value),
-                                  Container(height: 164),
-                                ],
-                              )),
-                          _buildNextEpisode()
-                        ],
-                      ),
-                    );
-                  } else if (isFirstLength) {
-                    textWidget = Container(
-                      child: Column(
-                        children: <Widget>[
-                          _buildPreviousEpisode(),
-                          Container(
-                              color: _viewModel._color.value,
-                              padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
-                              child: Column(
-                                children: <Widget>[
-                                  Container(height: 128),
-                                  Text(_viewModel.episodeName,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 20.0,
-                                          color: _viewModel
-                                              ._textStyle.value.color)),
-                                  Container(height: 32),
-                                ],
-                              )),
-                        ],
-                      ),
-                    );
-                  } else {
-                    textWidget = Container(
-                      color: _viewModel._color.value,
-                      child: Text(text, style: _viewModel._textStyle.value),
-                      padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
-                    );
-                  }
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _viewModel._onTapCallback();
-                      });
-                    },
-                    child: textWidget,
-                  );
-                },
-                physics: BouncingScrollPhysics(),
-                itemCount: _viewModel.texts.length)));
+    return Scaffold(
+        body: GestureDetector(
+            onTap: () {
+              print("ho");
+              _viewModel._onTapCallback();
+            },
+            child: WebView(
+              initialUrl: 'html/index.html',
+              javascriptMode: JavascriptMode.unrestricted,
+              onWebViewCreated: (WebViewController webViewController) {
+                _viewModel._webViewController.complete(webViewController);
+              },
+              javascriptChannels: {
+                JavascriptChannel(
+                    name: "Msg",
+                    onMessageReceived: (msg) {
+                      print("msg");
+                    })
+              },
+            )));
+//    return Scrollbar(
+//        child: EasyRefresh(
+//            key: _easyRefreshKey,
+//            onRefresh: _viewModel._prevEpisodeName != null ? onRefresh : null,
+//            loadMore: _viewModel._nextEpisodeName != null ? loadMore : null,
+//            refreshHeader: BallPulseHeader(
+//              key: _headerKey,
+//              color: _viewModel._textStyle.value.color,
+//            ),
+//            refreshFooter: BallPulseFooter(
+//              key: _footerKey,
+//              color: _viewModel._textStyle.value.color,
+//            ),
+//            child: ListView.builder(
+//                controller: _viewModel._scrollController,
+//                itemBuilder: (context, index) {
+//                  final text = _viewModel.texts[index];
+//                  Widget textWidget;
+//                  bool isLastLength = index == _viewModel.texts.length - 1;
+//                  bool isFirstLength = index == 0;
+//                  if (isLastLength) {
+//                    textWidget = Container(
+//                      color: _viewModel._color.value,
+//                      child: Column(
+//                        crossAxisAlignment: CrossAxisAlignment.start,
+//                        children: <Widget>[
+//                          Container(
+//                              padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+//                              child: Column(
+//                                children: <Widget>[
+//                                  Text(text,
+//                                      style: _viewModel._textStyle.value),
+//                                  Container(height: 164),
+//                                ],
+//                              )),
+//                          _buildNextEpisode()
+//                        ],
+//                      ),
+//                    );
+//                  } else if (isFirstLength) {
+//                    textWidget = Container(
+//                      child: Column(
+//                        children: <Widget>[
+//                          _buildPreviousEpisode(),
+//                          Container(
+//                              color: _viewModel._color.value,
+//                              padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+//                              child: Column(
+//                                children: <Widget>[
+//                                  Container(height: 128),
+//                                  Text(_viewModel.episodeName,
+//                                      style: TextStyle(
+//                                          fontWeight: FontWeight.bold,
+//                                          fontSize: 20.0,
+//                                          color: _viewModel
+//                                              ._textStyle.value.color)),
+//                                  Container(height: 32),
+//                                ],
+//                              )),
+//                        ],
+//                      ),
+//                    );
+//                  } else {
+//                    textWidget = Container(
+//                      color: _viewModel._color.value,
+//                      child: Text(text, style: _viewModel._textStyle.value),
+//                      padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+//                    );
+//                  }
+//                  return GestureDetector(
+//                    onTap: () {
+//                      setState(() {
+//                        _viewModel._onTapCallback();
+//                      });
+//                    },
+//                    child: textWidget,
+//                  );
+//                },
+//                physics: BouncingScrollPhysics(),
+//                itemCount: _viewModel.texts.length)));
   }
 
   Widget _buildNextEpisode() {

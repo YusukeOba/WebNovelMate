@@ -44,6 +44,12 @@ dependencies:
 
   shared_preferences: ^0.5.1+2
 
+  webview_flutter:
+    git:
+      url: https://github.com/shaqian/plugins.git
+      ref: shaqian/webview
+      path: packages/webview_flutter
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -82,6 +88,14 @@ flutter:
 
   assets:
     - images/font_sizing.png
+    - html/three.js
+    - html/three.html
+    - html/bootstrap.min.css
+    - html/bootstrap.min.js
+    - html/index.html
+    - html/jquery-3.2.1.min.js
+    - html/style.css
+    - html/SawarabiMincho-Regular.ttf
 
   fonts:
   - family: "SawarabiMincho"

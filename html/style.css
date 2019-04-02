@@ -1,0 +1,8 @@
+body {
+    background-color: #f9f9f9;
+}
+
+@font-face {
+    font-family: SawarabiMincho;
+    src: url('SawarabiMincho-Regular.ttf') format("truetype");
+ }
