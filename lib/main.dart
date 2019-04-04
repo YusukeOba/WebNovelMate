@@ -2,9 +2,9 @@
 
 import 'package:NovelMate/common/NmLocalization.dart';
 import 'package:NovelMate/common/colors.dart';
-import 'package:NovelMate/common/datastore/narou/CachedNarouRankingDataStore.dart';
-import 'package:NovelMate/common/datastore/narou/RemoteNarouRankingDataStore.dart';
-import 'package:NovelMate/common/repository/RankingRepositoryImpl.dart';
+import 'package:NovelMate/common/datastore/narou/CachedNarouIndexDataStore.dart';
+import 'package:NovelMate/common/datastore/narou/RemoteNarouIndexDataStore.dart';
+import 'package:NovelMate/common/repository/IndexRepositoryImpl.dart';
 import 'package:NovelMate/page/BookshelfTabPage.dart';
 import 'package:NovelMate/page/SearchPage.dart';
 import 'package:NovelMate/page/SettingPage.dart';

@@ -1,10 +1,9 @@
 import 'package:NovelMate/common/colors.dart';
 import 'package:NovelMate/common/entities/domain/EpisodeEntity.dart';
 import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
-import 'package:NovelMate/common/entities/domain/SubscribedNovelEntity.dart';
-import 'package:NovelMate/common/repository/BookshelfRepository.dart';
 import 'package:NovelMate/common/repository/RepositoryFactory.dart';
 import 'package:NovelMate/page/TextPagerPage.dart';
+import 'package:NovelMate/page/WebViewTextPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -269,7 +268,8 @@ class _EpisodeIndexState extends State<EpisodeIndexPage> {
                     context,
                     MaterialPageRoute(
                         builder: (context) {
-                          return TextPagerPage(episodes, index);
+//                          return TextPagerPage(episodes, index);
+                        return WebViewExample();
                         },
                         fullscreenDialog: true))
                 .then((_) {

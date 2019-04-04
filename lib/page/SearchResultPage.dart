@@ -1,28 +1,32 @@
-import 'dart:math';
-
 import 'package:NovelMate/common/Sites.dart';
 import 'package:NovelMate/common/colors.dart';
+import 'package:NovelMate/common/entities/domain/EpisodeEntity.dart';
 import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
 import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
 import 'package:NovelMate/common/entities/domain/SubscribedNovelEntity.dart';
 import 'package:NovelMate/common/repository/BookshelfRepository.dart';
-import 'package:NovelMate/common/repository/RankingRepository.dart';
+import 'package:NovelMate/common/repository/IndexRepository.dart';
 import 'package:NovelMate/common/repository/RepositoryFactory.dart';
 import 'package:NovelMate/page/EpisodeIndexPage.dart';
+import 'package:NovelMate/page/TextPagerPage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 
 class SearchResultPage extends StatefulWidget {
+  /// 検索サイト
+  final Site _searchSite;
+
   /// 検索キーワード
   final String _searchWord;
 
-  SearchResultPage(this._searchWord);
+  SearchResultPage(this._searchSite, this._searchWord);
 
   @override
   State createState() {
-    return _SearchResultPageState(_SearchResultPageViewModel(_searchWord));
+    return _SearchResultPageState(
+        _SearchResultPageViewModel(_searchSite, _searchWord));
   }
 }
 
@@ -30,9 +34,12 @@ class _SearchResultPageViewModel {
   /// 検索キーワード
   final String _searchWord;
 
+  /// 表示中のサイト
+  Site _showningSite;
+
   /// 対応リポジトリ
-  final RankingRepository _repository =
-      RepositoryFactory.shared.getRankingRepository();
+  final IndexRepository _repository =
+      RepositoryFactory.shared.getIndexRepository();
 
   /// ListViewに表示する小説
   Future<List<RankingEntity>> _novels;
@@ -40,12 +47,9 @@ class _SearchResultPageViewModel {
   /// 選択中タブ
   int _currentSelectedTabIndex = 0;
 
-  /// 表示中のサイト
-  Site _showningSite = AvailableSites.narou;
-
-  _SearchResultPageViewModel(this._searchWord);
-
   bool visibleFav = false;
+
+  _SearchResultPageViewModel(this._showningSite, this._searchWord);
 
   String pageTitle() {
     return "$_searchWordを含む小説";
@@ -53,9 +57,8 @@ class _SearchResultPageViewModel {
 
   /// 人気順にソートする
   void showPopularity() {
-    _novels = _repository.setDirty(this._showningSite).then((_) {
-      return _repository.find(this._showningSite, 0, 500, this._searchWord);
-    }).then((novels) {
+    _novels =
+        _repository.find(this._showningSite, this._searchWord).then((novels) {
       // 人気順にソート
       novels.sort((lhs, rhs) {
         return rhs.popularity - lhs.popularity;
@@ -66,9 +69,8 @@ class _SearchResultPageViewModel {
 
   /// 更新日時順にソートする
   void showUpdatedAt() {
-    _novels = _repository.setDirty(this._showningSite).then((_) {
-      return _repository.find(this._showningSite, 0, 500, this._searchWord);
-    }).then((novels) {
+    _novels =
+        _repository.find(this._showningSite, this._searchWord).then((novels) {
       // 更新日時順にソート
       novels.sort((lhs, rhs) {
         return rhs.novelHeader.lastUpdatedAt - lhs.novelHeader.lastUpdatedAt;
@@ -105,27 +107,22 @@ class _SearchResultPageState extends State<SearchResultPage> {
         length: 2,
         initialIndex: _viewModel._currentSelectedTabIndex,
         child: Scaffold(
+          appBar: AppBar(
+            title: Text(_viewModel.pageTitle()),
+            bottom: TabBar(
+              tabs: [new Tab(text: "おすすめ順"), new Tab(text: "更新順")].toList(),
+              indicatorColor: Colors.white,
+              onTap: (index) {
+                setState(() {
+                  _viewModel._showWithSelectedTabIndex(index);
+                });
+              },
+            ),
+          ),
           body: RefreshIndicator(
               child: Scrollbar(
                   child: CustomScrollView(
-                slivers: <Widget>[
-                  SliverAppBar(
-                    title: Text(_viewModel.pageTitle()),
-                    pinned: true,
-                    bottom: TabBar(
-                      tabs:
-                          [new Tab(text: "人気順"), new Tab(text: "更新順")].toList(),
-                      indicatorColor: Colors.white,
-                      onTap: (index) {
-                        setState(() {
-                          _viewModel._showWithSelectedTabIndex(index);
-                        });
-                      },
-                    ),
-                  ),
-                  SliverPadding(padding: EdgeInsets.symmetric(vertical: 8.0)),
-                  _buildNovelLists()
-                ],
+                slivers: <Widget>[_buildNovelLists()],
               )),
               onRefresh: () {
                 return Future(() {
@@ -175,10 +172,6 @@ class _SearchResultPageState extends State<SearchResultPage> {
                 "時" +
                 date.minute.toString() +
                 "分 更新";
-
-            // 文字数
-            String textLength =
-                new NumberFormat().format(novel.novelHeader.textLength);
 
             return InkWell(
                 onTap: () async {
@@ -233,11 +226,8 @@ class _SearchResultPageState extends State<SearchResultPage> {
                                             style: TextStyle(
                                                 color: Colors.black,
                                                 fontSize: 11.0)),
-                                        TextSpan(
-                                            text: "／" + textLength + "文字",
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 11.0)),
+                                        _buildTextLength(
+                                            novel.novelHeader.textLength),
                                         TextSpan(
                                             text: "／" + formattedDate,
                                             style: TextStyle(
@@ -262,6 +252,18 @@ class _SearchResultPageState extends State<SearchResultPage> {
         });
   }
 
+  TextSpan _buildTextLength(int textLength) {
+    if (textLength != null && textLength != 0) {
+      // 文字数
+      String formattedTextLength = new NumberFormat().format(textLength);
+      return TextSpan(
+          text: "／" + formattedTextLength + "文字",
+          style: TextStyle(color: Colors.black, fontSize: 11.0));
+    } else {
+      return TextSpan();
+    }
+  }
+
   _showDetailPage(NovelHeader novelHeader) async {
     BookshelfRepository bkRepository =
         RepositoryFactory.shared.getBookshelfRepository();
@@ -272,7 +274,22 @@ class _SearchResultPageState extends State<SearchResultPage> {
     ]);
 
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return EpisodeIndexPage(novelHeader);
+      if (novelHeader.isShortStory) {
+        return TextPagerPage(
+            [
+              EpisodeEntity(
+                  novelHeader.identifier,
+                  "1",
+                  DateTime.now().millisecondsSinceEpoch,
+                  novelHeader.lastUpdatedAt,
+                  novelHeader.novelName,
+                  1,
+                  novelHeader.novelName)
+            ].toList(),
+            0);
+      } else {
+        return EpisodeIndexPage(novelHeader);
+      }
     }));
   }
 }

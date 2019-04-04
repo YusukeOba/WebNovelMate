@@ -1,6 +1,6 @@
 import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
 
-/// ランキング表示
+/// インデックス表示
 class RankingEntity {
   /// 順位
   final int popularity;

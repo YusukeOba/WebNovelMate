@@ -34,15 +34,7 @@ class BookshelfRepositoryImpl extends BookshelfRepository {
 
   @override
   Future<SubscribedNovelEntity> find(NovelIdentifier novelIdentifier) {
-    return findAll().then((novels) {
-      print("find equals novel.");
-      return novels.firstWhere((novel) =>
-          // サイト、サイト中の固有IDが一致しているものを抽出
-          novel.novelHeader.identifier.siteOfIdentifier ==
-              novelIdentifier.siteOfIdentifier &&
-          novel.novelHeader.identifier.site.identifier ==
-              novelIdentifier.site.identifier);
-    });
+    return cachedDataStores[novelIdentifier.site].find(novelIdentifier);
   }
 
   @override
@@ -140,8 +132,8 @@ class BookshelfRepositoryImpl extends BookshelfRepository {
   }
 
   @override
-  Future<void> updateReadingEpisode(
-      NovelIdentifier novelIdentifier, String episodeIdentifier) {
+  Future<void> updateReadingEpisode(NovelIdentifier novelIdentifier,
+      String episodeIdentifier, int percentage) {
     return findAll().then((novels) {
       print("find equals novel.");
       return novels.firstWhere((novel) =>
@@ -154,6 +146,7 @@ class BookshelfRepositoryImpl extends BookshelfRepository {
       print("try update reading episode variable.");
       // 値の書き込み
       novel.readingEpisodeIdentifier = episodeIdentifier;
+      novel.readingProgress = percentage;
       return novel..lastReadAt = DateTime.now().millisecondsSinceEpoch;
     }).then((novel) {
       print("try cache update reading episode.");

@@ -8,8 +8,9 @@ class CachedNarouEpisodeDataStore extends CachedEpisodeDataStore {
   /// [episodes]は保存対象のEntity
   Future<void> save(NovelIdentifier identifier, List<EpisodeEntity> episodes) {
     List<Future<void>> insertResult = episodes.map((episode) {
-      return Database().into(Database().cachedNarouEpisodeEntity).insert(
-          CachedNarouEpisodeEntityData(
+      return Database().into(Database().cachedEpisodeEntity).insert(
+          CachedEpisodeEntityData(
+              siteIdentifier: identifier.site.identifier,
               siteOfIdentifier: identifier.siteOfIdentifier,
               episodeIdentifier: episode.episodeIdentifier,
               firstWriteAt: episode.firstWriteAt,
@@ -24,7 +25,9 @@ class CachedNarouEpisodeDataStore extends CachedEpisodeDataStore {
 
   /// 話の一覧をすべて削除する
   Future<void> deleteByNovel(NovelIdentifier identifier) {
-    return (Database().delete(Database().cachedNarouEpisodeEntity)
+    return (Database().delete(Database().cachedEpisodeEntity)
+          ..where((episode) =>
+              episode.siteIdentifier.equals(identifier.site.identifier))
           ..where((episode) =>
               episode.siteOfIdentifier.equals(identifier.siteOfIdentifier)))
         .go();
@@ -32,7 +35,9 @@ class CachedNarouEpisodeDataStore extends CachedEpisodeDataStore {
 
   @override
   Future<bool> hasCache(NovelIdentifier identifier) {
-    return (Database().select(Database().cachedNarouEpisodeEntity)
+    return (Database().select(Database().cachedEpisodeEntity)
+          ..where((episode) =>
+              episode.siteIdentifier.equals(identifier.site.identifier))
           ..where((episode) =>
               episode.siteOfIdentifier.equals(identifier.siteOfIdentifier))
           ..limit(1))
@@ -44,7 +49,9 @@ class CachedNarouEpisodeDataStore extends CachedEpisodeDataStore {
 
   @override
   Future<List<EpisodeEntity>> findAllByNovel(NovelIdentifier identifier) {
-    return (Database().select(Database().cachedNarouEpisodeEntity)
+    return (Database().select(Database().cachedEpisodeEntity)
+          ..where((episode) =>
+              episode.siteIdentifier.equals(identifier.site.identifier))
           ..where((episode) =>
               episode.siteOfIdentifier.equals(identifier.siteOfIdentifier)))
         .get()

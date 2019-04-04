@@ -7,10 +7,6 @@ import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
 import 'package:NovelMate/common/entities/domain/SubscribedNovelEntity.dart';
 import 'package:NovelMate/common/entities/narou/NarouNovelListEntity.dart';
 
-import 'package:html/parser.dart' show parse;
-import 'package:html/dom.dart';
-import 'package:http/http.dart' as http;
-
 /// なろうの小説の更新処理
 class RemoteNarouBookshelfDataStore extends RemoteBookshelfDataStore {
   @override
@@ -91,7 +87,8 @@ class RemoteNarouBookshelfDataStore extends RemoteBookshelfDataStore {
               remoteNovel.end == 0,
               lastUpTime,
               remoteNovel.length,
-              remoteNovel.general_all_no),
+              remoteNovel.general_all_no,
+              remoteNovel.novel_type == 2),
           cachedNovel.lastReadAt,
           correctUnreadCount,
           remoteEpisodeCount,

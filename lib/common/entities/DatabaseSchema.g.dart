@@ -6,8 +6,9 @@ part of 'DatabaseSchema.dart';
 // MoorGenerator
 // **************************************************************************
 
-class CachedNarouSubscribedNovelEntityData {
-  final String identifier;
+class CachedSubscribedNovelEntityData {
+  final String siteIdentifier;
+  final String siteOfIdentifier;
   final String novelName;
   final String novelStory;
   final String writer;
@@ -18,8 +19,11 @@ class CachedNarouSubscribedNovelEntityData {
   final int episodeCount;
   final int lastReadAt;
   final String readingEpisodeIdentifier;
-  CachedNarouSubscribedNovelEntityData(
-      {this.identifier,
+  final int readingEpisodeProgress;
+  final bool isShortStory;
+  CachedSubscribedNovelEntityData(
+      {this.siteIdentifier,
+      this.siteOfIdentifier,
       this.novelName,
       this.novelStory,
       this.writer,
@@ -29,14 +33,19 @@ class CachedNarouSubscribedNovelEntityData {
       this.textLength,
       this.episodeCount,
       this.lastReadAt,
-      this.readingEpisodeIdentifier});
-  factory CachedNarouSubscribedNovelEntityData.fromData(
+      this.readingEpisodeIdentifier,
+      this.readingEpisodeProgress,
+      this.isShortStory});
+  factory CachedSubscribedNovelEntityData.fromData(
       Map<String, dynamic> data, GeneratedDatabase db) {
     final stringType = db.typeSystem.forDartType<String>();
     final intType = db.typeSystem.forDartType<int>();
     final boolType = db.typeSystem.forDartType<bool>();
-    return CachedNarouSubscribedNovelEntityData(
-      identifier: stringType.mapFromDatabaseResponse(data['identifier']),
+    return CachedSubscribedNovelEntityData(
+      siteIdentifier:
+          stringType.mapFromDatabaseResponse(data['site_identifier']),
+      siteOfIdentifier:
+          stringType.mapFromDatabaseResponse(data['site_of_identifier']),
       novelName: stringType.mapFromDatabaseResponse(data['novel_name']),
       novelStory: stringType.mapFromDatabaseResponse(data['novel_story']),
       writer: stringType.mapFromDatabaseResponse(data['writer']),
@@ -48,12 +57,15 @@ class CachedNarouSubscribedNovelEntityData {
       lastReadAt: intType.mapFromDatabaseResponse(data['last_read_at']),
       readingEpisodeIdentifier: stringType
           .mapFromDatabaseResponse(data['reading_episode_identifier']),
+      readingEpisodeProgress:
+          intType.mapFromDatabaseResponse(data['reading_episode_progress']),
+      isShortStory: boolType.mapFromDatabaseResponse(data['is_short_story']),
     );
   }
-  factory CachedNarouSubscribedNovelEntityData.fromJson(
-      Map<String, dynamic> json) {
-    return CachedNarouSubscribedNovelEntityData(
-      identifier: json['identifier'] as String,
+  factory CachedSubscribedNovelEntityData.fromJson(Map<String, dynamic> json) {
+    return CachedSubscribedNovelEntityData(
+      siteIdentifier: json['siteIdentifier'] as String,
+      siteOfIdentifier: json['siteOfIdentifier'] as String,
       novelName: json['novelName'] as String,
       novelStory: json['novelStory'] as String,
       writer: json['writer'] as String,
@@ -64,11 +76,14 @@ class CachedNarouSubscribedNovelEntityData {
       episodeCount: json['episodeCount'] as int,
       lastReadAt: json['lastReadAt'] as int,
       readingEpisodeIdentifier: json['readingEpisodeIdentifier'] as String,
+      readingEpisodeProgress: json['readingEpisodeProgress'] as int,
+      isShortStory: json['isShortStory'] as bool,
     );
   }
   Map<String, dynamic> toJson() {
     return {
-      'identifier': identifier,
+      'siteIdentifier': siteIdentifier,
+      'siteOfIdentifier': siteOfIdentifier,
       'novelName': novelName,
       'novelStory': novelStory,
       'writer': writer,
@@ -79,11 +94,14 @@ class CachedNarouSubscribedNovelEntityData {
       'episodeCount': episodeCount,
       'lastReadAt': lastReadAt,
       'readingEpisodeIdentifier': readingEpisodeIdentifier,
+      'readingEpisodeProgress': readingEpisodeProgress,
+      'isShortStory': isShortStory,
     };
   }
 
-  CachedNarouSubscribedNovelEntityData copyWith(
-          {String identifier,
+  CachedSubscribedNovelEntityData copyWith(
+          {String siteIdentifier,
+          String siteOfIdentifier,
           String novelName,
           String novelStory,
           String writer,
@@ -93,9 +111,12 @@ class CachedNarouSubscribedNovelEntityData {
           int textLength,
           int episodeCount,
           int lastReadAt,
-          String readingEpisodeIdentifier}) =>
-      CachedNarouSubscribedNovelEntityData(
-        identifier: identifier ?? this.identifier,
+          String readingEpisodeIdentifier,
+          int readingEpisodeProgress,
+          bool isShortStory}) =>
+      CachedSubscribedNovelEntityData(
+        siteIdentifier: siteIdentifier ?? this.siteIdentifier,
+        siteOfIdentifier: siteOfIdentifier ?? this.siteOfIdentifier,
         novelName: novelName ?? this.novelName,
         novelStory: novelStory ?? this.novelStory,
         writer: writer ?? this.writer,
@@ -107,11 +128,15 @@ class CachedNarouSubscribedNovelEntityData {
         lastReadAt: lastReadAt ?? this.lastReadAt,
         readingEpisodeIdentifier:
             readingEpisodeIdentifier ?? this.readingEpisodeIdentifier,
+        readingEpisodeProgress:
+            readingEpisodeProgress ?? this.readingEpisodeProgress,
+        isShortStory: isShortStory ?? this.isShortStory,
       );
   @override
   String toString() {
-    return (StringBuffer('CachedNarouSubscribedNovelEntityData(')
-          ..write('identifier: $identifier, ')
+    return (StringBuffer('CachedSubscribedNovelEntityData(')
+          ..write('siteIdentifier: $siteIdentifier, ')
+          ..write('siteOfIdentifier: $siteOfIdentifier, ')
           ..write('novelName: $novelName, ')
           ..write('novelStory: $novelStory, ')
           ..write('writer: $writer, ')
@@ -121,37 +146,44 @@ class CachedNarouSubscribedNovelEntityData {
           ..write('textLength: $textLength, ')
           ..write('episodeCount: $episodeCount, ')
           ..write('lastReadAt: $lastReadAt, ')
-          ..write('readingEpisodeIdentifier: $readingEpisodeIdentifier')
+          ..write('readingEpisodeIdentifier: $readingEpisodeIdentifier, ')
+          ..write('readingEpisodeProgress: $readingEpisodeProgress, ')
+          ..write('isShortStory: $isShortStory')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode =>
-      ((((((((((identifier.hashCode) * 31 + novelName.hashCode) * 31 +
-                                                                      novelStory
+      (((((((((((((siteIdentifier.hashCode) * 31 + siteOfIdentifier.hashCode) * 31 + novelName.hashCode) * 31 + novelStory.hashCode) * 31 +
+                                                                              writer
+                                                                                  .hashCode) *
+                                                                          31 +
+                                                                      unreadCount
                                                                           .hashCode) *
                                                                   31 +
-                                                              writer.hashCode) *
+                                                              isComplete
+                                                                  .hashCode) *
                                                           31 +
-                                                      unreadCount.hashCode) *
+                                                      lastUpdatedAt.hashCode) *
                                                   31 +
-                                              isComplete.hashCode) *
+                                              textLength.hashCode) *
                                           31 +
-                                      lastUpdatedAt.hashCode) *
+                                      episodeCount.hashCode) *
                                   31 +
-                              textLength.hashCode) *
+                              lastReadAt.hashCode) *
                           31 +
-                      episodeCount.hashCode) *
+                      readingEpisodeIdentifier.hashCode) *
                   31 +
-              lastReadAt.hashCode) *
+              readingEpisodeProgress.hashCode) *
           31 +
-      readingEpisodeIdentifier.hashCode;
+      isShortStory.hashCode;
   @override
   bool operator ==(other) =>
       identical(this, other) ||
-      (other is CachedNarouSubscribedNovelEntityData &&
-          other.identifier == identifier &&
+      (other is CachedSubscribedNovelEntityData &&
+          other.siteIdentifier == siteIdentifier &&
+          other.siteOfIdentifier == siteOfIdentifier &&
           other.novelName == novelName &&
           other.novelStory == novelStory &&
           other.writer == writer &&
@@ -161,20 +193,29 @@ class CachedNarouSubscribedNovelEntityData {
           other.textLength == textLength &&
           other.episodeCount == episodeCount &&
           other.lastReadAt == lastReadAt &&
-          other.readingEpisodeIdentifier == readingEpisodeIdentifier);
+          other.readingEpisodeIdentifier == readingEpisodeIdentifier &&
+          other.readingEpisodeProgress == readingEpisodeProgress &&
+          other.isShortStory == isShortStory);
 }
 
-class $CachedNarouSubscribedNovelEntityTable
-    extends CachedNarouSubscribedNovelEntity
+class $CachedSubscribedNovelEntityTable extends CachedSubscribedNovelEntity
     implements
-        TableInfo<CachedNarouSubscribedNovelEntity,
-            CachedNarouSubscribedNovelEntityData> {
+        TableInfo<CachedSubscribedNovelEntity,
+            CachedSubscribedNovelEntityData> {
   final GeneratedDatabase _db;
-  $CachedNarouSubscribedNovelEntityTable(this._db);
-  GeneratedTextColumn _identifier;
+  $CachedSubscribedNovelEntityTable(this._db);
+  GeneratedTextColumn _siteIdentifier;
   @override
-  GeneratedTextColumn get identifier => _identifier ??= GeneratedTextColumn(
-        'identifier',
+  GeneratedTextColumn get siteIdentifier =>
+      _siteIdentifier ??= GeneratedTextColumn(
+        'site_identifier',
+        false,
+      );
+  GeneratedTextColumn _siteOfIdentifier;
+  @override
+  GeneratedTextColumn get siteOfIdentifier =>
+      _siteOfIdentifier ??= GeneratedTextColumn(
+        'site_of_identifier',
         false,
       );
   GeneratedTextColumn _novelName;
@@ -238,9 +279,23 @@ class $CachedNarouSubscribedNovelEntityTable
         'reading_episode_identifier',
         true,
       );
+  GeneratedIntColumn _readingEpisodeProgress;
+  @override
+  GeneratedIntColumn get readingEpisodeProgress =>
+      _readingEpisodeProgress ??= GeneratedIntColumn(
+        'reading_episode_progress',
+        true,
+      );
+  GeneratedBoolColumn _isShortStory;
+  @override
+  GeneratedBoolColumn get isShortStory => _isShortStory ??= GeneratedBoolColumn(
+        'is_short_story',
+        false,
+      );
   @override
   List<GeneratedColumn> get $columns => [
-        identifier,
+        siteIdentifier,
+        siteOfIdentifier,
         novelName,
         novelStory,
         writer,
@@ -250,16 +305,20 @@ class $CachedNarouSubscribedNovelEntityTable
         textLength,
         episodeCount,
         lastReadAt,
-        readingEpisodeIdentifier
+        readingEpisodeIdentifier,
+        readingEpisodeProgress,
+        isShortStory
       ];
   @override
-  CachedNarouSubscribedNovelEntity get asDslTable => this;
+  CachedSubscribedNovelEntity get asDslTable => this;
   @override
-  String get $tableName => 'cached_narou_subscribed_novel_entity';
+  String get $tableName => 'cached_subscribed_novel_entity';
   @override
   bool validateIntegrity(
-          CachedNarouSubscribedNovelEntityData instance, bool isInserting) =>
-      identifier.isAcceptableValue(instance.identifier, isInserting) &&
+          CachedSubscribedNovelEntityData instance, bool isInserting) =>
+      siteIdentifier.isAcceptableValue(instance.siteIdentifier, isInserting) &&
+      siteOfIdentifier.isAcceptableValue(
+          instance.siteOfIdentifier, isInserting) &&
       novelName.isAcceptableValue(instance.novelName, isInserting) &&
       novelStory.isAcceptableValue(instance.novelStory, isInserting) &&
       writer.isAcceptableValue(instance.writer, isInserting) &&
@@ -270,20 +329,27 @@ class $CachedNarouSubscribedNovelEntityTable
       episodeCount.isAcceptableValue(instance.episodeCount, isInserting) &&
       lastReadAt.isAcceptableValue(instance.lastReadAt, isInserting) &&
       readingEpisodeIdentifier.isAcceptableValue(
-          instance.readingEpisodeIdentifier, isInserting);
+          instance.readingEpisodeIdentifier, isInserting) &&
+      readingEpisodeProgress.isAcceptableValue(
+          instance.readingEpisodeProgress, isInserting) &&
+      isShortStory.isAcceptableValue(instance.isShortStory, isInserting);
   @override
-  Set<GeneratedColumn> get $primaryKey => {identifier};
+  Set<GeneratedColumn> get $primaryKey => {siteIdentifier, siteOfIdentifier};
   @override
-  CachedNarouSubscribedNovelEntityData map(Map<String, dynamic> data) {
-    return CachedNarouSubscribedNovelEntityData.fromData(data, _db);
+  CachedSubscribedNovelEntityData map(Map<String, dynamic> data) {
+    return CachedSubscribedNovelEntityData.fromData(data, _db);
   }
 
   @override
-  Map<String, Variable> entityToSql(CachedNarouSubscribedNovelEntityData d,
+  Map<String, Variable> entityToSql(CachedSubscribedNovelEntityData d,
       {bool includeNulls = false}) {
     final map = <String, Variable>{};
-    if (d.identifier != null || includeNulls) {
-      map['identifier'] = Variable<String, StringType>(d.identifier);
+    if (d.siteIdentifier != null || includeNulls) {
+      map['site_identifier'] = Variable<String, StringType>(d.siteIdentifier);
+    }
+    if (d.siteOfIdentifier != null || includeNulls) {
+      map['site_of_identifier'] =
+          Variable<String, StringType>(d.siteOfIdentifier);
     }
     if (d.novelName != null || includeNulls) {
       map['novel_name'] = Variable<String, StringType>(d.novelName);
@@ -316,11 +382,19 @@ class $CachedNarouSubscribedNovelEntityTable
       map['reading_episode_identifier'] =
           Variable<String, StringType>(d.readingEpisodeIdentifier);
     }
+    if (d.readingEpisodeProgress != null || includeNulls) {
+      map['reading_episode_progress'] =
+          Variable<int, IntType>(d.readingEpisodeProgress);
+    }
+    if (d.isShortStory != null || includeNulls) {
+      map['is_short_story'] = Variable<bool, BoolType>(d.isShortStory);
+    }
     return map;
   }
 }
 
-class CachedNarouEpisodeEntityData {
+class CachedEpisodeEntityData {
+  final String siteIdentifier;
   final String siteOfIdentifier;
   final String episodeIdentifier;
   final int firstWriteAt;
@@ -328,19 +402,22 @@ class CachedNarouEpisodeEntityData {
   final String nullableChapterName;
   final int displayOrder;
   final String episodeName;
-  CachedNarouEpisodeEntityData(
-      {this.siteOfIdentifier,
+  CachedEpisodeEntityData(
+      {this.siteIdentifier,
+      this.siteOfIdentifier,
       this.episodeIdentifier,
       this.firstWriteAt,
       this.lastUpdateAt,
       this.nullableChapterName,
       this.displayOrder,
       this.episodeName});
-  factory CachedNarouEpisodeEntityData.fromData(
+  factory CachedEpisodeEntityData.fromData(
       Map<String, dynamic> data, GeneratedDatabase db) {
     final stringType = db.typeSystem.forDartType<String>();
     final intType = db.typeSystem.forDartType<int>();
-    return CachedNarouEpisodeEntityData(
+    return CachedEpisodeEntityData(
+      siteIdentifier:
+          stringType.mapFromDatabaseResponse(data['site_identifier']),
       siteOfIdentifier:
           stringType.mapFromDatabaseResponse(data['site_of_identifier']),
       episodeIdentifier:
@@ -353,8 +430,9 @@ class CachedNarouEpisodeEntityData {
       episodeName: stringType.mapFromDatabaseResponse(data['episode_name']),
     );
   }
-  factory CachedNarouEpisodeEntityData.fromJson(Map<String, dynamic> json) {
-    return CachedNarouEpisodeEntityData(
+  factory CachedEpisodeEntityData.fromJson(Map<String, dynamic> json) {
+    return CachedEpisodeEntityData(
+      siteIdentifier: json['siteIdentifier'] as String,
       siteOfIdentifier: json['siteOfIdentifier'] as String,
       episodeIdentifier: json['episodeIdentifier'] as String,
       firstWriteAt: json['firstWriteAt'] as int,
@@ -366,6 +444,7 @@ class CachedNarouEpisodeEntityData {
   }
   Map<String, dynamic> toJson() {
     return {
+      'siteIdentifier': siteIdentifier,
       'siteOfIdentifier': siteOfIdentifier,
       'episodeIdentifier': episodeIdentifier,
       'firstWriteAt': firstWriteAt,
@@ -376,15 +455,17 @@ class CachedNarouEpisodeEntityData {
     };
   }
 
-  CachedNarouEpisodeEntityData copyWith(
-          {String siteOfIdentifier,
+  CachedEpisodeEntityData copyWith(
+          {String siteIdentifier,
+          String siteOfIdentifier,
           String episodeIdentifier,
           int firstWriteAt,
           int lastUpdateAt,
           String nullableChapterName,
           int displayOrder,
           String episodeName}) =>
-      CachedNarouEpisodeEntityData(
+      CachedEpisodeEntityData(
+        siteIdentifier: siteIdentifier ?? this.siteIdentifier,
         siteOfIdentifier: siteOfIdentifier ?? this.siteOfIdentifier,
         episodeIdentifier: episodeIdentifier ?? this.episodeIdentifier,
         firstWriteAt: firstWriteAt ?? this.firstWriteAt,
@@ -395,7 +476,8 @@ class CachedNarouEpisodeEntityData {
       );
   @override
   String toString() {
-    return (StringBuffer('CachedNarouEpisodeEntityData(')
+    return (StringBuffer('CachedEpisodeEntityData(')
+          ..write('siteIdentifier: $siteIdentifier, ')
           ..write('siteOfIdentifier: $siteOfIdentifier, ')
           ..write('episodeIdentifier: $episodeIdentifier, ')
           ..write('firstWriteAt: $firstWriteAt, ')
@@ -409,7 +491,9 @@ class CachedNarouEpisodeEntityData {
 
   @override
   int get hashCode =>
-      ((((((siteOfIdentifier.hashCode) * 31 + episodeIdentifier.hashCode) * 31 +
+      (((((((siteIdentifier.hashCode) * 31 + siteOfIdentifier.hashCode) * 31 +
+                                              episodeIdentifier.hashCode) *
+                                          31 +
                                       firstWriteAt.hashCode) *
                                   31 +
                               lastUpdateAt.hashCode) *
@@ -422,7 +506,8 @@ class CachedNarouEpisodeEntityData {
   @override
   bool operator ==(other) =>
       identical(this, other) ||
-      (other is CachedNarouEpisodeEntityData &&
+      (other is CachedEpisodeEntityData &&
+          other.siteIdentifier == siteIdentifier &&
           other.siteOfIdentifier == siteOfIdentifier &&
           other.episodeIdentifier == episodeIdentifier &&
           other.firstWriteAt == firstWriteAt &&
@@ -432,11 +517,17 @@ class CachedNarouEpisodeEntityData {
           other.episodeName == episodeName);
 }
 
-class $CachedNarouEpisodeEntityTable extends CachedNarouEpisodeEntity
-    implements
-        TableInfo<CachedNarouEpisodeEntity, CachedNarouEpisodeEntityData> {
+class $CachedEpisodeEntityTable extends CachedEpisodeEntity
+    implements TableInfo<CachedEpisodeEntity, CachedEpisodeEntityData> {
   final GeneratedDatabase _db;
-  $CachedNarouEpisodeEntityTable(this._db);
+  $CachedEpisodeEntityTable(this._db);
+  GeneratedTextColumn _siteIdentifier;
+  @override
+  GeneratedTextColumn get siteIdentifier =>
+      _siteIdentifier ??= GeneratedTextColumn(
+        'site_identifier',
+        false,
+      );
   GeneratedTextColumn _siteOfIdentifier;
   @override
   GeneratedTextColumn get siteOfIdentifier =>
@@ -484,6 +575,7 @@ class $CachedNarouEpisodeEntityTable extends CachedNarouEpisodeEntity
       );
   @override
   List<GeneratedColumn> get $columns => [
+        siteIdentifier,
         siteOfIdentifier,
         episodeIdentifier,
         firstWriteAt,
@@ -493,12 +585,12 @@ class $CachedNarouEpisodeEntityTable extends CachedNarouEpisodeEntity
         episodeName
       ];
   @override
-  CachedNarouEpisodeEntity get asDslTable => this;
+  CachedEpisodeEntity get asDslTable => this;
   @override
-  String get $tableName => 'cached_narou_episode_entity';
+  String get $tableName => 'cached_episode_entity';
   @override
-  bool validateIntegrity(
-          CachedNarouEpisodeEntityData instance, bool isInserting) =>
+  bool validateIntegrity(CachedEpisodeEntityData instance, bool isInserting) =>
+      siteIdentifier.isAcceptableValue(instance.siteIdentifier, isInserting) &&
       siteOfIdentifier.isAcceptableValue(
           instance.siteOfIdentifier, isInserting) &&
       episodeIdentifier.isAcceptableValue(
@@ -510,16 +602,20 @@ class $CachedNarouEpisodeEntityTable extends CachedNarouEpisodeEntity
       displayOrder.isAcceptableValue(instance.displayOrder, isInserting) &&
       episodeName.isAcceptableValue(instance.episodeName, isInserting);
   @override
-  Set<GeneratedColumn> get $primaryKey => {siteOfIdentifier, episodeIdentifier};
+  Set<GeneratedColumn> get $primaryKey =>
+      {siteIdentifier, siteOfIdentifier, episodeIdentifier};
   @override
-  CachedNarouEpisodeEntityData map(Map<String, dynamic> data) {
-    return CachedNarouEpisodeEntityData.fromData(data, _db);
+  CachedEpisodeEntityData map(Map<String, dynamic> data) {
+    return CachedEpisodeEntityData.fromData(data, _db);
   }
 
   @override
-  Map<String, Variable> entityToSql(CachedNarouEpisodeEntityData d,
+  Map<String, Variable> entityToSql(CachedEpisodeEntityData d,
       {bool includeNulls = false}) {
     final map = <String, Variable>{};
+    if (d.siteIdentifier != null || includeNulls) {
+      map['site_identifier'] = Variable<String, StringType>(d.siteIdentifier);
+    }
     if (d.siteOfIdentifier != null || includeNulls) {
       map['site_of_identifier'] =
           Variable<String, StringType>(d.siteOfIdentifier);
@@ -548,16 +644,22 @@ class $CachedNarouEpisodeEntityTable extends CachedNarouEpisodeEntity
   }
 }
 
-class CachedNarouTextEntityData {
+class CachedTextEntityData {
+  final String siteIdentifier;
   final String siteOfIdentifier;
   final String episodeIdentifier;
   final String episodeText;
-  CachedNarouTextEntityData(
-      {this.siteOfIdentifier, this.episodeIdentifier, this.episodeText});
-  factory CachedNarouTextEntityData.fromData(
+  CachedTextEntityData(
+      {this.siteIdentifier,
+      this.siteOfIdentifier,
+      this.episodeIdentifier,
+      this.episodeText});
+  factory CachedTextEntityData.fromData(
       Map<String, dynamic> data, GeneratedDatabase db) {
     final stringType = db.typeSystem.forDartType<String>();
-    return CachedNarouTextEntityData(
+    return CachedTextEntityData(
+      siteIdentifier:
+          stringType.mapFromDatabaseResponse(data['site_identifier']),
       siteOfIdentifier:
           stringType.mapFromDatabaseResponse(data['site_of_identifier']),
       episodeIdentifier:
@@ -565,8 +667,9 @@ class CachedNarouTextEntityData {
       episodeText: stringType.mapFromDatabaseResponse(data['episode_text']),
     );
   }
-  factory CachedNarouTextEntityData.fromJson(Map<String, dynamic> json) {
-    return CachedNarouTextEntityData(
+  factory CachedTextEntityData.fromJson(Map<String, dynamic> json) {
+    return CachedTextEntityData(
+      siteIdentifier: json['siteIdentifier'] as String,
       siteOfIdentifier: json['siteOfIdentifier'] as String,
       episodeIdentifier: json['episodeIdentifier'] as String,
       episodeText: json['episodeText'] as String,
@@ -574,24 +677,28 @@ class CachedNarouTextEntityData {
   }
   Map<String, dynamic> toJson() {
     return {
+      'siteIdentifier': siteIdentifier,
       'siteOfIdentifier': siteOfIdentifier,
       'episodeIdentifier': episodeIdentifier,
       'episodeText': episodeText,
     };
   }
 
-  CachedNarouTextEntityData copyWith(
-          {String siteOfIdentifier,
+  CachedTextEntityData copyWith(
+          {String siteIdentifier,
+          String siteOfIdentifier,
           String episodeIdentifier,
           String episodeText}) =>
-      CachedNarouTextEntityData(
+      CachedTextEntityData(
+        siteIdentifier: siteIdentifier ?? this.siteIdentifier,
         siteOfIdentifier: siteOfIdentifier ?? this.siteOfIdentifier,
         episodeIdentifier: episodeIdentifier ?? this.episodeIdentifier,
         episodeText: episodeText ?? this.episodeText,
       );
   @override
   String toString() {
-    return (StringBuffer('CachedNarouTextEntityData(')
+    return (StringBuffer('CachedTextEntityData(')
+          ..write('siteIdentifier: $siteIdentifier, ')
           ..write('siteOfIdentifier: $siteOfIdentifier, ')
           ..write('episodeIdentifier: $episodeIdentifier, ')
           ..write('episodeText: $episodeText')
@@ -601,21 +708,31 @@ class CachedNarouTextEntityData {
 
   @override
   int get hashCode =>
-      ((siteOfIdentifier.hashCode) * 31 + episodeIdentifier.hashCode) * 31 +
+      (((siteIdentifier.hashCode) * 31 + siteOfIdentifier.hashCode) * 31 +
+              episodeIdentifier.hashCode) *
+          31 +
       episodeText.hashCode;
   @override
   bool operator ==(other) =>
       identical(this, other) ||
-      (other is CachedNarouTextEntityData &&
+      (other is CachedTextEntityData &&
+          other.siteIdentifier == siteIdentifier &&
           other.siteOfIdentifier == siteOfIdentifier &&
           other.episodeIdentifier == episodeIdentifier &&
           other.episodeText == episodeText);
 }
 
-class $CachedNarouTextEntityTable extends CachedNarouTextEntity
-    implements TableInfo<CachedNarouTextEntity, CachedNarouTextEntityData> {
+class $CachedTextEntityTable extends CachedTextEntity
+    implements TableInfo<CachedTextEntity, CachedTextEntityData> {
   final GeneratedDatabase _db;
-  $CachedNarouTextEntityTable(this._db);
+  $CachedTextEntityTable(this._db);
+  GeneratedTextColumn _siteIdentifier;
+  @override
+  GeneratedTextColumn get siteIdentifier =>
+      _siteIdentifier ??= GeneratedTextColumn(
+        'site_identifier',
+        false,
+      );
   GeneratedTextColumn _siteOfIdentifier;
   @override
   GeneratedTextColumn get siteOfIdentifier =>
@@ -638,30 +755,34 @@ class $CachedNarouTextEntityTable extends CachedNarouTextEntity
       );
   @override
   List<GeneratedColumn> get $columns =>
-      [siteOfIdentifier, episodeIdentifier, episodeText];
+      [siteIdentifier, siteOfIdentifier, episodeIdentifier, episodeText];
   @override
-  CachedNarouTextEntity get asDslTable => this;
+  CachedTextEntity get asDslTable => this;
   @override
-  String get $tableName => 'cached_narou_text_entity';
+  String get $tableName => 'cached_text_entity';
   @override
-  bool validateIntegrity(
-          CachedNarouTextEntityData instance, bool isInserting) =>
+  bool validateIntegrity(CachedTextEntityData instance, bool isInserting) =>
+      siteIdentifier.isAcceptableValue(instance.siteIdentifier, isInserting) &&
       siteOfIdentifier.isAcceptableValue(
           instance.siteOfIdentifier, isInserting) &&
       episodeIdentifier.isAcceptableValue(
           instance.episodeIdentifier, isInserting) &&
       episodeText.isAcceptableValue(instance.episodeText, isInserting);
   @override
-  Set<GeneratedColumn> get $primaryKey => {siteOfIdentifier, episodeIdentifier};
+  Set<GeneratedColumn> get $primaryKey =>
+      {siteIdentifier, siteOfIdentifier, episodeIdentifier};
   @override
-  CachedNarouTextEntityData map(Map<String, dynamic> data) {
-    return CachedNarouTextEntityData.fromData(data, _db);
+  CachedTextEntityData map(Map<String, dynamic> data) {
+    return CachedTextEntityData.fromData(data, _db);
   }
 
   @override
-  Map<String, Variable> entityToSql(CachedNarouTextEntityData d,
+  Map<String, Variable> entityToSql(CachedTextEntityData d,
       {bool includeNulls = false}) {
     final map = <String, Variable>{};
+    if (d.siteIdentifier != null || includeNulls) {
+      map['site_identifier'] = Variable<String, StringType>(d.siteIdentifier);
+    }
     if (d.siteOfIdentifier != null || includeNulls) {
       map['site_of_identifier'] =
           Variable<String, StringType>(d.siteOfIdentifier);
@@ -679,20 +800,16 @@ class $CachedNarouTextEntityTable extends CachedNarouTextEntity
 
 abstract class _$Database extends GeneratedDatabase {
   _$Database(QueryExecutor e) : super(const SqlTypeSystem.withDefaults(), e);
-  $CachedNarouSubscribedNovelEntityTable _cachedNarouSubscribedNovelEntity;
-  $CachedNarouSubscribedNovelEntityTable get cachedNarouSubscribedNovelEntity =>
-      _cachedNarouSubscribedNovelEntity ??=
-          $CachedNarouSubscribedNovelEntityTable(this);
-  $CachedNarouEpisodeEntityTable _cachedNarouEpisodeEntity;
-  $CachedNarouEpisodeEntityTable get cachedNarouEpisodeEntity =>
-      _cachedNarouEpisodeEntity ??= $CachedNarouEpisodeEntityTable(this);
-  $CachedNarouTextEntityTable _cachedNarouTextEntity;
-  $CachedNarouTextEntityTable get cachedNarouTextEntity =>
-      _cachedNarouTextEntity ??= $CachedNarouTextEntityTable(this);
+  $CachedSubscribedNovelEntityTable _cachedSubscribedNovelEntity;
+  $CachedSubscribedNovelEntityTable get cachedSubscribedNovelEntity =>
+      _cachedSubscribedNovelEntity ??= $CachedSubscribedNovelEntityTable(this);
+  $CachedEpisodeEntityTable _cachedEpisodeEntity;
+  $CachedEpisodeEntityTable get cachedEpisodeEntity =>
+      _cachedEpisodeEntity ??= $CachedEpisodeEntityTable(this);
+  $CachedTextEntityTable _cachedTextEntity;
+  $CachedTextEntityTable get cachedTextEntity =>
+      _cachedTextEntity ??= $CachedTextEntityTable(this);
   @override
-  List<TableInfo> get allTables => [
-        cachedNarouSubscribedNovelEntity,
-        cachedNarouEpisodeEntity,
-        cachedNarouTextEntity
-      ];
+  List<TableInfo> get allTables =>
+      [cachedSubscribedNovelEntity, cachedEpisodeEntity, cachedTextEntity];
 }

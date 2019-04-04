@@ -28,8 +28,12 @@ class NovelHeader {
   /// 話数
   final int episodeCount;
 
+  /// 短編かどうか
+  final bool isShortStory;
+
   NovelHeader(this.identifier, this.novelName, this.novelStory, this.writer,
-      this.isComplete, this.lastUpdatedAt, this.textLength, this.episodeCount);
+      this.isComplete, this.lastUpdatedAt, this.textLength, this.episodeCount,
+      this.isShortStory);
 
   @override
   String toString() {

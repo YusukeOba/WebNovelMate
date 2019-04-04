@@ -1,15 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:NovelMate/common/HttpClient.dart';
 import 'package:NovelMate/common/Sites.dart';
-import 'package:NovelMate/common/datastore/RemoteRankingDataStore.dart';
+import 'package:NovelMate/common/datastore/RemoteIndexDataStore.dart';
 import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
 import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
 import 'package:NovelMate/common/entities/narou/NarouNovelListEntity.dart';
 
-class RemoteNarouRankingDataStore extends RemoteRankingDataStore {
+class RemoteNarouIndexDataStore extends RemoteIndexDataStore {
   /// 検索ワードを元に小説家になろうのタイトルを検索する
   @override
   Future<List<RankingEntity>> fetchRanking(int start, int end,
@@ -21,7 +20,7 @@ class RemoteNarouRankingDataStore extends RemoteRankingDataStore {
         "&lim=" +
         end.toString() +
         "&word=" +
-        title +
+        (title ?? "") +
         "&gzip=5" +
         "&order=hyoka";
 
@@ -63,10 +62,17 @@ class RemoteNarouRankingDataStore extends RemoteRankingDataStore {
               isCompleted,
               lastUpTime,
               entity.length,
-              entity.general_all_no),
+              entity.general_all_no,
+              entity.novel_type == 2), // 短編の場合はnovel_typeが2
         ));
       });
       return Future.value(rankings);
     });
+  }
+
+  @override
+  Future<List<RankingEntity>> fetchIndex(String title) {
+    // 内部的に検索API = ランキング取得APIは同一
+    return fetchRanking(0, 100, title: title);
   }
 }

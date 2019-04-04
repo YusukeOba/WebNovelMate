@@ -1,18 +1,22 @@
 import 'package:NovelMate/common/Sites.dart';
 import 'package:NovelMate/common/colors.dart';
-import 'package:NovelMate/common/datastore/CachedBookshelfDataStore.dart';
-import 'package:NovelMate/common/datastore/narou/CachedNarouBookshelfDataStore.dart';
+import 'package:NovelMate/common/entities/domain/EpisodeEntity.dart';
 import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
 import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
 import 'package:NovelMate/common/entities/domain/SubscribedNovelEntity.dart';
 import 'package:NovelMate/common/repository/BookshelfRepository.dart';
-import 'package:NovelMate/common/repository/RankingRepository.dart';
+import 'package:NovelMate/common/repository/IndexRepository.dart';
 import 'package:NovelMate/common/repository/RepositoryFactory.dart';
 import 'package:NovelMate/page/EpisodeIndexPage.dart';
 import 'package:NovelMate/page/SearchResultPage.dart';
+import 'package:NovelMate/page/TextPagerPage.dart';
 import 'package:flutter/material.dart';
 
 class SearchPage extends StatefulWidget {
+  SearchPage();
+
+  SearchPage.forDesignTime();
+
   @override
   _SearchPageState createState() {
     return new _SearchPageState(_SearchPageViewModel());
@@ -20,11 +24,11 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageViewModel {
-  final RankingRepository _repository =
-      RepositoryFactory.shared.getRankingRepository();
+  final IndexRepository _repository =
+      RepositoryFactory.shared.getIndexRepository();
 
   /// 表示中のサイト種別
-  Site showingSite = AvailableSites.narou;
+  Site showingSite = AvailableSites.aozora;
 
   /// 入力中の文言
   String inputtedText = "";
@@ -41,14 +45,24 @@ class _SearchPageViewModel {
       return;
     }
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return SearchResultPage(inputtedText);
+      return SearchResultPage(showingSite, inputtedText);
     }));
   }
 
   void onRefresh() {
     this.rankings = _repository.setDirty(showingSite).then((_) {
-      return _repository.find(showingSite, 0, 20, inputtedText);
+      return _repository.fetchRanking(showingSite);
     }).then((entities) {
+      entities.sort((lhs, rhs) {
+        return rhs.popularity - lhs.popularity;
+      });
+      return entities;
+    });
+  }
+
+  // 初期表示
+  void shownFirst() {
+    this.rankings = _repository.fetchRanking(showingSite).then((entities) {
       entities.sort((lhs, rhs) {
         return rhs.popularity - lhs.popularity;
       });
@@ -84,7 +98,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _viewModel.onRefresh();
+    _viewModel.shownFirst();
   }
 
   /// 検索ボックス
@@ -95,7 +109,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
       child: Column(
         children: <Widget>[
           Text(
-            "好きな小説を、様々な方法で探してみましょう！",
+            "好きな小説を探してみましょう！",
             style: TextStyle(fontSize: 16.0),
           ),
           Container(height: 8.0),
@@ -110,7 +124,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
             maxLines: 1,
             decoration: InputDecoration(
                 suffixIcon: Icon(Icons.search),
-                hintText: "小説名・ユーザーを検索...",
+                hintText: "小説名を入力...",
                 contentPadding: EdgeInsets.fromLTRB(8, 12, 8, 8),
                 fillColor: sNMBackgroundColor,
                 filled: true,
@@ -142,8 +156,8 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                   style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
                 )),
             Container(
-              height: 32,
-              child: Divider(),
+              height: 16,
+              child: Divider(height: 1),
             ),
             this._buildListTiles()
           ]),
@@ -160,6 +174,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
             print("nodata");
             return Center(child: CircularProgressIndicator());
           }
+
           print("hasData");
           return Column(children: <Widget>[
             Column(
@@ -177,31 +192,30 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                           text: "／" + novel.novelHeader.writer,
                           style: TextStyle(color: Colors.black))
                     ])),
-                    subtitle: Text(
-                      novel.novelHeader.novelStory,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    subtitle: _buildStory(novel.novelHeader.novelStory),
                     onTap: () {
                       _showDetailPage(novel.novelHeader);
                     },
                   ),
-                  Divider()
+                  Divider(height: 1)
                 ]);
               }).toList(),
             ),
-// TODO: もっと見る対応
-//            Row(
-//              mainAxisAlignment: MainAxisAlignment.end,
-//              children: <Widget>[
-//                FlatButton(
-//                  child: Text("もっと見る"),
-//                  onPressed: () {},
-//                )
-//              ],
-//            )
+            // TODO: もっと見る対応
           ]);
         });
+  }
+
+  Widget _buildStory(String story) {
+    if (story.isEmpty) {
+      return null;
+    } else {
+      return Text(
+        story,
+        maxLines: 3,
+        overflow: TextOverflow.ellipsis,
+      );
+    }
   }
 
   _showDetailPage(NovelHeader novelHeader) async {
@@ -214,7 +228,22 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
     ]);
 
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return EpisodeIndexPage(novelHeader);
+      if (novelHeader.isShortStory) {
+        return TextPagerPage(
+            [
+              EpisodeEntity(
+                  novelHeader.identifier,
+                  "1",
+                  DateTime.now().millisecondsSinceEpoch,
+                  novelHeader.lastUpdatedAt,
+                  novelHeader.novelName,
+                  1,
+                  novelHeader.novelName)
+            ].toList(),
+            0);
+      } else {
+        return EpisodeIndexPage(novelHeader);
+      }
     }));
   }
 }
