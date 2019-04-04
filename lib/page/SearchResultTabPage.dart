@@ -44,12 +44,12 @@ class _SearchResultTabPageViewModel {
   final String _searchWord;
 
   /// 表示中のサイト
-  Site _showningSite;
+  Site _showingSite;
 
   /// 選択中タブ
   SearchResultTab _currentSelectedTab = SearchResultTab.popular;
 
-  _SearchResultTabPageViewModel(this._showningSite, this._searchWord);
+  _SearchResultTabPageViewModel(this._showingSite, this._searchWord);
 
   String pageTitle() {
     return "$_searchWordを含む小説";
@@ -96,7 +96,7 @@ class _SearchResultTabPageState extends State<SearchResultTabPage> {
                   List<int>.generate(SearchResultTab.values.length, (i) => i)
                       .map((index) {
             return SearchResultPage(SearchResultTab.values[index],
-                _viewModel._showningSite, _viewModel._searchWord);
+                _viewModel._showingSite, _viewModel._searchWord);
           }).toList()),
         ));
   }

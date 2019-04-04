@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:core';
 
-import 'package:NovelMate/common/Sites.dart';
 import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
 
 /// インデックス種別
