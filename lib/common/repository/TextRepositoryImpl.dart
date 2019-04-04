@@ -41,30 +41,35 @@ class TextRepositoryImpl extends TextRepository {
   @override
   Future<TextEntity> findByIdentifier(
       NovelIdentifier novelIdentifier, String episodeIdentifier) async {
-    return Future(() async {
-      final cache = cachedDataStores[novelIdentifier.site];
-      final remote = remoteDataStores[novelIdentifier.site];
-
-      // 対応データではない
-      if (cache == null || remote == null) {
-        throw Exception("findEpisodesByNovel error. Found unavailable site.");
-      }
-
-      if (await cache.hasCache(
-          novelIdentifier.siteOfIdentifier, episodeIdentifier)) {
-        print("fetch text by cache. text id = " + episodeIdentifier);
-        return cache.findByEpisodeId(
-            novelIdentifier.siteOfIdentifier, episodeIdentifier);
-      } else {
-        print("fetch text by remote. text id = " + episodeIdentifier);
-        return remote
-            .findByEpisodeId(novelIdentifier, episodeIdentifier)
-            .then((textEntity) async {
-          await cache.insertOrUpdate([textEntity].toList());
-          print("Save completed.");
-          return Future.value(textEntity);
-        });
-      }
+    print("start find by identifier. identifier = " +
+        novelIdentifier.site.hashCode.toString());
+    cachedDataStores.forEach((site, cache) {
+      print("id " + site.hashCode.toString());
     });
+    final cache = cachedDataStores[novelIdentifier.site];
+    final remote = remoteDataStores[novelIdentifier.site];
+
+    // 対応データではない
+    if (cache == null || remote == null) {
+      throw Exception("findEpisodesByNovel error. Found unavailable site.");
+    }
+
+    print("check cache.");
+
+    if (await cache.hasCache(
+        novelIdentifier.siteOfIdentifier, episodeIdentifier)) {
+      print("fetch text by cache. text id = " + episodeIdentifier);
+      return cache.findByEpisodeId(
+          novelIdentifier.siteOfIdentifier, episodeIdentifier);
+    } else {
+      print("fetch text by remote. text id = " + episodeIdentifier);
+      return remote
+          .findByEpisodeId(novelIdentifier, episodeIdentifier)
+          .then((textEntity) async {
+        await cache.insertOrUpdate([textEntity].toList());
+        print("Save completed.");
+        return Future.value(textEntity);
+      });
+    }
   }
 }

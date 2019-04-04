@@ -3,6 +3,7 @@ import 'package:NovelMate/common/entities/domain/EpisodeEntity.dart';
 import 'package:NovelMate/common/entities/domain/SubscribedNovelEntity.dart';
 import 'package:NovelMate/common/repository/RepositoryFactory.dart';
 import 'package:NovelMate/page/BookshelfTabPage.dart';
+import 'package:NovelMate/page/EpisodeIndexPage.dart';
 import 'package:NovelMate/page/SearchPage.dart';
 import 'package:NovelMate/page/TextPagerPage.dart';
 import 'package:flutter/material.dart';
@@ -144,19 +145,22 @@ class _BookshelfState extends State<BookshelfPage> {
     return InkWell(
         onTap: () {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
-//            return EpisodeIndexPage(novel.novelHeader);
-            return TextPagerPage(
-                [
-                  EpisodeEntity(
-                      novel.novelHeader.identifier,
-                      "1",
-                      DateTime.now().millisecondsSinceEpoch,
-                      DateTime.now().millisecondsSinceEpoch,
-                      novel.novelHeader.novelName,
-                      1,
-                      novel.novelHeader.novelName)
-                ].toList(),
-                0);
+            if (novel.novelHeader.isShortStory) {
+              return TextPagerPage(
+                  [
+                    EpisodeEntity(
+                        novel.novelHeader.identifier,
+                        "1",
+                        DateTime.now().millisecondsSinceEpoch,
+                        DateTime.now().millisecondsSinceEpoch,
+                        novel.novelHeader.novelName,
+                        1,
+                        novel.novelHeader.novelName)
+                  ].toList(),
+                  0);
+            } else {
+              return EpisodeIndexPage(novel.novelHeader);
+            }
           })).then((_) {
             setState(() {
               _viewModel.refreshLists();

@@ -30,9 +30,9 @@ class RemoteAozoraTextDataStore extends RemoteTextDataStore {
       if (element.id == "contents") {
         return;
       }
-      outerHtml.add(element.outerHtml);
+      outerHtml.add(element.text);
     });
 
-    return outerHtml.join().replaceAll("\r", "").replaceAll("\n", "");
+    return outerHtml.join();
   }
 }

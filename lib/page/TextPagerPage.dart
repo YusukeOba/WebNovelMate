@@ -53,8 +53,6 @@ class _TextPagerViewModel {
   double _sliderMin = 0;
   double _sliderMax = 0;
 
-  int initialScrollValue = 0;
-
   FirstScrollPosition _firstScrollPosition = FirstScrollPosition.first;
 
   ValueNotifier<double> _sliderValueNotifier = ValueNotifier(0);
@@ -142,26 +140,13 @@ class _TextPagerViewModel {
 
   /// エピソード一覧から表示する(続きからよむもこのケース)
   void showByContinue() {
+    print("start text fetch.");
     _texts = RepositoryFactory.shared
-        .getBookshelfRepository()
-        .find(_currentEpisode.novelIdentifier)
-        .then((novel) {
-      if (novel == null) {
-        print("reading episode is not found.");
-        initialScrollValue = 0;
-      }
-      if (novel.readingEpisodeIdentifier == _currentEpisode.episodeIdentifier) {
-        print("reading episode.");
-        initialScrollValue = novel.readingProgress;
-      } else {
-        print("this episode is not reading.");
-        initialScrollValue = 0;
-      }
-
-      return RepositoryFactory.shared.getTextRepository().findByIdentifier(
-          _currentEpisode.novelIdentifier, _currentEpisode.episodeIdentifier);
-    }).then((text) {
-      print("loading text");
+        .getTextRepository()
+        .findByIdentifier(
+            _currentEpisode.novelIdentifier, _currentEpisode.episodeIdentifier)
+        .then((text) {
+      print("finish text fetch.");
       // 大量の文字列を一気に表示するとViewのサイズが大きすぎるためListViewで表示したい
       // そのため改行コードで分割する
       List<String> texts = text.episodeText.split("\n");
@@ -171,6 +156,12 @@ class _TextPagerViewModel {
 
   void toggleOuterView() {
     _shownOuterView = !_shownOuterView;
+    if (_shownOuterView) {
+      SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+    } else {
+      // フルスクリーン
+      SystemChrome.setEnabledSystemUIOverlays([]);
+    }
   }
 
   void setOuterViewVisibility(bool visibility) {
@@ -224,7 +215,7 @@ class _TextPagerViewModel {
         height: lineHeight);
     _textStyle.value = style;
 
-    print("change. textStyle = " + style.height.toString());
+    print("change. textStyle = " + style.toString());
 
     final repository = RepositoryFactory.shared.getSettingRepository();
     repository.setColorPattern(colorPattern);
@@ -252,7 +243,7 @@ class _TextPagerViewModel {
 }
 
 class _TextPagerState extends State<TextPagerPage>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   _TextPagerViewModel _viewModel;
 
   _TextPagerState(this._viewModel);
@@ -267,18 +258,22 @@ class _TextPagerState extends State<TextPagerPage>
 
       // フルスクリーン
       SystemChrome.setEnabledSystemUIOverlays([]);
+      WidgetsBinding.instance.addObserver(this);
     });
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.inactive) {
+      _viewModel.updateReadingEpisode();
+    }
   }
 
   @override
   void dispose() {
     super.dispose();
     print("dispose");
+    WidgetsBinding.instance.removeObserver(this);
   }
 
   @override
@@ -415,7 +410,6 @@ class _TextPagerState extends State<TextPagerPage>
             },
             // Sliderからの通知をScrollViewに反映
             _viewModel._sliderValueNotifier,
-            _viewModel.initialScrollValue,
             _viewModel._firstScrollPosition,
             _viewModel._backgroundColor,
             _viewModel._textStyle,

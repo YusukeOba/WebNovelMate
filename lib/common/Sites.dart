@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 
 /// 対応webサイト固有のIF
 abstract class Site {
+  // HashMap識別用のHashCode
+  @override
+  int get hashCode;
+
   // 小説サイト固有の文言
   String get identifier;
 
@@ -15,11 +19,6 @@ abstract class Site {
 
   // 小説サイトのテキストカラー
   Color get textColor;
-
-  @override
-  int get hashCode {
-    return identifier.hashCode;
-  }
 
   @override
   bool operator ==(other) =>
@@ -35,9 +34,11 @@ class AvailableSites {
 
 /// 小説家になろう
 class _Narou implements Site {
+  static const _identifier = "narou";
+
   @override
   String get identifier {
-    return "narou";
+    return _identifier;
   }
 
   @override
@@ -54,6 +55,15 @@ class _Narou implements Site {
   String get siteName {
     return "小説家になろう";
   }
+
+  @override
+  int get hashCode {
+    return 1;
+  }
+
+  @override
+  bool operator ==(other) =>
+      other is Site && other.identifier == this.identifier;
 }
 
 /// カクヨム
@@ -77,6 +87,15 @@ class _Kakuyomu implements Site {
   String get siteName {
     return "カクヨム";
   }
+
+  @override
+  int get hashCode {
+    return 2;
+  }
+
+  @override
+  bool operator ==(other) =>
+      other is Site && other.identifier == this.identifier;
 }
 
 /// 青空文庫
@@ -100,4 +119,13 @@ class _Aozora implements Site {
   String get siteName {
     return "青空文庫";
   }
+
+  @override
+  int get hashCode {
+    return 3;
+  }
+
+  @override
+  bool operator ==(other) =>
+      other is Site && other.identifier == this.identifier;
 }
