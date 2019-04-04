@@ -2,25 +2,33 @@ import 'package:NovelMate/common/datastore/CachedEpisodeDataStore.dart';
 import 'package:NovelMate/common/entities/DatabaseSchema.dart';
 import 'package:NovelMate/common/entities/domain/EpisodeEntity.dart';
 import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
+import 'package:moor_flutter/moor_flutter.dart';
 
 class CachedNarouEpisodeDataStore extends CachedEpisodeDataStore {
   /// 話の一覧を保存する
   /// [episodes]は保存対象のEntity
-  Future<void> save(NovelIdentifier identifier, List<EpisodeEntity> episodes) {
-    List<Future<void>> insertResult = episodes.map((episode) {
-      return Database().into(Database().cachedEpisodeEntity).insert(
-          CachedEpisodeEntityData(
-              siteIdentifier: identifier.site.identifier,
-              siteOfIdentifier: identifier.siteOfIdentifier,
-              episodeIdentifier: episode.episodeIdentifier,
-              firstWriteAt: episode.firstWriteAt,
-              lastUpdateAt: episode.lastUpdateAt,
-              nullableChapterName: episode.nullableChapterName,
-              displayOrder: episode.displayOrder,
-              episodeName: episode.episodeName));
-    }).toList();
+  Future save(NovelIdentifier identifier, List<EpisodeEntity> episodes) {
+    FlutterQueryExecutor executor = Database().executor;
+    return executor.ensureOpen().then((_) {
+      final batch = executor.db.batch();
+      print("batch query creating..");
 
-    return Future.wait(insertResult);
+      episodes.forEach((episode) {
+        batch.insert("cached_episode_entity", {
+          "site_identifier": episode.novelIdentifier.site.identifier,
+          "site_of_identifier": episode.novelIdentifier.siteOfIdentifier,
+          "episode_identifier": episode.episodeIdentifier,
+          "first_write_at": episode.firstWriteAt,
+          "last_update_at": episode.lastUpdateAt,
+          "nullable_chapter_name": episode.nullableChapterName,
+          "display_order": episode.displayOrder,
+          "episode_name": episode.episodeName
+        });
+      });
+
+      print("batch start");
+      return batch.commit(noResult: true);
+    });
   }
 
   /// 話の一覧をすべて削除する
