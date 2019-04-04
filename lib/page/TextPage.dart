@@ -28,6 +28,9 @@ class TextPage extends StatefulWidget {
   ValueNotifier<double> manualScrollOffset;
 
   /// 初期スクロール位置
+  int _initialScrollPosition;
+
+  /// 初期スクロール位置
   FirstScrollPosition _firstScrollPosition;
 
   /// 次の話の名前
@@ -54,6 +57,7 @@ class TextPage extends StatefulWidget {
       this._onTapCallback,
       this._sliderConfigCallback,
       this.manualScrollOffset,
+      this._initialScrollPosition,
       this._firstScrollPosition,
       this._color,
       this._textStyle,
@@ -75,6 +79,7 @@ class TextPage extends StatefulWidget {
         _onTapCallback,
         _sliderConfigCallback,
         manualScrollOffset,
+        _initialScrollPosition,
         _firstScrollPosition,
         _color,
         _textStyle,
@@ -111,6 +116,9 @@ class _TextPageViewModel {
   ValueNotifier<double> manualScrollOffset;
 
   /// 初期スクロール位置
+  int _initialScrollPosition;
+
+  /// 初期スクロール位置
   FirstScrollPosition _firstScrollPosition;
 
   /// 次の話の名前
@@ -131,14 +139,13 @@ class _TextPageViewModel {
   /// テキスト設定
   ValueNotifier<TextStyle> _textStyle;
 
-  ScrollController _scrollController;
-
   _TextPageViewModel(
       this.episodeName,
       this.texts,
       this._onTapCallback,
       this._sliderConfigCallback,
       this.manualScrollOffset,
+      this._initialScrollPosition,
       this._firstScrollPosition,
       this._color,
       this._textStyle,
@@ -151,20 +158,6 @@ class _TextPageViewModel {
     _prevEpisodeName = prevEpisodeName;
     _nextActionCallback = nextActionCallback;
     _prevActionCallback = prevActionCallback;
-    _scrollController = ScrollController(keepScrollOffset: false);
-
-    _webViewController.future.then((controller) {
-      print("finish!!!");
-      final text = this.texts.join();
-//      final replaced = text.replaceAll("\r", "<br>").replaceAll("\n", "\\n");
-      controller
-          .evaluateJavascript("window.setText('" + "aaaa" + "');");
-    });
-  }
-
-  void notifySliderConfig() {
-    _sliderConfigCallback(_scrollController.position.minScrollExtent,
-        _scrollController.offset, _scrollController.position.maxScrollExtent);
   }
 }
 
@@ -173,57 +166,66 @@ class _TextPageState extends State<TextPage> {
 
   _TextPageState(this._viewModel);
 
-  GlobalKey<EasyRefreshState> _easyRefreshKey =
-      new GlobalKey<EasyRefreshState>();
-  GlobalKey<RefreshHeaderState> _headerKey =
-      new GlobalKey<RefreshHeaderState>();
-  GlobalKey<RefreshFooterState> _footerKey =
-      new GlobalKey<RefreshFooterState>();
-
-  _scrollListener() {
-    _viewModel.notifySliderConfig();
-    print("min = " +
-        _viewModel._scrollController.position.minScrollExtent.toString());
-    print("max = " +
-        _viewModel._scrollController.position.maxScrollExtent.toString());
-    print("current = " + _viewModel._scrollController.offset.toString());
+  _manualScrollValueListener() {
+    _viewModel._webViewController.future.then((controller) {
+      print("scroll manual.");
+      controller.evaluateJavascript("window.scroll(" +
+          _viewModel.manualScrollOffset.value.toString() +
+          ");");
+    });
   }
 
-  _manualScrollValueListener() {
-    if (!_viewModel._scrollController.hasClients) {
-      print("Client not found.");
-      return;
-    }
+  _textStyleListener() {
+    return _viewModel._webViewController.future.then((controller) {
+      controller.evaluateJavascript("window.setFontColor('#" +
+          _viewModel._textStyle.value.color.value
+              .toRadixString(16)
+              .substring(2) +
+          "');");
+      controller.evaluateJavascript("window.setFontSize(" +
+          _viewModel._textStyle.value.fontSize.toString() +
+          ");");
+      controller.evaluateJavascript("window.setTypeface('" +
+          _viewModel._textStyle.value.fontFamily.toString() +
+          "');");
+      controller.evaluateJavascript("window.setLineHeight('" +
+          _viewModel._textStyle.value.height.toString() +
+          "');");
+    });
+  }
 
-    _viewModel._scrollController.jumpTo(_viewModel.manualScrollOffset.value);
+  _colorListener() {
+    return _viewModel._webViewController.future.then((controller) {
+      final query = "window.setBackgroundColor('#" +
+          _viewModel._color.value.value.toRadixString(16).substring(2) +
+          "');";
+      print("query" + query);
+      controller.evaluateJavascript(query);
+    });
   }
 
   @override
   void initState() {
     super.initState();
-    _viewModel._scrollController.addListener(this._scrollListener);
     _viewModel.manualScrollOffset.addListener(_manualScrollValueListener);
+    _viewModel._textStyle.addListener(_textStyleListener);
+    _viewModel._color.addListener(_colorListener);
 
     // viewのbuild完了時に一度だけ呼ばれる.
     // ScrollViewの準備完了時、Sliderのmin,maxを伝えるため。
     SchedulerBinding.instance.addPostFrameCallback((_) {
       print("now mounted.");
-      if (_viewModel._scrollController.hasClients) {
-        if (_viewModel._firstScrollPosition == FirstScrollPosition.bottom) {
-          // TODO: 一番下までスクロール
-          _viewModel.notifySliderConfig();
-        } else {
-          _viewModel.notifySliderConfig();
-        }
-      } else {
-        print("scrollview is not mounted...");
-      }
+      if (_viewModel._firstScrollPosition == FirstScrollPosition.bottom) {
+        // TODO: 一番下までスクロール
+      } else {}
     });
   }
 
   @override
   void dispose() {
     _viewModel.manualScrollOffset.removeListener(_manualScrollValueListener);
+    _viewModel._textStyle.removeListener(_textStyleListener);
+    _viewModel._color.removeListener(_colorListener);
     super.dispose();
   }
 
@@ -235,160 +237,58 @@ class _TextPageState extends State<TextPage> {
     return Future.value(_viewModel._nextActionCallback());
   }
 
+  bool firstTime = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: GestureDetector(
-            onTap: () {
-              print("ho");
-              _viewModel._onTapCallback();
-            },
-            child: WebView(
-              initialUrl: 'html/index.html',
-              javascriptMode: JavascriptMode.unrestricted,
-              onWebViewCreated: (WebViewController webViewController) {
-                _viewModel._webViewController.complete(webViewController);
-              },
-              javascriptChannels: {
-                JavascriptChannel(
-                    name: "Msg",
-                    onMessageReceived: (msg) {
-                      print("msg");
-                    })
-              },
-            )));
-//    return Scrollbar(
-//        child: EasyRefresh(
-//            key: _easyRefreshKey,
-//            onRefresh: _viewModel._prevEpisodeName != null ? onRefresh : null,
-//            loadMore: _viewModel._nextEpisodeName != null ? loadMore : null,
-//            refreshHeader: BallPulseHeader(
-//              key: _headerKey,
-//              color: _viewModel._textStyle.value.color,
-//            ),
-//            refreshFooter: BallPulseFooter(
-//              key: _footerKey,
-//              color: _viewModel._textStyle.value.color,
-//            ),
-//            child: ListView.builder(
-//                controller: _viewModel._scrollController,
-//                itemBuilder: (context, index) {
-//                  final text = _viewModel.texts[index];
-//                  Widget textWidget;
-//                  bool isLastLength = index == _viewModel.texts.length - 1;
-//                  bool isFirstLength = index == 0;
-//                  if (isLastLength) {
-//                    textWidget = Container(
-//                      color: _viewModel._color.value,
-//                      child: Column(
-//                        crossAxisAlignment: CrossAxisAlignment.start,
-//                        children: <Widget>[
-//                          Container(
-//                              padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
-//                              child: Column(
-//                                children: <Widget>[
-//                                  Text(text,
-//                                      style: _viewModel._textStyle.value),
-//                                  Container(height: 164),
-//                                ],
-//                              )),
-//                          _buildNextEpisode()
-//                        ],
-//                      ),
-//                    );
-//                  } else if (isFirstLength) {
-//                    textWidget = Container(
-//                      child: Column(
-//                        children: <Widget>[
-//                          _buildPreviousEpisode(),
-//                          Container(
-//                              color: _viewModel._color.value,
-//                              padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
-//                              child: Column(
-//                                children: <Widget>[
-//                                  Container(height: 128),
-//                                  Text(_viewModel.episodeName,
-//                                      style: TextStyle(
-//                                          fontWeight: FontWeight.bold,
-//                                          fontSize: 20.0,
-//                                          color: _viewModel
-//                                              ._textStyle.value.color)),
-//                                  Container(height: 32),
-//                                ],
-//                              )),
-//                        ],
-//                      ),
-//                    );
-//                  } else {
-//                    textWidget = Container(
-//                      color: _viewModel._color.value,
-//                      child: Text(text, style: _viewModel._textStyle.value),
-//                      padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
-//                    );
-//                  }
-//                  return GestureDetector(
-//                    onTap: () {
-//                      setState(() {
-//                        _viewModel._onTapCallback();
-//                      });
-//                    },
-//                    child: textWidget,
-//                  );
-//                },
-//                physics: BouncingScrollPhysics(),
-//                itemCount: _viewModel.texts.length)));
-  }
+        body: WebView(
+      initialUrl: 'html/index.html',
+      javascriptMode: JavascriptMode.unrestricted,
+      onWebViewCreated: (WebViewController webViewController) {
+        _viewModel._webViewController.complete(webViewController);
+      },
+      javascriptChannels: {
+        JavascriptChannel(
+            name: "Msg",
+            onMessageReceived: (JavascriptMessage msg) {
+              if (msg.message == "LOADED") {
+                _viewModel._webViewController.future.then((controller) {
+                  final text = _viewModel.texts.join();
+                  _textStyleListener();
+                  _colorListener();
+                  print("start!!");
+                  controller
+                      .evaluateJavascript("window.setText('" + text + "');")
+                      .then((_) {
+                    print("finished!!");
+                  });
+                });
+              }
 
-  Widget _buildNextEpisode() {
-    if (_viewModel._nextEpisodeName != null) {
-      return Container(
-          child: Column(
-        children: <Widget>[
-          Container(height: 32),
-          Container(
-              color: sNMAccentColor,
-              child: Column(
-                children: <Widget>[
-                  Container(height: 32.0),
-                  Text("次の話: "),
-                  Container(
-                    child: Text(_viewModel._nextEpisodeName,
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    padding: EdgeInsets.symmetric(horizontal: 16.0),
-                  ),
-                  Container(height: 32.0),
-                ],
-              ))
-        ],
-      ));
-    } else {
-      return Container();
-    }
-  }
+              if (msg.message == "TAP") {
+                _viewModel._onTapCallback();
+              }
 
-  Widget _buildPreviousEpisode() {
-    if (_viewModel._prevEpisodeName != null) {
-      return Container(
-          child: Column(
-        children: <Widget>[
-          Container(
-              color: sNMAccentColor,
-              child: Column(
-                children: <Widget>[
-                  Container(height: 32.0),
-                  Text("前の話: "),
-                  Container(
-                    child: Text(_viewModel._prevEpisodeName,
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    padding: EdgeInsets.symmetric(horizontal: 16.0),
-                  ),
-                  Container(height: 32.0),
-                ],
-              ))
-        ],
-      ));
-    } else {
-      return Container();
-    }
+              if (msg.message.contains("SCROLL")) {
+                print(msg.message);
+                final msgs = msg.message.split(",");
+                _viewModel._sliderConfigCallback(
+                    0, double.parse(msgs[1]), double.parse(msgs[2]));
+
+                if (this.firstTime) {
+                  this.firstTime = false;
+                  print("initial scroll offset = " +
+                      _viewModel._initialScrollPosition.toString());
+                  _viewModel._webViewController.future.then((controller) {
+                    controller.evaluateJavascript("window.scroll(" +
+                        _viewModel._initialScrollPosition.toString() +
+                        ");");
+                  });
+                }
+              }
+            })
+      },
+    ));
   }
 }

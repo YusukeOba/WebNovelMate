@@ -6,7 +6,6 @@ import 'package:NovelMate/common/entities/domain/SubscribedNovelEntity.dart';
 
 /// 汎用の本棚の本を取得する処理
 abstract class BaseCachedBookshelfDataStore extends CachedBookshelfDataStore {
-
   /// 依存する対応サイト
   Site get sourceSite;
 
@@ -15,8 +14,8 @@ abstract class BaseCachedBookshelfDataStore extends CachedBookshelfDataStore {
     return (Database()
             // ignore: invalid_use_of_visible_for_testing_member
             .select(Database().cachedSubscribedNovelEntity)
-              ..where((entity) => entity.siteIdentifier
-                  .equals(sourceSite.identifier)))
+              ..where((entity) =>
+                  entity.siteIdentifier.equals(sourceSite.identifier)))
         .get()
         .then((novels) {
       return Future.value(novels.map((novel) {
@@ -35,8 +34,44 @@ abstract class BaseCachedBookshelfDataStore extends CachedBookshelfDataStore {
             novel.lastReadAt,
             novel.unreadCount,
             novel.episodeCount,
+            readingProgress: novel.readingEpisodeProgress,
             readingEpisodeIdentifier: novel.readingEpisodeIdentifier);
       }).toList());
+    });
+  }
+
+  @override
+  Future<SubscribedNovelEntity> find(NovelIdentifier identifier) {
+    return (Database()
+            // ignore: invalid_use_of_visible_for_testing_member
+            .select(Database().cachedSubscribedNovelEntity)
+              ..where((entity) =>
+                  entity.siteOfIdentifier.equals(identifier.siteOfIdentifier))
+              ..where((entity) =>
+                  entity.siteIdentifier.equals(sourceSite.identifier)))
+        .get()
+        .then((novels) {
+      if (novels == null || novels.length == 0) {
+        return null;
+      } else {
+        final novel = novels.first;
+        return SubscribedNovelEntity(
+            NovelHeader(
+                NovelIdentifier(sourceSite, novel.siteOfIdentifier),
+                novel.novelName,
+                novel.novelStory,
+                novel.writer,
+                novel.isComplete,
+                novel.lastUpdatedAt,
+                novel.textLength,
+                novel.episodeCount,
+                novel.isShortStory),
+            novel.lastReadAt,
+            novel.unreadCount,
+            novel.episodeCount,
+            readingProgress: novel.readingEpisodeProgress,
+            readingEpisodeIdentifier: novel.readingEpisodeIdentifier);
+      }
     });
   }
 
@@ -92,6 +127,7 @@ abstract class BaseCachedBookshelfDataStore extends CachedBookshelfDataStore {
               episodeCount: entity.episodeCount,
               lastReadAt: entity.lastReadAt,
               isShortStory: entity.novelHeader.isShortStory,
+              readingEpisodeProgress: entity.readingProgress,
               readingEpisodeIdentifier: entity.readingEpisodeIdentifier));
     }).toList();
 

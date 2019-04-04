@@ -1,5 +1,6 @@
 import 'package:NovelMate/common/Sites.dart';
 import 'package:NovelMate/common/colors.dart';
+import 'package:NovelMate/common/entities/domain/EpisodeEntity.dart';
 import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
 import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
 import 'package:NovelMate/common/entities/domain/SubscribedNovelEntity.dart';
@@ -8,7 +9,7 @@ import 'package:NovelMate/common/repository/IndexRepository.dart';
 import 'package:NovelMate/common/repository/RepositoryFactory.dart';
 import 'package:NovelMate/page/EpisodeIndexPage.dart';
 import 'package:NovelMate/page/SearchResultPage.dart';
-import 'package:NovelMate/page/WebViewTextPage.dart';
+import 'package:NovelMate/page/TextPagerPage.dart';
 import 'package:flutter/material.dart';
 
 class SearchPage extends StatefulWidget {
@@ -59,15 +60,15 @@ class _SearchPageViewModel {
     });
   }
 
-    // 初期表示
-    void shownFirst() {
-      this.rankings = _repository.fetchRanking(showingSite).then((entities) {
-        entities.sort((lhs, rhs) {
-          return rhs.popularity - lhs.popularity;
-        });
-        return entities;
+  // 初期表示
+  void shownFirst() {
+    this.rankings = _repository.fetchRanking(showingSite).then((entities) {
+      entities.sort((lhs, rhs) {
+        return rhs.popularity - lhs.popularity;
       });
-    }
+      return entities;
+    });
+  }
 }
 
 class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
@@ -200,16 +201,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                 ]);
               }).toList(),
             ),
-// TODO: もっと見る対応
-//            Row(
-//              mainAxisAlignment: MainAxisAlignment.end,
-//              children: <Widget>[
-//                FlatButton(
-//                  child: Text("もっと見る"),
-//                  onPressed: () {},
-//                )
-//              ],
-//            )
+            // TODO: もっと見る対応
           ]);
         });
   }
@@ -236,8 +228,22 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
     ]);
 
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-//      return EpisodeIndexPage(novelHeader);
-    return WebViewExample();
+      if (novelHeader.isShortStory) {
+        return TextPagerPage(
+            [
+              EpisodeEntity(
+                  novelHeader.identifier,
+                  "1",
+                  DateTime.now().millisecondsSinceEpoch,
+                  novelHeader.lastUpdatedAt,
+                  novelHeader.novelName,
+                  1,
+                  novelHeader.novelName)
+            ].toList(),
+            0);
+      } else {
+        return EpisodeIndexPage(novelHeader);
+      }
     }));
   }
 }

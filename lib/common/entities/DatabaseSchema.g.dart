@@ -19,6 +19,7 @@ class CachedSubscribedNovelEntityData {
   final int episodeCount;
   final int lastReadAt;
   final String readingEpisodeIdentifier;
+  final int readingEpisodeProgress;
   final bool isShortStory;
   CachedSubscribedNovelEntityData(
       {this.siteIdentifier,
@@ -33,6 +34,7 @@ class CachedSubscribedNovelEntityData {
       this.episodeCount,
       this.lastReadAt,
       this.readingEpisodeIdentifier,
+      this.readingEpisodeProgress,
       this.isShortStory});
   factory CachedSubscribedNovelEntityData.fromData(
       Map<String, dynamic> data, GeneratedDatabase db) {
@@ -55,6 +57,8 @@ class CachedSubscribedNovelEntityData {
       lastReadAt: intType.mapFromDatabaseResponse(data['last_read_at']),
       readingEpisodeIdentifier: stringType
           .mapFromDatabaseResponse(data['reading_episode_identifier']),
+      readingEpisodeProgress:
+          intType.mapFromDatabaseResponse(data['reading_episode_progress']),
       isShortStory: boolType.mapFromDatabaseResponse(data['is_short_story']),
     );
   }
@@ -72,6 +76,7 @@ class CachedSubscribedNovelEntityData {
       episodeCount: json['episodeCount'] as int,
       lastReadAt: json['lastReadAt'] as int,
       readingEpisodeIdentifier: json['readingEpisodeIdentifier'] as String,
+      readingEpisodeProgress: json['readingEpisodeProgress'] as int,
       isShortStory: json['isShortStory'] as bool,
     );
   }
@@ -89,6 +94,7 @@ class CachedSubscribedNovelEntityData {
       'episodeCount': episodeCount,
       'lastReadAt': lastReadAt,
       'readingEpisodeIdentifier': readingEpisodeIdentifier,
+      'readingEpisodeProgress': readingEpisodeProgress,
       'isShortStory': isShortStory,
     };
   }
@@ -106,6 +112,7 @@ class CachedSubscribedNovelEntityData {
           int episodeCount,
           int lastReadAt,
           String readingEpisodeIdentifier,
+          int readingEpisodeProgress,
           bool isShortStory}) =>
       CachedSubscribedNovelEntityData(
         siteIdentifier: siteIdentifier ?? this.siteIdentifier,
@@ -121,6 +128,8 @@ class CachedSubscribedNovelEntityData {
         lastReadAt: lastReadAt ?? this.lastReadAt,
         readingEpisodeIdentifier:
             readingEpisodeIdentifier ?? this.readingEpisodeIdentifier,
+        readingEpisodeProgress:
+            readingEpisodeProgress ?? this.readingEpisodeProgress,
         isShortStory: isShortStory ?? this.isShortStory,
       );
   @override
@@ -138,6 +147,7 @@ class CachedSubscribedNovelEntityData {
           ..write('episodeCount: $episodeCount, ')
           ..write('lastReadAt: $lastReadAt, ')
           ..write('readingEpisodeIdentifier: $readingEpisodeIdentifier, ')
+          ..write('readingEpisodeProgress: $readingEpisodeProgress, ')
           ..write('isShortStory: $isShortStory')
           ..write(')'))
         .toString();
@@ -145,27 +155,27 @@ class CachedSubscribedNovelEntityData {
 
   @override
   int get hashCode =>
-      ((((((((((((siteIdentifier.hashCode) * 31 + siteOfIdentifier.hashCode) * 31 + novelName.hashCode) * 31 +
-                                                                              novelStory
+      (((((((((((((siteIdentifier.hashCode) * 31 + siteOfIdentifier.hashCode) * 31 + novelName.hashCode) * 31 + novelStory.hashCode) * 31 +
+                                                                              writer
                                                                                   .hashCode) *
                                                                           31 +
-                                                                      writer
+                                                                      unreadCount
                                                                           .hashCode) *
                                                                   31 +
-                                                              unreadCount
+                                                              isComplete
                                                                   .hashCode) *
                                                           31 +
-                                                      isComplete.hashCode) *
+                                                      lastUpdatedAt.hashCode) *
                                                   31 +
-                                              lastUpdatedAt.hashCode) *
+                                              textLength.hashCode) *
                                           31 +
-                                      textLength.hashCode) *
+                                      episodeCount.hashCode) *
                                   31 +
-                              episodeCount.hashCode) *
+                              lastReadAt.hashCode) *
                           31 +
-                      lastReadAt.hashCode) *
+                      readingEpisodeIdentifier.hashCode) *
                   31 +
-              readingEpisodeIdentifier.hashCode) *
+              readingEpisodeProgress.hashCode) *
           31 +
       isShortStory.hashCode;
   @override
@@ -184,6 +194,7 @@ class CachedSubscribedNovelEntityData {
           other.episodeCount == episodeCount &&
           other.lastReadAt == lastReadAt &&
           other.readingEpisodeIdentifier == readingEpisodeIdentifier &&
+          other.readingEpisodeProgress == readingEpisodeProgress &&
           other.isShortStory == isShortStory);
 }
 
@@ -268,6 +279,13 @@ class $CachedSubscribedNovelEntityTable extends CachedSubscribedNovelEntity
         'reading_episode_identifier',
         true,
       );
+  GeneratedIntColumn _readingEpisodeProgress;
+  @override
+  GeneratedIntColumn get readingEpisodeProgress =>
+      _readingEpisodeProgress ??= GeneratedIntColumn(
+        'reading_episode_progress',
+        true,
+      );
   GeneratedBoolColumn _isShortStory;
   @override
   GeneratedBoolColumn get isShortStory => _isShortStory ??= GeneratedBoolColumn(
@@ -288,6 +306,7 @@ class $CachedSubscribedNovelEntityTable extends CachedSubscribedNovelEntity
         episodeCount,
         lastReadAt,
         readingEpisodeIdentifier,
+        readingEpisodeProgress,
         isShortStory
       ];
   @override
@@ -311,6 +330,8 @@ class $CachedSubscribedNovelEntityTable extends CachedSubscribedNovelEntity
       lastReadAt.isAcceptableValue(instance.lastReadAt, isInserting) &&
       readingEpisodeIdentifier.isAcceptableValue(
           instance.readingEpisodeIdentifier, isInserting) &&
+      readingEpisodeProgress.isAcceptableValue(
+          instance.readingEpisodeProgress, isInserting) &&
       isShortStory.isAcceptableValue(instance.isShortStory, isInserting);
   @override
   Set<GeneratedColumn> get $primaryKey => {siteIdentifier, siteOfIdentifier};
@@ -360,6 +381,10 @@ class $CachedSubscribedNovelEntityTable extends CachedSubscribedNovelEntity
     if (d.readingEpisodeIdentifier != null || includeNulls) {
       map['reading_episode_identifier'] =
           Variable<String, StringType>(d.readingEpisodeIdentifier);
+    }
+    if (d.readingEpisodeProgress != null || includeNulls) {
+      map['reading_episode_progress'] =
+          Variable<int, IntType>(d.readingEpisodeProgress);
     }
     if (d.isShortStory != null || includeNulls) {
       map['is_short_story'] = Variable<bool, BoolType>(d.isShortStory);

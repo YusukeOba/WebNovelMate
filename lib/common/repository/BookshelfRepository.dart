@@ -27,6 +27,6 @@ abstract class BookshelfRepository {
   Future<void> delete(List<SubscribedNovelEntity> delete);
 
   /// 現在読んでいる話を更新する
-  Future<void> updateReadingEpisode(
-      NovelIdentifier novelIdentifier, String episodeIdentifier);
+  Future<void> updateReadingEpisode(NovelIdentifier novelIdentifier,
+      String episodeIdentifier, int percentage);
 }

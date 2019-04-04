@@ -1,5 +1,6 @@
 import 'package:NovelMate/common/Sites.dart';
 import 'package:NovelMate/common/colors.dart';
+import 'package:NovelMate/common/entities/domain/EpisodeEntity.dart';
 import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
 import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
 import 'package:NovelMate/common/entities/domain/SubscribedNovelEntity.dart';
@@ -7,6 +8,7 @@ import 'package:NovelMate/common/repository/BookshelfRepository.dart';
 import 'package:NovelMate/common/repository/IndexRepository.dart';
 import 'package:NovelMate/common/repository/RepositoryFactory.dart';
 import 'package:NovelMate/page/EpisodeIndexPage.dart';
+import 'package:NovelMate/page/TextPagerPage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -108,7 +110,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
           appBar: AppBar(
             title: Text(_viewModel.pageTitle()),
             bottom: TabBar(
-              tabs: [new Tab(text: "人気順"), new Tab(text: "更新順")].toList(),
+              tabs: [new Tab(text: "おすすめ順"), new Tab(text: "更新順")].toList(),
               indicatorColor: Colors.white,
               onTap: (index) {
                 setState(() {
@@ -272,7 +274,22 @@ class _SearchResultPageState extends State<SearchResultPage> {
     ]);
 
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return EpisodeIndexPage(novelHeader);
+      if (novelHeader.isShortStory) {
+        return TextPagerPage(
+            [
+              EpisodeEntity(
+                  novelHeader.identifier,
+                  "1",
+                  DateTime.now().millisecondsSinceEpoch,
+                  novelHeader.lastUpdatedAt,
+                  novelHeader.novelName,
+                  1,
+                  novelHeader.novelName)
+            ].toList(),
+            0);
+      } else {
+        return EpisodeIndexPage(novelHeader);
+      }
     }));
   }
 }

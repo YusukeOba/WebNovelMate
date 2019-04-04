@@ -2,8 +2,8 @@ import 'package:moor_flutter/moor_flutter.dart';
 
 part 'DatabaseSchema.g.dart';
 
-/// DBスキーマ群をここに定義する
 ///
+/// DBスキーマ群をここに定義する
 ///
 
 ///
@@ -45,6 +45,9 @@ class CachedSubscribedNovelEntity extends Table {
 
   /// 最後に読んだ話
   TextColumn get readingEpisodeIdentifier => text().nullable()();
+
+  /// 最後に読んだ話の進捗度
+  IntColumn get readingEpisodeProgress => integer().nullable()();
 
   /// 短編かどうか
   BoolColumn get isShortStory => boolean()();

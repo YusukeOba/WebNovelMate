@@ -1,45 +1,55 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>ヘルプ</title>
-    <link rel="stylesheet" href="./bootstrap.min.css" />
-    <link rel="stylesheet" href="./style.css" />
+    <link rel="stylesheet" href="./bootstrap.min.css"/>
+    <link rel="stylesheet" href="./style.css"/>
     <script src="./jquery-3.2.1.min.js"></script>
     <script src="./bootstrap.min.js"></script>
 
     <script type="text/javascript">
       /* DOMが操作可能になった時に実行 */
       $(document).ready(function() {
-        console.log("hog");
         console.log($("#scroller")[0].scrollHeight);
 
-        $(window).scrollTop($("#scroller")[0].scrollHeight);
+        Msg.postMessage("LOADED");
+
+
+       // 画面クリック
+    $("#scroller").click(function () {
+        Msg.postMessage("TAP");
+    });
+
       });
+
+
+      // スクロール位置の指定
+      function scroll(value) {
+         $(window).scrollTop(value);
+      }
 
       // スクロールイベント
       $(window).scroll(function() {
-        console.log("ss");
-        Msg.postMessage("Hello");
+          let offset = $(window).scrollTop();
+        let scrollMax = $("#scroller")[0].scrollHeight;
+        console.log("notify = " + offset + " : " + scrollMax);
+        Msg.postMessage("SCROLL" + "," + offset + "," + scrollMax);
       });
 
       // 文言の設定
       function setText(text) {
+//         $("#scroller").append(text);
+            document.getElementById("scroller").innerHTML = text;
 
-        // let replaced =  text
-        // .replace(/[\|｜](.+?)《(.+?)》/g, '<ruby>$1<rt>$2</rt></ruby>')
-        // .replace(/[\|｜](.+?)（(.+?)）/g, '<ruby>$1<rt>$2</rt></ruby>')
-        // .replace(/[\|｜](.+?)\((.+?)\)/g, '<ruby>$1<rt>$2</rt></ruby>')
-        // .replace(/([一-龠]+)《(.+?)》/g, '<ruby>$1<rt>$2</rt></ruby>')
-        // .replace(/([一-龠]+)（([ぁ-んァ-ヶ]+?)）/g, '<ruby>$1<rt>$2</rt></ruby>')
-        // .replace(/([一-龠]+)\(([ぁ-んァ-ヶ]+?)\)/g, '<ruby>$1<rt>$2</rt></ruby>')
-        // .replace(/[\|｜]《(.+?)》/g, '《$1》')
-        // .replace(/[\|｜]（(.+?)）/g, '（$1）')
-        // .replace(/[\|｜]\((.+?)\)/g, '($1)')
-
-         $("#scroller").append(text);
         $('a').contents().unwrap();
+
+          let offset = $(window).scrollTop();
+        let scrollMax = $("#scroller")[0].scrollHeight;
+        console.log("notify = " + offset + " : " + scrollMax);
+        Msg.postMessage("SCROLL" + "," + offset + "," + scrollMax);
+
       }
 
       // フォントカラーの設定
@@ -67,15 +77,17 @@
           $("body").css('background-color', color);
       }
 
+
+
     </script>
-  </head>
+</head>
 
-  <!-- window.setText('<ruby><rb>私</rb><rp></ruby>'); -->
-    <!-- window.setFontColor('#ff0000')-->
+<!-- window.setText('<ruby><rb>私</rb><rp></ruby>'); -->
+<!-- window.setFontColor('#ff0000')-->
 
 
-  <body>
-    <div id="scroller" class="container">
-    </div>
-  </body>
+<body>
+<div id="scroller" class="container">
+</div>
+</body>
 </html>

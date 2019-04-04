@@ -53,6 +53,8 @@ class _TextPagerViewModel {
   double _sliderMin = 0;
   double _sliderMax = 0;
 
+  int initialScrollValue = 0;
+
   FirstScrollPosition _firstScrollPosition = FirstScrollPosition.first;
 
   ValueNotifier<double> _sliderValueNotifier = ValueNotifier(0);
@@ -141,10 +143,25 @@ class _TextPagerViewModel {
   /// エピソード一覧から表示する(続きからよむもこのケース)
   void showByContinue() {
     _texts = RepositoryFactory.shared
-        .getTextRepository()
-        .findByIdentifier(
-            _currentEpisode.novelIdentifier, _currentEpisode.episodeIdentifier)
-        .then((text) {
+        .getBookshelfRepository()
+        .find(_currentEpisode.novelIdentifier)
+        .then((novel) {
+      if (novel == null) {
+        print("reading episode is not found.");
+        initialScrollValue = 0;
+      }
+      if (novel.readingEpisodeIdentifier == _currentEpisode.episodeIdentifier) {
+        print("reading episode.");
+        initialScrollValue = novel.readingProgress;
+      } else {
+        print("this episode is not reading.");
+        initialScrollValue = 0;
+      }
+
+      return RepositoryFactory.shared.getTextRepository().findByIdentifier(
+          _currentEpisode.novelIdentifier, _currentEpisode.episodeIdentifier);
+    }).then((text) {
+      print("loading text");
       // 大量の文字列を一気に表示するとViewのサイズが大きすぎるためListViewで表示したい
       // そのため改行コードで分割する
       List<String> texts = text.episodeText.split("\n");
@@ -154,12 +171,6 @@ class _TextPagerViewModel {
 
   void toggleOuterView() {
     _shownOuterView = !_shownOuterView;
-    if (_shownOuterView) {
-      SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
-    } else {
-      // フルスクリーン
-      SystemChrome.setEnabledSystemUIOverlays([]);
-    }
   }
 
   void setOuterViewVisibility(bool visibility) {
@@ -213,12 +224,13 @@ class _TextPagerViewModel {
         height: lineHeight);
     _textStyle.value = style;
 
-    print("change. textStyle = " + style.toString());
+    print("change. textStyle = " + style.height.toString());
 
     final repository = RepositoryFactory.shared.getSettingRepository();
     repository.setColorPattern(colorPattern);
     repository.setFontSize(fontSize);
     repository.setGothic(isGothic);
+    repository.setLineHeight(lineHeight);
   }
 
   /// フォント設定の読み込み
@@ -234,8 +246,8 @@ class _TextPagerViewModel {
   /// 最後に読んだエピソードの保存
   Future<void> updateReadingEpisode() {
     final repository = RepositoryFactory.shared.getBookshelfRepository();
-    return repository.updateReadingEpisode(
-        _currentEpisode.novelIdentifier, _currentEpisode.episodeIdentifier);
+    return repository.updateReadingEpisode(_currentEpisode.novelIdentifier,
+        _currentEpisode.episodeIdentifier, _rawSliderOffset.toInt());
   }
 }
 
@@ -403,6 +415,7 @@ class _TextPagerState extends State<TextPagerPage>
             },
             // Sliderからの通知をScrollViewに反映
             _viewModel._sliderValueNotifier,
+            _viewModel.initialScrollValue,
             _viewModel._firstScrollPosition,
             _viewModel._backgroundColor,
             _viewModel._textStyle,
