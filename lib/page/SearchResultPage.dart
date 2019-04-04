@@ -5,134 +5,100 @@ import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
 import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
 import 'package:NovelMate/common/entities/domain/SubscribedNovelEntity.dart';
 import 'package:NovelMate/common/repository/BookshelfRepository.dart';
-import 'package:NovelMate/common/repository/IndexRepository.dart';
 import 'package:NovelMate/common/repository/RepositoryFactory.dart';
 import 'package:NovelMate/page/EpisodeIndexPage.dart';
+import 'package:NovelMate/page/SearchResultTabPage.dart';
 import 'package:NovelMate/page/TextPagerPage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 
 class SearchResultPage extends StatefulWidget {
-  /// 検索サイト
-  final Site _searchSite;
+  final SearchResultTab _tab;
 
-  /// 検索キーワード
+  final Site _showingSite;
+
   final String _searchWord;
 
-  SearchResultPage(this._searchSite, this._searchWord);
+  SearchResultPage(this._tab, this._showingSite, this._searchWord);
 
   @override
   State createState() {
-    return _SearchResultPageState(
-        _SearchResultPageViewModel(_searchSite, _searchWord));
+    return _SearchResulState(
+        _SearchResultViewModel(_tab, _showingSite, _searchWord));
   }
 }
 
-class _SearchResultPageViewModel {
-  /// 検索キーワード
+class _SearchResultViewModel {
+  final SearchResultTab _tab;
+
+  final Site _showingSite;
+
   final String _searchWord;
 
-  /// 表示中のサイト
-  Site _showningSite;
-
   /// 対応リポジトリ
-  final IndexRepository _repository =
-      RepositoryFactory.shared.getIndexRepository();
+  final _repository = RepositoryFactory.shared.getIndexRepository();
 
-  /// ListViewに表示する小説
+  /// 表示している小説
   Future<List<RankingEntity>> _novels;
 
-  /// 選択中タブ
-  int _currentSelectedTabIndex = 0;
+  _SearchResultViewModel(this._tab, this._showingSite, this._searchWord);
 
-  bool visibleFav = false;
-
-  _SearchResultPageViewModel(this._showningSite, this._searchWord);
-
-  String pageTitle() {
-    return "$_searchWordを含む小説";
-  }
-
-  /// 人気順にソートする
-  void showPopularity() {
-    _novels =
-        _repository.find(this._showningSite, this._searchWord).then((novels) {
-      // 人気順にソート
-      novels.sort((lhs, rhs) {
-        return rhs.popularity - lhs.popularity;
+  show() {
+    if (_tab == SearchResultTab.popular) {
+      _novels =
+          _repository.find(this._showingSite, this._searchWord).then((novels) {
+        // 人気順にソート
+        novels.sort((lhs, rhs) {
+          return rhs.popularity - lhs.popularity;
+        });
+        return novels;
       });
-      return novels;
-    });
-  }
-
-  /// 更新日時順にソートする
-  void showUpdatedAt() {
-    _novels =
-        _repository.find(this._showningSite, this._searchWord).then((novels) {
-      // 更新日時順にソート
-      novels.sort((lhs, rhs) {
-        return rhs.novelHeader.lastUpdatedAt - lhs.novelHeader.lastUpdatedAt;
+    } else {
+      _novels =
+          _repository.find(this._showingSite, this._searchWord).then((novels) {
+        // 更新日時順にソート
+        novels.sort((lhs, rhs) {
+          return rhs.novelHeader.lastUpdatedAt - lhs.novelHeader.lastUpdatedAt;
+        });
+        return novels;
       });
-      return novels;
-    });
-  }
-
-  /// 選択タブに応じて更新する
-  void _showWithSelectedTabIndex(index) {
-    this._currentSelectedTabIndex = index;
-    if (index == 0) {
-      showPopularity();
-    } else if (index == 1) {
-      showUpdatedAt();
     }
+  }
+
+  refresh() async {
+    await _repository.setDirtyIndex(this._showingSite);
+    show();
   }
 }
 
-class _SearchResultPageState extends State<SearchResultPage> {
-  final _SearchResultPageViewModel _viewModel;
+class _SearchResulState extends State<SearchResultPage> {
+  final _SearchResultViewModel _viewModel;
 
-  _SearchResultPageState(this._viewModel);
+  _SearchResulState(this._viewModel);
 
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
-    _viewModel._showWithSelectedTabIndex(0);
+    setState(() {
+      _viewModel.show();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-        length: 2,
-        initialIndex: _viewModel._currentSelectedTabIndex,
-        child: Scaffold(
-          appBar: AppBar(
-            title: Text(_viewModel.pageTitle()),
-            bottom: TabBar(
-              tabs: [new Tab(text: "おすすめ順"), new Tab(text: "更新順")].toList(),
-              indicatorColor: Colors.white,
-              onTap: (index) {
-                setState(() {
-                  _viewModel._showWithSelectedTabIndex(index);
-                });
-              },
-            ),
-          ),
-          body: RefreshIndicator(
-              child: Scrollbar(
-                  child: CustomScrollView(
-                slivers: <Widget>[_buildNovelLists()],
-              )),
-              onRefresh: () {
-                return Future(() {
-                  setState(() {
-                    this._viewModel._showWithSelectedTabIndex(
-                        this._viewModel._currentSelectedTabIndex);
-                  });
-                });
-              }),
-        ));
+    return RefreshIndicator(
+        child: Scrollbar(
+            child: CustomScrollView(
+          slivers: <Widget>[_buildNovelLists()],
+        )),
+        onRefresh: () {
+          return Future(() {
+            setState(() {
+              _viewModel.refresh();
+            });
+          });
+        });
   }
 
   Widget _buildNovelLists() {

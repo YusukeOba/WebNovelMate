@@ -3,33 +3,54 @@ import 'package:NovelMate/common/datastore/CachedIndexDataStore.dart';
 import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
 
 class CachedNarouIndexDataStore extends CachedIndexDataStore {
-  List<RankingEntity> _cache;
+  List<RankingEntity> _cacheRanking;
+  List<RankingEntity> _cacheSearch;
 
   @override
-  Future<Function> clearAll() {
+  Future<bool> hasCache(CacheType cacheType) {
     return Future(() {
-      _cache = null;
+      switch (cacheType) {
+        case CacheType.ranking:
+          return _cacheRanking != null;
+        case CacheType.search:
+          return _cacheSearch != null;
+      }
     });
   }
 
   @override
-  Future<List<RankingEntity>> fetchAll() {
+  Future<List<RankingEntity>> fetchAll(CacheType cacheType) {
     return Future(() {
-      return _cache;
+      switch (cacheType) {
+        case CacheType.ranking:
+          return _cacheRanking;
+        case CacheType.search:
+          return _cacheSearch;
+      }
     });
   }
 
   @override
-  Future<void> save(List<RankingEntity> entities) {
+  Future<void> save(CacheType cacheType, List<RankingEntity> entities) {
     return Future(() {
-      return _cache = entities;
+      switch (cacheType) {
+        case CacheType.ranking:
+          return _cacheRanking = entities;
+        case CacheType.search:
+          return _cacheSearch = entities;
+      }
     });
   }
 
   @override
-  Future<bool> hasCache() {
+  Future<void> clear(CacheType cacheType) {
     return Future(() {
-      return _cache != null;
+      switch (cacheType) {
+        case CacheType.ranking:
+          return _cacheRanking = null;
+        case CacheType.search:
+          return _cacheSearch = null;
+      }
     });
   }
 }

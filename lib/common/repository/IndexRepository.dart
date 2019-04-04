@@ -18,9 +18,11 @@ abstract class IndexRepository {
   ///
   /// [end]で取得する最後のindex位置
   /// [freeWord]は自由な文言
-  Future<List<RankingEntity>> find(
-      Site site, String freeWord);
+  Future<List<RankingEntity>> find(Site site, String freeWord);
 
   /// インデックスの削除
-  Future<void> setDirty(Site site);
+  Future<void> setDirtyIndex(Site site);
+
+  /// ランキングの削除
+  Future<void> setDirtyRanking(Site site);
 }

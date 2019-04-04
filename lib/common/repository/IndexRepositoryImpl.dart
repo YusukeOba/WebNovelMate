@@ -10,9 +10,15 @@ class IndexRepositoryImpl extends IndexRepository {
       : super(cacheDataStores, remoteDataStores);
 
   @override
-  Future<void> setDirty(Site site) {
+  Future<void> setDirtyRanking(Site site) {
     print("called dirty");
-    return cacheDataStores[site].clearAll();
+    return cacheDataStores[site].clear(CacheType.ranking);
+  }
+
+  @override
+  Future<void> setDirtyIndex(Site site) {
+    print("called dirty");
+    return cacheDataStores[site].clear(CacheType.search);
   }
 
   @override
@@ -24,8 +30,14 @@ class IndexRepositoryImpl extends IndexRepository {
           "Error. this novel is unavailable site. Please implements");
     }
 
-    // 検索は常に最新を参照したい
-    return remote.fetchIndex(freeWord);
+    if (await cache.hasCache(CacheType.search)) {
+      return cache.fetchAll(CacheType.search);
+    } else {
+      return remote.fetchIndex(freeWord).then((novels) {
+        cache.save(CacheType.search, novels);
+        return novels;
+      });
+    }
   }
 
   @override
@@ -37,12 +49,12 @@ class IndexRepositoryImpl extends IndexRepository {
           "Error. this novel is unavailable site. Please implements");
     }
 
-    if (await cache.hasCache()) {
+    if (await cache.hasCache(CacheType.ranking)) {
       print("fetch by cache.");
-      return cache.fetchAll();
+      return cache.fetchAll(CacheType.ranking);
     } else {
       return remote.fetchRanking(0, 20).then((lists) async {
-        await cache.save(lists);
+        await cache.save(CacheType.ranking, lists);
         print("cache saved.");
         return lists;
       });
