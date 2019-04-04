@@ -42,7 +42,7 @@ packages:
       name: build
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.2"
+    version: "1.1.3"
   build_config:
     dependency: transitive
     description:
@@ -63,7 +63,7 @@ packages:
       name: build_resolvers
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.3"
+    version: "1.0.4"
   build_runner:
     dependency: "direct dev"
     description:
@@ -227,7 +227,7 @@ packages:
       name: http
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.12.0+1"
+    version: "0.12.0+2"
   http_multi_server:
     dependency: transitive
     description:
@@ -297,7 +297,7 @@ packages:
       name: json_serializable
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.1.0"
+    version: "2.1.1"
   kernel:
     dependency: transitive
     description:
@@ -491,7 +491,7 @@ packages:
       name: source_gen
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.9.4+1"
+    version: "0.9.4+2"
   source_map_stack_trace:
     dependency: transitive
     description:
@@ -632,15 +632,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.12"
-  webview_flutter:
-    dependency: "direct main"
-    description:
-      path: "packages/webview_flutter"
-      ref: "shaqian/webview"
-      resolved-ref: "01b7104e2273420720ab27a12445109ec3e06d23"
-      url: "https://github.com/shaqian/plugins.git"
-    source: git
-    version: "0.3.3+1"
   xml:
     dependency: transitive
     description:
