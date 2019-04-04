@@ -28,7 +28,7 @@ class _SearchPageViewModel {
       RepositoryFactory.shared.getIndexRepository();
 
   /// 表示中のサイト種別
-  Site showingSite = AvailableSites.narou;
+  Site showingSite = AvailableSites.aozora;
 
   /// 入力中の文言
   String inputtedText = "";
