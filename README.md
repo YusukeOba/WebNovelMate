@@ -23,7 +23,7 @@ Application using flutter.
 4. Move to ``WebNovelMate`` directory.
 5. Run `flutter run` command.
 
-# License
+## License
 
 ```
 Copyright 2019 Yusuke Oba
