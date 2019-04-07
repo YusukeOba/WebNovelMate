@@ -60,6 +60,10 @@ dev_dependencies:
   # App Icon
   flutter_launcher_icons: "^0.7.0"
 
+  # Intent Action URL
+  url_launcher: ^5.0.2
+
+
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec
 

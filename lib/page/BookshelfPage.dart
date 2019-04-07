@@ -188,150 +188,150 @@ class _BookshelfState extends State<BookshelfPage> {
   }
 
   Widget _buildListTile(int index, SubscribedNovelEntity novel) {
-    return InkWell(
-        onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) {
-            if (novel.novelHeader.isShortStory) {
-              return TextPagerPage(
-                  [
-                    EpisodeEntity(
-                        novel.novelHeader.identifier,
-                        "1",
-                        DateTime.now().millisecondsSinceEpoch,
-                        DateTime.now().millisecondsSinceEpoch,
-                        novel.novelHeader.novelName,
-                        1,
-                        novel.novelHeader.novelName)
-                  ].toList(),
-                  0);
-            } else {
-              return EpisodeIndexPage(novel.novelHeader);
-            }
-          })).then((_) {
-            setState(() {
-              _viewModel.refreshLists();
-            });
-          });
-        },
-        child: _buildNovelDetail(index, novel));
-  }
-
-  Widget _buildNovelDetail(int index, SubscribedNovelEntity novel) {
-    Widget novelDetailWidget;
     if (_viewModel._deleteMode.value) {
-      novelDetailWidget = Container(
-          padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-          decoration: new BoxDecoration(
-              border: new Border(
-                  bottom: BorderSide(width: 0.5, color: Colors.black26))),
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      // タイトル
-                      Text(novel.novelHeader.novelName,
-                          maxLines: 1,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                          overflow: TextOverflow.ellipsis),
-                      // 作者名
-                      Text(
-                        novel.novelHeader.writer,
-                        style: TextStyle(color: Colors.black87, fontSize: 12.0),
-                      ),
-                      Container(
-                        height: 4.0,
-                      ),
-                      Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
+      return InkWell(
+          onTap: () {
+            setState(() {
+              _viewModel.putDelete(novel, !_viewModel.isDeleteByNovel(novel));
+            });
+          },
+          child: Container(
+              padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+              decoration: new BoxDecoration(
+                  border: new Border(
+                      bottom: BorderSide(width: 0.5, color: Colors.black26))),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
+                          // タイトル
+                          Text(novel.novelHeader.novelName,
+                              maxLines: 1,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                              overflow: TextOverflow.ellipsis),
+                          // 作者名
+                          Text(
+                            novel.novelHeader.writer,
+                            style: TextStyle(
+                                color: Colors.black87, fontSize: 12.0),
+                          ),
+                          Container(
+                            height: 4.0,
+                          ),
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: <Widget>[
 //                      // 未読数
 //                      _buildUnreadChip(novel),
-                          // 完結済かどうか
-                          Text(
-                            novel.novelHeader.isComplete ? "完結済" : "連載中",
-                            style: TextStyle(
-                                color: Colors.black87, fontSize: 12.0),
-                          ),
-                          Container(width: 4.0),
-                          // 掲載話数
-                          Text(
-                            novel.episodeCount.toString() + "話",
-                            style: TextStyle(
-                                color: Colors.black87, fontSize: 12.0),
-                          ),
-                          _buildCircle(),
-                          // 更新日
-                          _buildLastUpdateLabel(novel),
-                        ],
-                      )
-                    ]),
-                flex: 9,
-              ),
-              Expanded(
-                flex: 1,
-                child: Checkbox(
-                  activeColor: sNMPrimaryColor,
-                  value: _viewModel.isDeleteByNovel(novel),
-                  onChanged: (value) {
-                    setState(() {
-                      _viewModel.putDelete(novel, value);
-                    });
-                  },
-                ),
-              )
-            ],
-          ));
+                              // 完結済かどうか
+                              Text(
+                                novel.novelHeader.isComplete ? "完結済" : "連載中",
+                                style: TextStyle(
+                                    color: Colors.black87, fontSize: 12.0),
+                              ),
+                              Container(width: 4.0),
+                              // 掲載話数
+                              Text(
+                                novel.episodeCount.toString() + "話",
+                                style: TextStyle(
+                                    color: Colors.black87, fontSize: 12.0),
+                              ),
+                              _buildCircle(),
+                              // 更新日
+                              _buildLastUpdateLabel(novel),
+                            ],
+                          )
+                        ]),
+                    flex: 9,
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Checkbox(
+                      activeColor: sNMPrimaryColor,
+                      value: _viewModel.isDeleteByNovel(novel),
+                      onChanged: (value) {
+                        setState(() {
+                          _viewModel.putDelete(novel, value);
+                        });
+                      },
+                    ),
+                  )
+                ],
+              )));
     } else {
-      novelDetailWidget = Container(
-          padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-          decoration: new BoxDecoration(
-              border: new Border(
-                  bottom: BorderSide(width: 0.5, color: Colors.black26))),
-          child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                // タイトル
-                Text(novel.novelHeader.novelName,
-                    maxLines: 1,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                    overflow: TextOverflow.ellipsis),
-                // 作者名
-                Text(
-                  novel.novelHeader.writer,
-                  style: TextStyle(color: Colors.black87, fontSize: 12.0),
-                ),
-                Container(
-                  height: 4.0,
-                ),
-                Wrap(
-                  crossAxisAlignment: WrapCrossAlignment.center,
+      return InkWell(
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) {
+              if (novel.novelHeader.isShortStory) {
+                return TextPagerPage(
+                    [
+                      EpisodeEntity(
+                          novel.novelHeader.identifier,
+                          "1",
+                          DateTime.now().millisecondsSinceEpoch,
+                          DateTime.now().millisecondsSinceEpoch,
+                          novel.novelHeader.novelName,
+                          1,
+                          novel.novelHeader.novelName)
+                    ].toList(),
+                    0);
+              } else {
+                return EpisodeIndexPage(novel.novelHeader);
+              }
+            })).then((_) {
+              setState(() {
+                _viewModel.refreshLists();
+              });
+            });
+          },
+          child: Container(
+              padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+              decoration: new BoxDecoration(
+                  border: new Border(
+                      bottom: BorderSide(width: 0.5, color: Colors.black26))),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
+                    // タイトル
+                    Text(novel.novelHeader.novelName,
+                        maxLines: 1,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                        overflow: TextOverflow.ellipsis),
+                    // 作者名
+                    Text(
+                      novel.novelHeader.writer,
+                      style: TextStyle(color: Colors.black87, fontSize: 12.0),
+                    ),
+                    Container(
+                      height: 4.0,
+                    ),
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: <Widget>[
 //                      // 未読数
 //                      _buildUnreadChip(novel),
-                    // 完結済かどうか
-                    Text(
-                      novel.novelHeader.isComplete ? "完結済" : "連載中",
-                      style: TextStyle(color: Colors.black87, fontSize: 12.0),
-                    ),
-                    Container(width: 4.0),
-                    // 掲載話数
-                    Text(
-                      novel.episodeCount.toString() + "話",
-                      style: TextStyle(color: Colors.black87, fontSize: 12.0),
-                    ),
-                    _buildCircle(),
-                    // 更新日
-                    _buildLastUpdateLabel(novel),
-                  ],
-                )
-              ]));
+                        // 完結済かどうか
+                        Text(
+                          novel.novelHeader.isComplete ? "完結済" : "連載中",
+                          style:
+                              TextStyle(color: Colors.black87, fontSize: 12.0),
+                        ),
+                        Container(width: 4.0),
+                        // 掲載話数
+                        Text(
+                          novel.episodeCount.toString() + "話",
+                          style:
+                              TextStyle(color: Colors.black87, fontSize: 12.0),
+                        ),
+                        _buildCircle(),
+                        // 更新日
+                        _buildLastUpdateLabel(novel),
+                      ],
+                    )
+                  ])));
     }
-    return AnimatedSwitcher(
-      child: novelDetailWidget,
-      duration: Duration(milliseconds: 500),
-    );
   }
 
   /// TODO: 対応

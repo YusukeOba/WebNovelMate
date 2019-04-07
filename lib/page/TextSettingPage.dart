@@ -10,15 +10,15 @@ typedef OnSettingChanged = void Function(double fontSize,
     ColorPattern _colorPattern, bool _isGothic, double lineHeight);
 
 /// 設定ページ
-class SettingPage extends StatefulWidget {
+class TextSettingPage extends StatefulWidget {
   @override
-  SettingState createState() {
-    return SettingState();
+  TextSettingState createState() {
+    return TextSettingState();
   }
 }
 
 /// 設定ページ
-class SettingState extends State<SettingPage> {
+class TextSettingState extends State<TextSettingPage> {
   double _fontSize;
   ColorPattern _colorPattern;
   bool _isGothic;
@@ -60,7 +60,7 @@ class SettingState extends State<SettingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("設定"),
+        title: Text("テキストの設定"),
       ),
       body: Column(
         children: <Widget>[

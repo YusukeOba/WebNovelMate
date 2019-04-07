@@ -4,7 +4,7 @@ import 'package:NovelMate/common/colors.dart';
 import 'package:NovelMate/common/entities/domain/EpisodeEntity.dart';
 import 'package:NovelMate/common/repository/RepositoryFactory.dart';
 import 'package:NovelMate/common/repository/SettingRepository.dart';
-import 'package:NovelMate/page/SettingPage.dart';
+import 'package:NovelMate/page/TextSettingPage.dart';
 import 'package:NovelMate/page/TextPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
