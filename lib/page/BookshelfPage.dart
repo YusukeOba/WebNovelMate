@@ -14,12 +14,13 @@ import 'package:flutter/widgets.dart';
 ///
 class BookshelfPage extends StatefulWidget {
   final BookshelfTab _tab;
+  final ValueNotifier<bool> _deleteMode;
 
-  BookshelfPage(this._tab);
+  BookshelfPage(this._tab, this._deleteMode);
 
   @override
   _BookshelfState createState() {
-    return _BookshelfState(_tab);
+    return _BookshelfState(_BookshelfViewModel(_tab, _deleteMode));
   }
 }
 
@@ -33,7 +34,12 @@ class _BookshelfViewModel {
   /// 表示している小説
   Future<List<SubscribedNovelEntity>> _novels;
 
-  _BookshelfViewModel(this._tab);
+  final ValueNotifier<bool> _deleteMode;
+
+  /// 削除対象のindex, 削除フラグ
+  List<SubscribedNovelEntity> _deleteCandidates = [];
+
+  _BookshelfViewModel(this._tab, this._deleteMode);
 
   /// 選択中のタブに応じたListの状態変更
   void refreshLists() {
@@ -55,14 +61,46 @@ class _BookshelfViewModel {
         break;
     }
   }
+
+  /// 削除候補か
+  isDeleteByNovel(SubscribedNovelEntity novel) {
+    return _deleteCandidates.contains(novel);
+  }
+
+  /// 削除候補に追加
+  putDelete(SubscribedNovelEntity novel, bool isDelete) {
+    if (isDelete) {
+      _deleteCandidates.add(novel);
+    } else {
+      _deleteCandidates.remove(novel);
+    }
+  }
+
+  /// 削除の確定
+  confirmDelete() async {
+    _deleteCandidates.forEach((novel) async {
+      await RepositoryFactory.shared
+          .getBookshelfRepository()
+          .delete([novel].toList());
+      print("index deleting...");
+      await RepositoryFactory.shared
+          .getEpisodeRepository()
+          .deleteByNovel(novel.novelHeader.identifier);
+      print("ep deleting...");
+      await RepositoryFactory.shared
+          .getTextRepository()
+          .deleteByNovel(novel.novelHeader.identifier);
+      print("txt deleting...");
+    });
+
+    refreshLists();
+  }
 }
 
 class _BookshelfState extends State<BookshelfPage> {
-  final BookshelfTab _tab;
-
   final _BookshelfViewModel _viewModel;
 
-  _BookshelfState(this._tab) : _viewModel = _BookshelfViewModel(_tab);
+  _BookshelfState(this._viewModel);
 
   @override
   void initState() {
@@ -74,16 +112,19 @@ class _BookshelfState extends State<BookshelfPage> {
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-        child: Scrollbar(
-            child: CustomScrollView(slivers: <Widget>[_buildNovelLists()])),
-        onRefresh: () {
-          return Future(() {
-            setState(() {
-              this._viewModel.refreshLists();
+    return Scaffold(
+      body: RefreshIndicator(
+          child: Scrollbar(
+              child: CustomScrollView(slivers: <Widget>[_buildNovelLists()])),
+          onRefresh: () {
+            return Future(() {
+              setState(() {
+                this._viewModel.refreshLists();
+              });
             });
-          });
-        });
+          }),
+      bottomNavigationBar: _buildConfirm(),
+    );
   }
 
   Widget _buildNovelLists() {
@@ -132,16 +173,21 @@ class _BookshelfState extends State<BookshelfPage> {
         }
 
         // データが存在する
-        SliverList novelLists = SliverList(
-            delegate: SliverChildListDelegate(
-                snapShot.data.map((novel) => _buildListTile(novel)).toList()));
+        List<Widget> widgets = [];
+
+        snapShot.data.asMap().forEach((index, novel) {
+          widgets.add(_buildListTile(index, novel));
+        });
+
+        SliverList novelLists =
+            SliverList(delegate: SliverChildListDelegate(widgets));
 
         return novelLists;
       },
     );
   }
 
-  Widget _buildListTile(SubscribedNovelEntity novel) {
+  Widget _buildListTile(int index, SubscribedNovelEntity novel) {
     return InkWell(
         onTap: () {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -167,49 +213,125 @@ class _BookshelfState extends State<BookshelfPage> {
             });
           });
         },
-        child: Container(
-            padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-            decoration: new BoxDecoration(
-                border: new Border(
-                    bottom: BorderSide(width: 0.5, color: Colors.black26))),
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  // タイトル
-                  Text(novel.novelHeader.novelName,
-                      maxLines: 1,
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                      overflow: TextOverflow.ellipsis),
-                  // 作者名
-                  Text(
-                    novel.novelHeader.writer,
-                    style: TextStyle(color: Colors.black87, fontSize: 12.0),
-                  ),
-                  Container(
-                    height: 4.0,
-                  ),
-                  Wrap(
-                    crossAxisAlignment: WrapCrossAlignment.center,
+        child: _buildNovelDetail(index, novel));
+  }
+
+  Widget _buildNovelDetail(int index, SubscribedNovelEntity novel) {
+    Widget novelDetailWidget;
+    if (_viewModel._deleteMode.value) {
+      novelDetailWidget = Container(
+          padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+          decoration: new BoxDecoration(
+              border: new Border(
+                  bottom: BorderSide(width: 0.5, color: Colors.black26))),
+          child: Row(
+            children: <Widget>[
+              Expanded(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
+                      // タイトル
+                      Text(novel.novelHeader.novelName,
+                          maxLines: 1,
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                          overflow: TextOverflow.ellipsis),
+                      // 作者名
+                      Text(
+                        novel.novelHeader.writer,
+                        style: TextStyle(color: Colors.black87, fontSize: 12.0),
+                      ),
+                      Container(
+                        height: 4.0,
+                      ),
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: <Widget>[
 //                      // 未読数
 //                      _buildUnreadChip(novel),
-                      // 完結済かどうか
-                      Text(
-                        novel.novelHeader.isComplete ? "完結済" : "連載中",
-                        style: TextStyle(color: Colors.black87, fontSize: 12.0),
-                      ),
-                      Container(width: 4.0),
-                      // 掲載話数
-                      Text(
-                        novel.episodeCount.toString() + "話",
-                        style: TextStyle(color: Colors.black87, fontSize: 12.0),
-                      ),
-                      _buildCircle(),
-                      // 更新日
-                      _buildLastUpdateLabel(novel),
-                    ],
-                  )
-                ])));
+                          // 完結済かどうか
+                          Text(
+                            novel.novelHeader.isComplete ? "完結済" : "連載中",
+                            style: TextStyle(
+                                color: Colors.black87, fontSize: 12.0),
+                          ),
+                          Container(width: 4.0),
+                          // 掲載話数
+                          Text(
+                            novel.episodeCount.toString() + "話",
+                            style: TextStyle(
+                                color: Colors.black87, fontSize: 12.0),
+                          ),
+                          _buildCircle(),
+                          // 更新日
+                          _buildLastUpdateLabel(novel),
+                        ],
+                      )
+                    ]),
+                flex: 9,
+              ),
+              Expanded(
+                flex: 1,
+                child: Checkbox(
+                  activeColor: sNMPrimaryColor,
+                  value: _viewModel.isDeleteByNovel(novel),
+                  onChanged: (value) {
+                    setState(() {
+                      _viewModel.putDelete(novel, value);
+                    });
+                  },
+                ),
+              )
+            ],
+          ));
+    } else {
+      novelDetailWidget = Container(
+          padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+          decoration: new BoxDecoration(
+              border: new Border(
+                  bottom: BorderSide(width: 0.5, color: Colors.black26))),
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                // タイトル
+                Text(novel.novelHeader.novelName,
+                    maxLines: 1,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis),
+                // 作者名
+                Text(
+                  novel.novelHeader.writer,
+                  style: TextStyle(color: Colors.black87, fontSize: 12.0),
+                ),
+                Container(
+                  height: 4.0,
+                ),
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: <Widget>[
+//                      // 未読数
+//                      _buildUnreadChip(novel),
+                    // 完結済かどうか
+                    Text(
+                      novel.novelHeader.isComplete ? "完結済" : "連載中",
+                      style: TextStyle(color: Colors.black87, fontSize: 12.0),
+                    ),
+                    Container(width: 4.0),
+                    // 掲載話数
+                    Text(
+                      novel.episodeCount.toString() + "話",
+                      style: TextStyle(color: Colors.black87, fontSize: 12.0),
+                    ),
+                    _buildCircle(),
+                    // 更新日
+                    _buildLastUpdateLabel(novel),
+                  ],
+                )
+              ]));
+    }
+    return AnimatedSwitcher(
+      child: novelDetailWidget,
+      duration: Duration(milliseconds: 500),
+    );
   }
 
   /// TODO: 対応
@@ -271,5 +393,32 @@ class _BookshelfState extends State<BookshelfPage> {
       formattedDate,
       style: TextStyle(color: Colors.black87, fontSize: 12.0),
     );
+  }
+
+  /// 小説削除の確定
+  Widget _buildConfirm() {
+    if (_viewModel._deleteMode.value) {
+      return Container(
+        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        decoration: new BoxDecoration(
+            border:
+                new Border(top: BorderSide(width: 0.5, color: Colors.black26))),
+        child: Wrap(alignment: WrapAlignment.center, children: <Widget>[
+          SizedBox(
+              width: 200,
+              child: RaisedButton(
+                  color: Colors.red,
+                  textColor: Colors.white,
+                  onPressed: () {
+                    setState(() {
+                      _viewModel.confirmDelete();
+                    });
+                  },
+                  child: Text("削除する")))
+        ]),
+      );
+    } else {
+      return SizedBox.fromSize(size: Size.zero);
+    }
   }
 }

@@ -23,7 +23,7 @@ class SearchResultPage extends StatefulWidget {
 
   @override
   State createState() {
-    return _SearchResulState(
+    return _SearchResultState(
         _SearchResultViewModel(_tab, _showingSite, _searchWord));
   }
 }
@@ -71,10 +71,10 @@ class _SearchResultViewModel {
   }
 }
 
-class _SearchResulState extends State<SearchResultPage> {
+class _SearchResultState extends State<SearchResultPage> {
   final _SearchResultViewModel _viewModel;
 
-  _SearchResulState(this._viewModel);
+  _SearchResultState(this._viewModel);
 
   @override
   void initState() {

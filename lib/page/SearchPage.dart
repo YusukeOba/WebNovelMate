@@ -29,7 +29,7 @@ class _SearchPageViewModel {
       RepositoryFactory.shared.getIndexRepository();
 
   /// 表示中のサイト種別
-  Site showingSite = AvailableSites.aozora;
+  Site showingSite = AvailableSites.narou;
 
   /// 入力中の文言
   String inputtedText = "";
