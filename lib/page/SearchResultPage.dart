@@ -69,6 +69,42 @@ class _SearchResultViewModel {
     await _repository.setDirtyIndex(this._showingSite);
     show();
   }
+
+  // 詳細ページの作成
+  Future<Widget> createDetailPage(NovelHeader novelHeader) async {
+    BookshelfRepository bkRepository =
+        RepositoryFactory.shared.getBookshelfRepository();
+
+    final novel = await bkRepository.find(novelHeader.identifier);
+
+    if (novel == null) {
+      // 登録していないので新規登録
+      await bkRepository.save([
+        SubscribedNovelEntity(
+            novelHeader,
+            DateTime.now().millisecondsSinceEpoch,
+            novelHeader.episodeCount,
+            novelHeader.episodeCount)
+      ]);
+    }
+
+    if (novelHeader.isShortStory) {
+      return TextPagerPage(
+          [
+            EpisodeEntity(
+                novelHeader.identifier,
+                "1",
+                DateTime.now().millisecondsSinceEpoch,
+                novelHeader.lastUpdatedAt,
+                novelHeader.novelName,
+                1,
+                novelHeader.novelName)
+          ].toList(),
+          0);
+    } else {
+      return EpisodeIndexPage(novelHeader);
+    }
+  }
 }
 
 class _SearchResultState extends State<SearchResultPage> {
@@ -231,31 +267,9 @@ class _SearchResultState extends State<SearchResultPage> {
   }
 
   _showDetailPage(NovelHeader novelHeader) async {
-    BookshelfRepository bkRepository =
-        RepositoryFactory.shared.getBookshelfRepository();
-
-    await bkRepository.save([
-      SubscribedNovelEntity(novelHeader, DateTime.now().millisecondsSinceEpoch,
-          novelHeader.episodeCount, novelHeader.episodeCount)
-    ]);
-
+    final widget = await _viewModel.createDetailPage(novelHeader);
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      if (novelHeader.isShortStory) {
-        return TextPagerPage(
-            [
-              EpisodeEntity(
-                  novelHeader.identifier,
-                  "1",
-                  DateTime.now().millisecondsSinceEpoch,
-                  novelHeader.lastUpdatedAt,
-                  novelHeader.novelName,
-                  1,
-                  novelHeader.novelName)
-            ].toList(),
-            0);
-      } else {
-        return EpisodeIndexPage(novelHeader);
-      }
+      return widget;
     }));
   }
 }

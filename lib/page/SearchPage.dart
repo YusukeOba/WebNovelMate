@@ -1,6 +1,5 @@
 import 'package:NovelMate/common/Sites.dart';
 import 'package:NovelMate/common/colors.dart';
-import 'package:NovelMate/common/datastore/CachedIndexDataStore.dart';
 import 'package:NovelMate/common/entities/domain/EpisodeEntity.dart';
 import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
 import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
@@ -69,6 +68,42 @@ class _SearchPageViewModel {
       });
       return entities;
     });
+  }
+
+  // 詳細ページの作成
+  Future<Widget> createDetailPage(NovelHeader novelHeader) async {
+    BookshelfRepository bkRepository =
+        RepositoryFactory.shared.getBookshelfRepository();
+
+    final novel = await bkRepository.find(novelHeader.identifier);
+
+    if (novel == null) {
+      // 登録していないので新規登録
+      await bkRepository.save([
+        SubscribedNovelEntity(
+            novelHeader,
+            DateTime.now().millisecondsSinceEpoch,
+            novelHeader.episodeCount,
+            novelHeader.episodeCount)
+      ]);
+    }
+
+    if (novelHeader.isShortStory) {
+      return TextPagerPage(
+          [
+            EpisodeEntity(
+                novelHeader.identifier,
+                "1",
+                DateTime.now().millisecondsSinceEpoch,
+                novelHeader.lastUpdatedAt,
+                novelHeader.novelName,
+                1,
+                novelHeader.novelName)
+          ].toList(),
+          0);
+    } else {
+      return EpisodeIndexPage(novelHeader);
+    }
   }
 }
 
@@ -220,31 +255,9 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
   }
 
   _showDetailPage(NovelHeader novelHeader) async {
-    BookshelfRepository bkRepository =
-        RepositoryFactory.shared.getBookshelfRepository();
-
-    await bkRepository.save([
-      SubscribedNovelEntity(novelHeader, DateTime.now().millisecondsSinceEpoch,
-          novelHeader.episodeCount, novelHeader.episodeCount)
-    ]);
-
+    Widget page = await _viewModel.createDetailPage(novelHeader);
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      if (novelHeader.isShortStory) {
-        return TextPagerPage(
-            [
-              EpisodeEntity(
-                  novelHeader.identifier,
-                  "1",
-                  DateTime.now().millisecondsSinceEpoch,
-                  novelHeader.lastUpdatedAt,
-                  novelHeader.novelName,
-                  1,
-                  novelHeader.novelName)
-            ].toList(),
-            0);
-      } else {
-        return EpisodeIndexPage(novelHeader);
-      }
+      return page;
     }));
   }
 }

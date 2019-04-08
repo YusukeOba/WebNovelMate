@@ -61,6 +61,7 @@ class _EpisodeIndexViewModel {
         .then((novel) {
       if (novel.readingEpisodeIdentifier != null) {
         print("reading episode is found.");
+        print("identifier = " + novel.readingEpisodeIdentifier);
         readingEpisodeIdentifier = novel.readingEpisodeIdentifier;
       } else {
         print("reading episode is not found.");
@@ -272,7 +273,7 @@ class _EpisodeIndexState extends State<EpisodeIndexPage> {
                         fullscreenDialog: true))
                 .then((_) {
               setState(() {
-                _viewModel.refreshReadingStatus();
+                _viewModel.readingEpisodeIdentifier = episode.episodeIdentifier;
               });
             });
           },
