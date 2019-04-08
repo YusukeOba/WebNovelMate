@@ -10,6 +10,7 @@ import 'package:NovelMate/common/repository/RepositoryFactory.dart';
 import 'package:NovelMate/page/EpisodeIndexPage.dart';
 import 'package:NovelMate/page/SearchResultTabPage.dart';
 import 'package:NovelMate/page/TextPagerPage.dart';
+import 'package:NovelMate/widget/GeneralError.dart';
 import 'package:flutter/material.dart';
 
 class SearchPage extends StatefulWidget {
@@ -206,9 +207,21 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
         future: this._viewModel.rankings,
         builder: (context, snapShot) {
           print("will shown!!");
-          if (!snapShot.hasData) {
-            print("nodata");
+          // 読み込み中
+          if (snapShot.connectionState == ConnectionState.active ||
+              snapShot.connectionState == ConnectionState.waiting ||
+              snapShot.connectionState == ConnectionState.none) {
             return Center(child: CircularProgressIndicator());
+          }
+
+          // エラー
+          if (snapShot.hasError || !snapShot.hasData) {
+            return GeneralError.networkError(() {
+              setState(() {
+                print("refresh");
+                this._viewModel.onRefresh();
+              });
+            });
           }
 
           print("hasData");

@@ -9,6 +9,7 @@ import 'package:NovelMate/common/repository/RepositoryFactory.dart';
 import 'package:NovelMate/page/EpisodeIndexPage.dart';
 import 'package:NovelMate/page/SearchResultTabPage.dart';
 import 'package:NovelMate/page/TextPagerPage.dart';
+import 'package:NovelMate/widget/GeneralError.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -43,10 +44,15 @@ class _SearchResultViewModel {
 
   _SearchResultViewModel(this._tab, this._showingSite, this._searchWord);
 
-  show() {
+  void show() {
+    _novels = _show();
+  }
+
+  Future<List<RankingEntity>> _show() {
     if (_tab == SearchResultTab.popular) {
-      _novels =
-          _repository.find(this._showingSite, this._searchWord).then((novels) {
+      return _repository
+          .find(this._showingSite, this._searchWord)
+          .then((novels) {
         // 人気順にソート
         novels.sort((lhs, rhs) {
           return rhs.popularity - lhs.popularity;
@@ -54,8 +60,9 @@ class _SearchResultViewModel {
         return novels;
       });
     } else {
-      _novels =
-          _repository.find(this._showingSite, this._searchWord).then((novels) {
+      return _repository
+          .find(this._showingSite, this._searchWord)
+          .then((novels) {
         // 更新日時順にソート
         novels.sort((lhs, rhs) {
           return rhs.novelHeader.lastUpdatedAt - lhs.novelHeader.lastUpdatedAt;
@@ -68,6 +75,12 @@ class _SearchResultViewModel {
   refresh() async {
     await _repository.setDirtyIndex(this._showingSite);
     show();
+  }
+
+  showFirst() {
+    _novels = _repository.setDirtyIndex(this._showingSite).then((_) {
+      return _show();
+    });
   }
 
   // 詳細ページの作成
@@ -114,10 +127,9 @@ class _SearchResultState extends State<SearchResultPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     setState(() {
-      _viewModel.show();
+      _viewModel.showFirst();
     });
   }
 
@@ -141,14 +153,29 @@ class _SearchResultState extends State<SearchResultPage> {
     return FutureBuilder<List<RankingEntity>>(
         future: _viewModel._novels,
         builder: (context, snapShot) {
-          // 読み込み中はダイアログ表示
-          if (!snapShot.hasData ||
+          print("snapShot = " + snapShot.toString());
+          // 読み込み中
+          if (snapShot.connectionState == ConnectionState.active ||
               snapShot.connectionState == ConnectionState.waiting ||
               snapShot.connectionState == ConnectionState.none) {
             return SliverList(
               delegate: SliverChildBuilderDelegate((context, index) {
                 return Center(
                     heightFactor: 2.0, child: CircularProgressIndicator());
+              }, childCount: 1),
+            );
+          }
+
+          // エラー
+          if (snapShot.hasError || !snapShot.hasData) {
+            return SliverList(
+              delegate: SliverChildBuilderDelegate((context, index) {
+                return GeneralError.networkError(() {
+                  setState(() {
+                    print("refresh");
+                    this._viewModel.refresh();
+                  });
+                });
               }, childCount: 1),
             );
           }

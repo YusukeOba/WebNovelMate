@@ -4,8 +4,9 @@ import 'package:NovelMate/common/colors.dart';
 import 'package:NovelMate/common/entities/domain/EpisodeEntity.dart';
 import 'package:NovelMate/common/repository/RepositoryFactory.dart';
 import 'package:NovelMate/common/repository/SettingRepository.dart';
-import 'package:NovelMate/page/TextSettingPage.dart';
 import 'package:NovelMate/page/TextPage.dart';
+import 'package:NovelMate/page/TextSettingPage.dart';
+import 'package:NovelMate/widget/Alert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -45,7 +46,7 @@ class _TextPagerViewModel {
   int _index;
 
   /// AppBar, BottomBarを出すかどうか
-  bool _shownOuterView = false;
+  bool _shownOuterView = true;
 
   PageController _pageController;
 
@@ -58,6 +59,8 @@ class _TextPagerViewModel {
   ValueNotifier<double> _sliderValueNotifier = ValueNotifier(0);
 
   bool _pageAnimating = false;
+
+  bool _blockTapGesture = true;
 
   /// 文字色
   ValueNotifier<TextStyle> _textStyle = ValueNotifier(TextStyle());
@@ -240,6 +243,12 @@ class _TextPagerViewModel {
     return repository.updateReadingEpisode(_currentEpisode.novelIdentifier,
         _currentEpisode.episodeIdentifier, _rawSliderOffset.toInt());
   }
+
+  /// 画面に戻る前にフルスクリーン状態を解除し、最後に読んだエピソードを保存する
+  willPop() async {
+    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+    await updateReadingEpisode();
+  }
 }
 
 class _TextPagerState extends State<TextPagerPage>
@@ -285,7 +294,8 @@ class _TextPagerState extends State<TextPagerPage>
                   top: _viewModel._shownOuterView ? kToolbarHeight : 0,
                   bottom: 0,
                   child: IgnorePointer(
-                      ignoring: _viewModel._pageAnimating,
+                      ignoring: _viewModel._pageAnimating ||
+                          _viewModel._blockTapGesture,
                       child: PageView.builder(
                           scrollDirection: Axis.vertical,
                           controller: _viewModel._pageController,
@@ -305,8 +315,7 @@ class _TextPagerState extends State<TextPagerPage>
             ]),
             bottomNavigationBar: _buildBottomBar()),
         onWillPop: () async {
-          SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
-          await _viewModel.updateReadingEpisode();
+          _viewModel.willPop();
           return Future.value(true);
         });
   }
@@ -383,49 +392,70 @@ class _TextPagerState extends State<TextPagerPage>
       builder: (context, snapShot) {
         Widget rowWidget;
         // 読み込み中
-        if (!snapShot.hasData ||
-            snapShot.connectionState == ConnectionState.active ||
+        if (snapShot.connectionState == ConnectionState.active ||
             snapShot.connectionState == ConnectionState.none ||
             snapShot.connectionState == ConnectionState.waiting) {
           rowWidget = Container(
               color: _viewModel._backgroundColor.value,
               child: Center(child: CircularProgressIndicator()));
+          _viewModel._blockTapGesture = true;
         } else {
-          rowWidget = TextPage(
-            _viewModel._currentEpisode.episodeName,
-            snapShot.data,
-            // toggle tap
-            () {
-              setState(() {
-                _viewModel.toggleOuterView();
-              });
-            },
-            // ScrollViewからの通知をSliderに反映
-            (min, currentOffset, max) {
-              setState(() {
-                _viewModel._sliderMin = min;
-                _viewModel._rawSliderOffset = currentOffset;
-                _viewModel._sliderMax = max;
-              });
-            },
-            // Sliderからの通知をScrollViewに反映
-            _viewModel._sliderValueNotifier,
-            _viewModel._firstScrollPosition,
-            _viewModel._backgroundColor,
-            _viewModel._textStyle,
-            nextActionCallback: () {
-              setState(() {
-                showNextPage();
-              });
-            },
-            prevActionCallback: () {
-              setState(() {
-                showPrevPage();
-              });
-            },
-            nextEpisodeName: _viewModel._nextEpisodeName,
-            prevEpisodeName: _viewModel._prevEpisodeName,
-          );
+          // エラー
+          if (snapShot.hasError || !snapShot.hasData) {
+            _viewModel._blockTapGesture = true;
+            Future.delayed(Duration(milliseconds: 10), () {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertUtils.networkError(context, () {
+                      _viewModel.willPop();
+                      Navigator.of(context).pop();
+                    });
+                  });
+            });
+            rowWidget = Container(
+                color: _viewModel._backgroundColor.value,
+                child: Center(child: CircularProgressIndicator()));
+            _viewModel._blockTapGesture = true;
+          } else {
+            // 正常系
+            _viewModel._blockTapGesture = false;
+            rowWidget = TextPage(
+              _viewModel._currentEpisode.episodeName,
+              snapShot.data,
+              // toggle tap
+              () {
+                setState(() {
+                  _viewModel.toggleOuterView();
+                });
+              },
+              // ScrollViewからの通知をSliderに反映
+              (min, currentOffset, max) {
+                setState(() {
+                  _viewModel._sliderMin = min;
+                  _viewModel._rawSliderOffset = currentOffset;
+                  _viewModel._sliderMax = max;
+                });
+              },
+              // Sliderからの通知をScrollViewに反映
+              _viewModel._sliderValueNotifier,
+              _viewModel._firstScrollPosition,
+              _viewModel._backgroundColor,
+              _viewModel._textStyle,
+              nextActionCallback: () {
+                setState(() {
+                  showNextPage();
+                });
+              },
+              prevActionCallback: () {
+                setState(() {
+                  showPrevPage();
+                });
+              },
+              nextEpisodeName: _viewModel._nextEpisodeName,
+              prevEpisodeName: _viewModel._prevEpisodeName,
+            );
+          }
         }
 
         // ちらつきを抑えるためクロスフェードで読み込み,実際のテキスト表示を切り替える

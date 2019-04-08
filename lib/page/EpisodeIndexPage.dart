@@ -3,6 +3,7 @@ import 'package:NovelMate/common/entities/domain/EpisodeEntity.dart';
 import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
 import 'package:NovelMate/common/repository/RepositoryFactory.dart';
 import 'package:NovelMate/page/TextPagerPage.dart';
+import 'package:NovelMate/widget/GeneralError.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -182,8 +183,7 @@ class _EpisodeIndexState extends State<EpisodeIndexPage> {
         future: _viewModel._episodes,
         builder: (context, snapShot) {
           // 読み込み中
-          if (!snapShot.hasData ||
-              snapShot.connectionState == ConnectionState.active ||
+          if (snapShot.connectionState == ConnectionState.active ||
               snapShot.connectionState == ConnectionState.none ||
               snapShot.connectionState == ConnectionState.waiting) {
             return Scaffold(
@@ -200,6 +200,34 @@ class _EpisodeIndexState extends State<EpisodeIndexPage> {
                   _buildStory(),
                   Container(height: 8.0),
                   Container(child: Center(child: CircularProgressIndicator()))
+                ])),
+              ])),
+            );
+          }
+
+          // エラー
+          if (snapShot.hasError || !snapShot.hasData) {
+            print("hasError");
+            return Scaffold(
+              appBar: AppBar(
+                title: Text(_viewModel._appBarTitle),
+              ),
+              body: Scrollbar(
+                  child: CustomScrollView(slivers: <Widget>[
+                SliverList(
+                    delegate: SliverChildListDelegate([
+                  Container(height: 16.0),
+                  _buildWriter(),
+                  Divider(),
+                  _buildStory(),
+                  Container(height: 8.0),
+                  GeneralError.networkError(() {
+                    setState(() {
+                      print("refresh");
+                      this._viewModel.showEpisodes();
+                      this._viewModel.showReadingContinue();
+                    });
+                  })
                 ])),
               ])),
             );
