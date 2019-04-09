@@ -36,7 +36,8 @@ void main() {
           true,
           DateTime.now().millisecondsSinceEpoch,
           100,
-          100));
+          100,
+          false));
 
   setUp(() {
     _cache = MockCachedDataStore();
@@ -51,61 +52,56 @@ void main() {
         return Future.value([dummyNovel]);
       });
 
-      when(_cache.hasCache()).thenAnswer((invocation) {
+      when(_cache.hasCache(CacheType.ranking)).thenAnswer((invocation) {
         return Future.value(false);
       });
 
-      await _subject.fetchLatest(dummySite).then((novels) {
+      await _subject.fetchRanking(dummySite).then((novels) {
         expect(novels.length, 1);
       });
     });
 
     test("キャッシュが有る時はキャッシュデータを返却する", () async {
-      when(_cache.fetchAll()).thenAnswer((_) {
+      when(_cache.fetchAll(CacheType.ranking)).thenAnswer((_) {
         return Future.value([dummyNovel]);
       });
 
-      when(_cache.hasCache()).thenAnswer((_) {
+      when(_cache.hasCache(CacheType.ranking)).thenAnswer((_) {
         return Future.value(true);
       });
 
-      await _subject.fetchLatest(dummySite);
+      await _subject.fetchRanking(dummySite);
     });
 
     group("fetchWithConditions", () {
       test("指定件数での取得ができること(Cache)", () async {
         // キャッシュは常にあるものとしておく
-        when(_cache.hasCache()).thenAnswer((_) {
+        when(_cache.hasCache(CacheType.search)).thenAnswer((_) {
           return Future.value(true);
         });
 
-        when(_cache.fetchAll()).thenAnswer((_) {
+        when(_cache.fetchAll(CacheType.search)).thenAnswer((_) {
           return Future.value(List<int>.generate(100, (i) => i).map((_) {
             return dummyNovel;
           }).toList());
         });
 
-        await _subject.find(dummySite, 0, 50, "").then((novels) {
-          expect(novels.length, 50);
-        });
-
-        await _subject.find(dummySite, 0, 0, "").then((novels) {
-          expect(novels, isNotNull);
-          expect(novels.length, 0);
+        await _subject.find(dummySite, "").then((novels) {
+          expect(novels.length, 100);
         });
       });
 
       test("検索結果が空でも落ちないこと(Cache)", () async {
         // キャッシュは常にあるものとしておく
-        when(_cache.hasCache()).thenAnswer((_) {
+        when(_cache.hasCache(CacheType.search)).thenAnswer((_) {
           return Future.value(true);
         });
 
-        when(_cache.fetchAll()).thenAnswer((_) {
+        when(_cache.fetchAll(CacheType.search)).thenAnswer((_) {
           return Future.value([]);
         });
 
-        await _subject.find(dummySite, 0, 0, "").then((novels) {
+        await _subject.find(dummySite, "").then((novels) {
           expect(novels, isNotNull);
           expect(novels.length, 0);
         });
@@ -113,39 +109,33 @@ void main() {
 
       test("指定件数での取得ができること(Network)", () async {
         // キャッシュは常にないものとしておく
-        when(_cache.hasCache()).thenAnswer((_) {
+        when(_cache.hasCache(CacheType.search)).thenAnswer((_) {
           return Future.value(false);
         });
 
-        when(_remote.fetchRanking(any, any, title: anyNamed("title")))
-            .thenAnswer((_) {
+        when(_remote.fetchIndex("")).thenAnswer((_) {
           return Future.value(List<int>.generate(100, (i) => i).map((_) {
             return dummyNovel;
           }).toList());
         });
 
-        await _subject.find(dummySite, 0, 50, "").then((novels) {
-          expect(novels.length, 50);
-        });
-
-        await _subject.find(dummySite, 0, 0, "").then((novels) {
+        await _subject.find(dummySite, "").then((novels) {
           expect(novels, isNotNull);
-          expect(novels.length, 0);
+          expect(novels.length, 100);
         });
       });
 
       test("検索結果が空でも落ちないこと(Network)", () async {
         // キャッシュは常にないものとしておく
-        when(_cache.hasCache()).thenAnswer((_) {
+        when(_cache.hasCache(CacheType.search)).thenAnswer((_) {
           return Future.value(false);
         });
 
-        when(_remote.fetchRanking(any, any, title: anyNamed("title")))
-            .thenAnswer((_) {
+        when(_remote.fetchIndex("")).thenAnswer((_) {
           return Future.value([]);
         });
 
-        await _subject.find(dummySite, 0, 0, "").then((novels) {
+        await _subject.find(dummySite, "").then((novels) {
           expect(novels, isNotNull);
           expect(novels.length, 0);
         });
