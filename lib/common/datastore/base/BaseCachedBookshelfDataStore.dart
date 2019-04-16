@@ -19,7 +19,6 @@ abstract class BaseCachedBookshelfDataStore extends CachedBookshelfDataStore {
         .get()
         .then((novels) {
       return Future.value(novels.map((novel) {
-        print("novel data = " + novel.toString());
         return SubscribedNovelEntity(
             NovelHeader(
                 NovelIdentifier(sourceSite, novel.siteOfIdentifier),

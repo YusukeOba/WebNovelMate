@@ -87,7 +87,7 @@ class BookshelfRepositoryImpl extends BookshelfRepository {
 
   @override
   Future<void> updateAll() async {
-    print("update All!!!");
+    print("update All!");
 
     /// 自分のキャッシュを読み出す
     return findAll().then((novels) {

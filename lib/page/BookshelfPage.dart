@@ -62,6 +62,15 @@ class _BookshelfViewModel {
     }
   }
 
+  /// 小説の更新
+  Future<void> updateAfterRefresh() async {
+    return Future(() async {
+      await _repository.updateAll();
+      this.refreshLists();
+      return;
+    });
+  }
+
   /// 削除候補か
   isDeleteByNovel(SubscribedNovelEntity novel) {
     return _deleteCandidates.contains(novel);
@@ -119,7 +128,7 @@ class _BookshelfState extends State<BookshelfPage> {
           onRefresh: () {
             return Future(() {
               setState(() {
-                this._viewModel.refreshLists();
+                this._viewModel.updateAfterRefresh();
               });
             });
           }),

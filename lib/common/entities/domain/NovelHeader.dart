@@ -31,13 +31,20 @@ class NovelHeader {
   /// 短編かどうか
   final bool isShortStory;
 
-  NovelHeader(this.identifier, this.novelName, this.novelStory, this.writer,
-      this.isComplete, this.lastUpdatedAt, this.textLength, this.episodeCount,
+  NovelHeader(
+      this.identifier,
+      this.novelName,
+      this.novelStory,
+      this.writer,
+      this.isComplete,
+      this.lastUpdatedAt,
+      this.textLength,
+      this.episodeCount,
       this.isShortStory);
 
   @override
   String toString() {
-    return 'NovelHeader{identifier: $identifier, novelName: $novelName, novelStory: $novelStory, writer: $writer, isComplete: $isComplete, lastUpdatedAt: $lastUpdatedAt, textLength: $textLength}';
+    return 'NovelHeader{identifier: $identifier, novelName: $novelName, writer: $writer, isComplete: $isComplete, lastUpdatedAt: $lastUpdatedAt, textLength: $textLength, episodeCount: $episodeCount, isShortStory: $isShortStory}';
   }
 }
 

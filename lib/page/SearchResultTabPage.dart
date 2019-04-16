@@ -1,19 +1,7 @@
 import 'package:NovelMate/common/Sites.dart';
-import 'package:NovelMate/common/colors.dart';
-import 'package:NovelMate/common/entities/domain/EpisodeEntity.dart';
-import 'package:NovelMate/common/entities/domain/NovelHeader.dart';
-import 'package:NovelMate/common/entities/domain/RankingEntity.dart';
-import 'package:NovelMate/common/entities/domain/SubscribedNovelEntity.dart';
-import 'package:NovelMate/common/repository/BookshelfRepository.dart';
-import 'package:NovelMate/common/repository/IndexRepository.dart';
-import 'package:NovelMate/common/repository/RepositoryFactory.dart';
-import 'package:NovelMate/page/EpisodeIndexPage.dart';
 import 'package:NovelMate/page/SearchResultPage.dart';
-import 'package:NovelMate/page/TextPagerPage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:intl/intl.dart';
 
 class SearchResultTabPage extends StatefulWidget {
   /// 検索サイト

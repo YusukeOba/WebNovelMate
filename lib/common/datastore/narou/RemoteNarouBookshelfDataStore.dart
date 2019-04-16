@@ -32,10 +32,12 @@ class RemoteNarouBookshelfDataStore extends RemoteBookshelfDataStore {
         0.toString() +
         "&lim=" +
         novels.length.toString() +
-        "&word=" +
+        "&ncode=" +
         nCodesString +
         "&gzip=5" +
         "&order=hyoka";
+
+    print("request url = " + requestUrl);
 
     // HTTPリクエスト -> JSONをModelにマップ
     Future<List<NarouNovelListEntity>> mappedEntities =
@@ -52,12 +54,15 @@ class RemoteNarouBookshelfDataStore extends RemoteBookshelfDataStore {
     Future<List<SubscribedNovelEntity>> updatedNovels =
         mappedEntities.then((entities) {
       entities.forEach((remoteNovel) {
+        print("start novel update.");
+
         // 最新データのnCodeで引っ掛ける
         final cachedNovel = updateTargetNovels[remoteNovel.ncode];
 
         // 最新データにキャッシュ中の小説が見つからない
         // = その小説がダイジェスト化などで消されている
         if (cachedNovel == null) {
+          print("Remote novel is deleted.");
           return; // あえて何もしない
         }
 
@@ -76,6 +81,10 @@ class RemoteNarouBookshelfDataStore extends RemoteBookshelfDataStore {
 
         // 話数がダイジェスト化等により減った場合は未読数がマイナスになるので、そのときは0にしておく
         final correctUnreadCount = newUnreadCount < 0 ? 0 : newUnreadCount;
+
+        print("cacheEpisodeCount:" + cachedEpisodeCount.toString());
+        print("remoteEpisodeCount:" + remoteEpisodeCount.toString());
+        print("diffEpisodeCount: " + diffEpisodeCount.toString());
 
         // 最新情報をマッピングした小説情報を作成する
         updateTargetNovels[remoteNovel.ncode] = SubscribedNovelEntity(
