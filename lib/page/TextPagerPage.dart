@@ -311,7 +311,7 @@ class _TextPagerState extends State<TextPagerPage>
                 right: 0.0,
                 child: _buildAppBar(),
                 /*You can't put null in the above line since Stack won't allow that*/
-              )
+              ),
             ]),
             bottomNavigationBar: _buildBottomBar()),
         onWillPop: () async {
@@ -322,68 +322,54 @@ class _TextPagerState extends State<TextPagerPage>
 
   Widget _buildAppBar() {
     Widget appbar;
-    if (_viewModel._shownOuterView) {
-      appbar = AppBar(
-        title: IconButton(
-            icon: Image.asset("images/font_sizing.png",
-                width: 28, height: 28, color: Colors.white),
-            onPressed: () {
-              _showSetting();
-            }),
-        centerTitle: false,
-      );
-    } else {
-      appbar = SizedBox(height: 0);
-    }
-
-    return AnimatedSize(
-      vsync: this,
-      duration: Duration(milliseconds: 200),
-      child: appbar,
-      curve: Curves.ease,
+    Widget emptyBar;
+    appbar = AppBar(
+      title: IconButton(
+          icon: Image.asset("images/font_sizing.png",
+              width: 28, height: 28, color: Colors.white),
+          onPressed: () {
+            _showSetting();
+          }),
+      centerTitle: false,
     );
+    emptyBar = SizedBox(height: 0);
+
+    return _viewModel._shownOuterView ? appbar : emptyBar;
   }
 
   Widget _buildBottomBar() {
     Widget bottomBar;
-    if (_viewModel._shownOuterView) {
-      bottomBar = SafeArea(
-          child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              decoration: new BoxDecoration(
-                  border: new Border(
-                      top: BorderSide(width: 0.5, color: Colors.black26))),
-              child: Wrap(
-                children: <Widget>[
-                  Column(
-                    children: <Widget>[
-                      Text(_viewModel._currentEpisode.episodeName,
-                          style: TextStyle(fontSize: 11.0)),
-                      Slider(
-                          inactiveColor: sNMAccentColor,
-                          activeColor: sNMPrimaryColor,
-                          value: _viewModel.sliderOffset,
-                          min: _viewModel._sliderMin,
-                          max: _viewModel._sliderMax,
-                          onChanged: (value) {
-                            setState(() {
-                              _viewModel._sliderValueNotifier.value = value;
-                            });
-                          })
-                    ],
-                  )
-                ],
-              )));
-    } else {
-      bottomBar = SizedBox(height: 0);
-    }
+    Widget emptyBar;
+    bottomBar = SafeArea(
+        child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            decoration: new BoxDecoration(
+                border: new Border(
+                    top: BorderSide(width: 0.5, color: Colors.black26))),
+            child: Wrap(
+              children: <Widget>[
+                Column(
+                  children: <Widget>[
+                    Text(_viewModel._currentEpisode.episodeName,
+                        style: TextStyle(fontSize: 11.0)),
+                    Slider(
+                        inactiveColor: sNMAccentColor,
+                        activeColor: sNMPrimaryColor,
+                        value: _viewModel.sliderOffset,
+                        min: _viewModel._sliderMin,
+                        max: _viewModel._sliderMax,
+                        onChanged: (value) {
+                          setState(() {
+                            _viewModel._sliderValueNotifier.value = value;
+                          });
+                        })
+                  ],
+                )
+              ],
+            )));
+    emptyBar = SizedBox(height: 0);
 
-    return AnimatedSize(
-      vsync: this,
-      duration: Duration(milliseconds: 200),
-      child: bottomBar,
-      curve: Curves.ease,
-    );
+    return _viewModel._shownOuterView ? bottomBar : emptyBar;
   }
 
   Widget _buildTexts() {
