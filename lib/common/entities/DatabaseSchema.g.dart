@@ -6,6 +6,7 @@ part of 'DatabaseSchema.dart';
 // MoorGenerator
 // **************************************************************************
 
+// ignore_for_file: unnecessary_brace_in_string_interps
 class CachedSubscribedNovelEntityData {
   final String siteIdentifier;
   final String siteOfIdentifier;
@@ -37,29 +38,41 @@ class CachedSubscribedNovelEntityData {
       this.readingEpisodeProgress,
       this.isShortStory});
   factory CachedSubscribedNovelEntityData.fromData(
-      Map<String, dynamic> data, GeneratedDatabase db) {
+      Map<String, dynamic> data, GeneratedDatabase db,
+      {String prefix}) {
+    final effectivePrefix = prefix ?? '';
     final stringType = db.typeSystem.forDartType<String>();
     final intType = db.typeSystem.forDartType<int>();
     final boolType = db.typeSystem.forDartType<bool>();
     return CachedSubscribedNovelEntityData(
-      siteIdentifier:
-          stringType.mapFromDatabaseResponse(data['site_identifier']),
-      siteOfIdentifier:
-          stringType.mapFromDatabaseResponse(data['site_of_identifier']),
-      novelName: stringType.mapFromDatabaseResponse(data['novel_name']),
-      novelStory: stringType.mapFromDatabaseResponse(data['novel_story']),
-      writer: stringType.mapFromDatabaseResponse(data['writer']),
-      unreadCount: intType.mapFromDatabaseResponse(data['unread_count']),
-      isComplete: boolType.mapFromDatabaseResponse(data['is_complete']),
-      lastUpdatedAt: intType.mapFromDatabaseResponse(data['last_updated_at']),
-      textLength: intType.mapFromDatabaseResponse(data['text_length']),
-      episodeCount: intType.mapFromDatabaseResponse(data['episode_count']),
-      lastReadAt: intType.mapFromDatabaseResponse(data['last_read_at']),
-      readingEpisodeIdentifier: stringType
-          .mapFromDatabaseResponse(data['reading_episode_identifier']),
-      readingEpisodeProgress:
-          intType.mapFromDatabaseResponse(data['reading_episode_progress']),
-      isShortStory: boolType.mapFromDatabaseResponse(data['is_short_story']),
+      siteIdentifier: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}site_identifier']),
+      siteOfIdentifier: stringType.mapFromDatabaseResponse(
+          data['${effectivePrefix}site_of_identifier']),
+      novelName: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}novel_name']),
+      novelStory: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}novel_story']),
+      writer:
+          stringType.mapFromDatabaseResponse(data['${effectivePrefix}writer']),
+      unreadCount: intType
+          .mapFromDatabaseResponse(data['${effectivePrefix}unread_count']),
+      isComplete: boolType
+          .mapFromDatabaseResponse(data['${effectivePrefix}is_complete']),
+      lastUpdatedAt: intType
+          .mapFromDatabaseResponse(data['${effectivePrefix}last_updated_at']),
+      textLength: intType
+          .mapFromDatabaseResponse(data['${effectivePrefix}text_length']),
+      episodeCount: intType
+          .mapFromDatabaseResponse(data['${effectivePrefix}episode_count']),
+      lastReadAt: intType
+          .mapFromDatabaseResponse(data['${effectivePrefix}last_read_at']),
+      readingEpisodeIdentifier: stringType.mapFromDatabaseResponse(
+          data['${effectivePrefix}reading_episode_identifier']),
+      readingEpisodeProgress: intType.mapFromDatabaseResponse(
+          data['${effectivePrefix}reading_episode_progress']),
+      isShortStory: boolType
+          .mapFromDatabaseResponse(data['${effectivePrefix}is_short_story']),
     );
   }
   factory CachedSubscribedNovelEntityData.fromJson(Map<String, dynamic> json) {
@@ -154,30 +167,37 @@ class CachedSubscribedNovelEntityData {
   }
 
   @override
-  int get hashCode =>
-      (((((((((((((siteIdentifier.hashCode) * 31 + siteOfIdentifier.hashCode) * 31 + novelName.hashCode) * 31 + novelStory.hashCode) * 31 +
-                                                                              writer
-                                                                                  .hashCode) *
-                                                                          31 +
-                                                                      unreadCount
-                                                                          .hashCode) *
-                                                                  31 +
-                                                              isComplete
-                                                                  .hashCode) *
-                                                          31 +
-                                                      lastUpdatedAt.hashCode) *
-                                                  31 +
-                                              textLength.hashCode) *
-                                          31 +
-                                      episodeCount.hashCode) *
-                                  31 +
-                              lastReadAt.hashCode) *
-                          31 +
-                      readingEpisodeIdentifier.hashCode) *
-                  31 +
-              readingEpisodeProgress.hashCode) *
-          31 +
-      isShortStory.hashCode;
+  int get hashCode => $mrjf($mrjc(
+      $mrjc(
+          $mrjc(
+              $mrjc(
+                  $mrjc(
+                      $mrjc(
+                          $mrjc(
+                              $mrjc(
+                                  $mrjc(
+                                      $mrjc(
+                                          $mrjc(
+                                              $mrjc(
+                                                  $mrjc(
+                                                      $mrjc(
+                                                          0,
+                                                          siteIdentifier
+                                                              .hashCode),
+                                                      siteOfIdentifier
+                                                          .hashCode),
+                                                  novelName.hashCode),
+                                              novelStory.hashCode),
+                                          writer.hashCode),
+                                      unreadCount.hashCode),
+                                  isComplete.hashCode),
+                              lastUpdatedAt.hashCode),
+                          textLength.hashCode),
+                      episodeCount.hashCode),
+                  lastReadAt.hashCode),
+              readingEpisodeIdentifier.hashCode),
+          readingEpisodeProgress.hashCode),
+      isShortStory.hashCode));
   @override
   bool operator ==(other) =>
       identical(this, other) ||
@@ -199,99 +219,202 @@ class CachedSubscribedNovelEntityData {
 }
 
 class $CachedSubscribedNovelEntityTable extends CachedSubscribedNovelEntity
-    implements
-        TableInfo<CachedSubscribedNovelEntity,
+    with
+        TableInfo<$CachedSubscribedNovelEntityTable,
             CachedSubscribedNovelEntityData> {
   final GeneratedDatabase _db;
-  $CachedSubscribedNovelEntityTable(this._db);
+  final String _alias;
+  $CachedSubscribedNovelEntityTable(this._db, [this._alias]);
   GeneratedTextColumn _siteIdentifier;
   @override
   GeneratedTextColumn get siteIdentifier =>
-      _siteIdentifier ??= GeneratedTextColumn(
-        'site_identifier',
-        false,
-      );
+      _siteIdentifier ??= _constructSiteIdentifier();
+  GeneratedTextColumn _constructSiteIdentifier() {
+    var cName = 'site_identifier';
+    if (_alias != null) cName = '$_alias.$cName';
+    return GeneratedTextColumn(
+      'site_identifier',
+      $tableName,
+      false,
+    );
+  }
+
   GeneratedTextColumn _siteOfIdentifier;
   @override
   GeneratedTextColumn get siteOfIdentifier =>
-      _siteOfIdentifier ??= GeneratedTextColumn(
-        'site_of_identifier',
-        false,
-      );
+      _siteOfIdentifier ??= _constructSiteOfIdentifier();
+  GeneratedTextColumn _constructSiteOfIdentifier() {
+    var cName = 'site_of_identifier';
+    if (_alias != null) cName = '$_alias.$cName';
+    return GeneratedTextColumn(
+      'site_of_identifier',
+      $tableName,
+      false,
+    );
+  }
+
   GeneratedTextColumn _novelName;
   @override
-  GeneratedTextColumn get novelName => _novelName ??= GeneratedTextColumn(
-        'novel_name',
-        false,
-      );
+  GeneratedTextColumn get novelName => _novelName ??= _constructNovelName();
+  GeneratedTextColumn _constructNovelName() {
+    var cName = 'novel_name';
+    if (_alias != null) cName = '$_alias.$cName';
+    return GeneratedTextColumn(
+      'novel_name',
+      $tableName,
+      false,
+    );
+  }
+
   GeneratedTextColumn _novelStory;
   @override
-  GeneratedTextColumn get novelStory => _novelStory ??= GeneratedTextColumn(
-        'novel_story',
-        false,
-      );
+  GeneratedTextColumn get novelStory => _novelStory ??= _constructNovelStory();
+  GeneratedTextColumn _constructNovelStory() {
+    var cName = 'novel_story';
+    if (_alias != null) cName = '$_alias.$cName';
+    return GeneratedTextColumn(
+      'novel_story',
+      $tableName,
+      false,
+    );
+  }
+
   GeneratedTextColumn _writer;
   @override
-  GeneratedTextColumn get writer => _writer ??= GeneratedTextColumn(
-        'writer',
-        false,
-      );
+  GeneratedTextColumn get writer => _writer ??= _constructWriter();
+  GeneratedTextColumn _constructWriter() {
+    var cName = 'writer';
+    if (_alias != null) cName = '$_alias.$cName';
+    return GeneratedTextColumn(
+      'writer',
+      $tableName,
+      false,
+    );
+  }
+
   GeneratedIntColumn _unreadCount;
   @override
-  GeneratedIntColumn get unreadCount => _unreadCount ??= GeneratedIntColumn(
-        'unread_count',
-        false,
-      );
+  GeneratedIntColumn get unreadCount =>
+      _unreadCount ??= _constructUnreadCount();
+  GeneratedIntColumn _constructUnreadCount() {
+    var cName = 'unread_count';
+    if (_alias != null) cName = '$_alias.$cName';
+    return GeneratedIntColumn(
+      'unread_count',
+      $tableName,
+      false,
+    );
+  }
+
   GeneratedBoolColumn _isComplete;
   @override
-  GeneratedBoolColumn get isComplete => _isComplete ??= GeneratedBoolColumn(
-        'is_complete',
-        false,
-      );
+  GeneratedBoolColumn get isComplete => _isComplete ??= _constructIsComplete();
+  GeneratedBoolColumn _constructIsComplete() {
+    var cName = 'is_complete';
+    if (_alias != null) cName = '$_alias.$cName';
+    return GeneratedBoolColumn(
+      'is_complete',
+      $tableName,
+      false,
+    );
+  }
+
   GeneratedIntColumn _lastUpdatedAt;
   @override
-  GeneratedIntColumn get lastUpdatedAt => _lastUpdatedAt ??= GeneratedIntColumn(
-        'last_updated_at',
-        true,
-      );
+  GeneratedIntColumn get lastUpdatedAt =>
+      _lastUpdatedAt ??= _constructLastUpdatedAt();
+  GeneratedIntColumn _constructLastUpdatedAt() {
+    var cName = 'last_updated_at';
+    if (_alias != null) cName = '$_alias.$cName';
+    return GeneratedIntColumn(
+      'last_updated_at',
+      $tableName,
+      true,
+    );
+  }
+
   GeneratedIntColumn _textLength;
   @override
-  GeneratedIntColumn get textLength => _textLength ??= GeneratedIntColumn(
-        'text_length',
-        false,
-      );
+  GeneratedIntColumn get textLength => _textLength ??= _constructTextLength();
+  GeneratedIntColumn _constructTextLength() {
+    var cName = 'text_length';
+    if (_alias != null) cName = '$_alias.$cName';
+    return GeneratedIntColumn(
+      'text_length',
+      $tableName,
+      false,
+    );
+  }
+
   GeneratedIntColumn _episodeCount;
   @override
-  GeneratedIntColumn get episodeCount => _episodeCount ??= GeneratedIntColumn(
-        'episode_count',
-        false,
-      );
+  GeneratedIntColumn get episodeCount =>
+      _episodeCount ??= _constructEpisodeCount();
+  GeneratedIntColumn _constructEpisodeCount() {
+    var cName = 'episode_count';
+    if (_alias != null) cName = '$_alias.$cName';
+    return GeneratedIntColumn(
+      'episode_count',
+      $tableName,
+      false,
+    );
+  }
+
   GeneratedIntColumn _lastReadAt;
   @override
-  GeneratedIntColumn get lastReadAt => _lastReadAt ??= GeneratedIntColumn(
-        'last_read_at',
-        false,
-      );
+  GeneratedIntColumn get lastReadAt => _lastReadAt ??= _constructLastReadAt();
+  GeneratedIntColumn _constructLastReadAt() {
+    var cName = 'last_read_at';
+    if (_alias != null) cName = '$_alias.$cName';
+    return GeneratedIntColumn(
+      'last_read_at',
+      $tableName,
+      false,
+    );
+  }
+
   GeneratedTextColumn _readingEpisodeIdentifier;
   @override
   GeneratedTextColumn get readingEpisodeIdentifier =>
-      _readingEpisodeIdentifier ??= GeneratedTextColumn(
-        'reading_episode_identifier',
-        true,
-      );
+      _readingEpisodeIdentifier ??= _constructReadingEpisodeIdentifier();
+  GeneratedTextColumn _constructReadingEpisodeIdentifier() {
+    var cName = 'reading_episode_identifier';
+    if (_alias != null) cName = '$_alias.$cName';
+    return GeneratedTextColumn(
+      'reading_episode_identifier',
+      $tableName,
+      true,
+    );
+  }
+
   GeneratedIntColumn _readingEpisodeProgress;
   @override
   GeneratedIntColumn get readingEpisodeProgress =>
-      _readingEpisodeProgress ??= GeneratedIntColumn(
-        'reading_episode_progress',
-        true,
-      );
+      _readingEpisodeProgress ??= _constructReadingEpisodeProgress();
+  GeneratedIntColumn _constructReadingEpisodeProgress() {
+    var cName = 'reading_episode_progress';
+    if (_alias != null) cName = '$_alias.$cName';
+    return GeneratedIntColumn(
+      'reading_episode_progress',
+      $tableName,
+      true,
+    );
+  }
+
   GeneratedBoolColumn _isShortStory;
   @override
-  GeneratedBoolColumn get isShortStory => _isShortStory ??= GeneratedBoolColumn(
-        'is_short_story',
-        false,
-      );
+  GeneratedBoolColumn get isShortStory =>
+      _isShortStory ??= _constructIsShortStory();
+  GeneratedBoolColumn _constructIsShortStory() {
+    var cName = 'is_short_story';
+    if (_alias != null) cName = '$_alias.$cName';
+    return GeneratedBoolColumn(
+      'is_short_story',
+      $tableName,
+      false,
+    );
+  }
+
   @override
   List<GeneratedColumn> get $columns => [
         siteIdentifier,
@@ -310,9 +433,11 @@ class $CachedSubscribedNovelEntityTable extends CachedSubscribedNovelEntity
         isShortStory
       ];
   @override
-  CachedSubscribedNovelEntity get asDslTable => this;
+  $CachedSubscribedNovelEntityTable get asDslTable => this;
   @override
-  String get $tableName => 'cached_subscribed_novel_entity';
+  String get $tableName => _alias ?? 'cached_subscribed_novel_entity';
+  @override
+  final String actualTableName = 'cached_subscribed_novel_entity';
   @override
   bool validateIntegrity(
           CachedSubscribedNovelEntityData instance, bool isInserting) =>
@@ -336,8 +461,11 @@ class $CachedSubscribedNovelEntityTable extends CachedSubscribedNovelEntity
   @override
   Set<GeneratedColumn> get $primaryKey => {siteIdentifier, siteOfIdentifier};
   @override
-  CachedSubscribedNovelEntityData map(Map<String, dynamic> data) {
-    return CachedSubscribedNovelEntityData.fromData(data, _db);
+  CachedSubscribedNovelEntityData map(Map<String, dynamic> data,
+      {String tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : null;
+    return CachedSubscribedNovelEntityData.fromData(data, _db,
+        prefix: effectivePrefix);
   }
 
   @override
@@ -391,6 +519,11 @@ class $CachedSubscribedNovelEntityTable extends CachedSubscribedNovelEntity
     }
     return map;
   }
+
+  @override
+  $CachedSubscribedNovelEntityTable createAlias(String alias) {
+    return $CachedSubscribedNovelEntityTable(_db, alias);
+  }
 }
 
 class CachedEpisodeEntityData {
@@ -412,22 +545,28 @@ class CachedEpisodeEntityData {
       this.displayOrder,
       this.episodeName});
   factory CachedEpisodeEntityData.fromData(
-      Map<String, dynamic> data, GeneratedDatabase db) {
+      Map<String, dynamic> data, GeneratedDatabase db,
+      {String prefix}) {
+    final effectivePrefix = prefix ?? '';
     final stringType = db.typeSystem.forDartType<String>();
     final intType = db.typeSystem.forDartType<int>();
     return CachedEpisodeEntityData(
-      siteIdentifier:
-          stringType.mapFromDatabaseResponse(data['site_identifier']),
-      siteOfIdentifier:
-          stringType.mapFromDatabaseResponse(data['site_of_identifier']),
-      episodeIdentifier:
-          stringType.mapFromDatabaseResponse(data['episode_identifier']),
-      firstWriteAt: intType.mapFromDatabaseResponse(data['first_write_at']),
-      lastUpdateAt: intType.mapFromDatabaseResponse(data['last_update_at']),
-      nullableChapterName:
-          stringType.mapFromDatabaseResponse(data['nullable_chapter_name']),
-      displayOrder: intType.mapFromDatabaseResponse(data['display_order']),
-      episodeName: stringType.mapFromDatabaseResponse(data['episode_name']),
+      siteIdentifier: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}site_identifier']),
+      siteOfIdentifier: stringType.mapFromDatabaseResponse(
+          data['${effectivePrefix}site_of_identifier']),
+      episodeIdentifier: stringType.mapFromDatabaseResponse(
+          data['${effectivePrefix}episode_identifier']),
+      firstWriteAt: intType
+          .mapFromDatabaseResponse(data['${effectivePrefix}first_write_at']),
+      lastUpdateAt: intType
+          .mapFromDatabaseResponse(data['${effectivePrefix}last_update_at']),
+      nullableChapterName: stringType.mapFromDatabaseResponse(
+          data['${effectivePrefix}nullable_chapter_name']),
+      displayOrder: intType
+          .mapFromDatabaseResponse(data['${effectivePrefix}display_order']),
+      episodeName: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}episode_name']),
     );
   }
   factory CachedEpisodeEntityData.fromJson(Map<String, dynamic> json) {
@@ -490,19 +629,20 @@ class CachedEpisodeEntityData {
   }
 
   @override
-  int get hashCode =>
-      (((((((siteIdentifier.hashCode) * 31 + siteOfIdentifier.hashCode) * 31 +
-                                              episodeIdentifier.hashCode) *
-                                          31 +
-                                      firstWriteAt.hashCode) *
-                                  31 +
-                              lastUpdateAt.hashCode) *
-                          31 +
-                      nullableChapterName.hashCode) *
-                  31 +
-              displayOrder.hashCode) *
-          31 +
-      episodeName.hashCode;
+  int get hashCode => $mrjf($mrjc(
+      $mrjc(
+          $mrjc(
+              $mrjc(
+                  $mrjc(
+                      $mrjc(
+                          $mrjc($mrjc(0, siteIdentifier.hashCode),
+                              siteOfIdentifier.hashCode),
+                          episodeIdentifier.hashCode),
+                      firstWriteAt.hashCode),
+                  lastUpdateAt.hashCode),
+              nullableChapterName.hashCode),
+          displayOrder.hashCode),
+      episodeName.hashCode));
   @override
   bool operator ==(other) =>
       identical(this, other) ||
@@ -518,61 +658,122 @@ class CachedEpisodeEntityData {
 }
 
 class $CachedEpisodeEntityTable extends CachedEpisodeEntity
-    implements TableInfo<CachedEpisodeEntity, CachedEpisodeEntityData> {
+    with TableInfo<$CachedEpisodeEntityTable, CachedEpisodeEntityData> {
   final GeneratedDatabase _db;
-  $CachedEpisodeEntityTable(this._db);
+  final String _alias;
+  $CachedEpisodeEntityTable(this._db, [this._alias]);
   GeneratedTextColumn _siteIdentifier;
   @override
   GeneratedTextColumn get siteIdentifier =>
-      _siteIdentifier ??= GeneratedTextColumn(
-        'site_identifier',
-        false,
-      );
+      _siteIdentifier ??= _constructSiteIdentifier();
+  GeneratedTextColumn _constructSiteIdentifier() {
+    var cName = 'site_identifier';
+    if (_alias != null) cName = '$_alias.$cName';
+    return GeneratedTextColumn(
+      'site_identifier',
+      $tableName,
+      false,
+    );
+  }
+
   GeneratedTextColumn _siteOfIdentifier;
   @override
   GeneratedTextColumn get siteOfIdentifier =>
-      _siteOfIdentifier ??= GeneratedTextColumn(
-        'site_of_identifier',
-        false,
-      );
+      _siteOfIdentifier ??= _constructSiteOfIdentifier();
+  GeneratedTextColumn _constructSiteOfIdentifier() {
+    var cName = 'site_of_identifier';
+    if (_alias != null) cName = '$_alias.$cName';
+    return GeneratedTextColumn(
+      'site_of_identifier',
+      $tableName,
+      false,
+    );
+  }
+
   GeneratedTextColumn _episodeIdentifier;
   @override
   GeneratedTextColumn get episodeIdentifier =>
-      _episodeIdentifier ??= GeneratedTextColumn(
-        'episode_identifier',
-        false,
-      );
+      _episodeIdentifier ??= _constructEpisodeIdentifier();
+  GeneratedTextColumn _constructEpisodeIdentifier() {
+    var cName = 'episode_identifier';
+    if (_alias != null) cName = '$_alias.$cName';
+    return GeneratedTextColumn(
+      'episode_identifier',
+      $tableName,
+      false,
+    );
+  }
+
   GeneratedIntColumn _firstWriteAt;
   @override
-  GeneratedIntColumn get firstWriteAt => _firstWriteAt ??= GeneratedIntColumn(
-        'first_write_at',
-        false,
-      );
+  GeneratedIntColumn get firstWriteAt =>
+      _firstWriteAt ??= _constructFirstWriteAt();
+  GeneratedIntColumn _constructFirstWriteAt() {
+    var cName = 'first_write_at';
+    if (_alias != null) cName = '$_alias.$cName';
+    return GeneratedIntColumn(
+      'first_write_at',
+      $tableName,
+      false,
+    );
+  }
+
   GeneratedIntColumn _lastUpdateAt;
   @override
-  GeneratedIntColumn get lastUpdateAt => _lastUpdateAt ??= GeneratedIntColumn(
-        'last_update_at',
-        false,
-      );
+  GeneratedIntColumn get lastUpdateAt =>
+      _lastUpdateAt ??= _constructLastUpdateAt();
+  GeneratedIntColumn _constructLastUpdateAt() {
+    var cName = 'last_update_at';
+    if (_alias != null) cName = '$_alias.$cName';
+    return GeneratedIntColumn(
+      'last_update_at',
+      $tableName,
+      false,
+    );
+  }
+
   GeneratedTextColumn _nullableChapterName;
   @override
   GeneratedTextColumn get nullableChapterName =>
-      _nullableChapterName ??= GeneratedTextColumn(
-        'nullable_chapter_name',
-        true,
-      );
+      _nullableChapterName ??= _constructNullableChapterName();
+  GeneratedTextColumn _constructNullableChapterName() {
+    var cName = 'nullable_chapter_name';
+    if (_alias != null) cName = '$_alias.$cName';
+    return GeneratedTextColumn(
+      'nullable_chapter_name',
+      $tableName,
+      true,
+    );
+  }
+
   GeneratedIntColumn _displayOrder;
   @override
-  GeneratedIntColumn get displayOrder => _displayOrder ??= GeneratedIntColumn(
-        'display_order',
-        false,
-      );
+  GeneratedIntColumn get displayOrder =>
+      _displayOrder ??= _constructDisplayOrder();
+  GeneratedIntColumn _constructDisplayOrder() {
+    var cName = 'display_order';
+    if (_alias != null) cName = '$_alias.$cName';
+    return GeneratedIntColumn(
+      'display_order',
+      $tableName,
+      false,
+    );
+  }
+
   GeneratedTextColumn _episodeName;
   @override
-  GeneratedTextColumn get episodeName => _episodeName ??= GeneratedTextColumn(
-        'episode_name',
-        false,
-      );
+  GeneratedTextColumn get episodeName =>
+      _episodeName ??= _constructEpisodeName();
+  GeneratedTextColumn _constructEpisodeName() {
+    var cName = 'episode_name';
+    if (_alias != null) cName = '$_alias.$cName';
+    return GeneratedTextColumn(
+      'episode_name',
+      $tableName,
+      false,
+    );
+  }
+
   @override
   List<GeneratedColumn> get $columns => [
         siteIdentifier,
@@ -585,9 +786,11 @@ class $CachedEpisodeEntityTable extends CachedEpisodeEntity
         episodeName
       ];
   @override
-  CachedEpisodeEntity get asDslTable => this;
+  $CachedEpisodeEntityTable get asDslTable => this;
   @override
-  String get $tableName => 'cached_episode_entity';
+  String get $tableName => _alias ?? 'cached_episode_entity';
+  @override
+  final String actualTableName = 'cached_episode_entity';
   @override
   bool validateIntegrity(CachedEpisodeEntityData instance, bool isInserting) =>
       siteIdentifier.isAcceptableValue(instance.siteIdentifier, isInserting) &&
@@ -605,8 +808,9 @@ class $CachedEpisodeEntityTable extends CachedEpisodeEntity
   Set<GeneratedColumn> get $primaryKey =>
       {siteIdentifier, siteOfIdentifier, episodeIdentifier};
   @override
-  CachedEpisodeEntityData map(Map<String, dynamic> data) {
-    return CachedEpisodeEntityData.fromData(data, _db);
+  CachedEpisodeEntityData map(Map<String, dynamic> data, {String tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : null;
+    return CachedEpisodeEntityData.fromData(data, _db, prefix: effectivePrefix);
   }
 
   @override
@@ -642,6 +846,11 @@ class $CachedEpisodeEntityTable extends CachedEpisodeEntity
     }
     return map;
   }
+
+  @override
+  $CachedEpisodeEntityTable createAlias(String alias) {
+    return $CachedEpisodeEntityTable(_db, alias);
+  }
 }
 
 class CachedTextEntityData {
@@ -655,16 +864,19 @@ class CachedTextEntityData {
       this.episodeIdentifier,
       this.episodeText});
   factory CachedTextEntityData.fromData(
-      Map<String, dynamic> data, GeneratedDatabase db) {
+      Map<String, dynamic> data, GeneratedDatabase db,
+      {String prefix}) {
+    final effectivePrefix = prefix ?? '';
     final stringType = db.typeSystem.forDartType<String>();
     return CachedTextEntityData(
-      siteIdentifier:
-          stringType.mapFromDatabaseResponse(data['site_identifier']),
-      siteOfIdentifier:
-          stringType.mapFromDatabaseResponse(data['site_of_identifier']),
-      episodeIdentifier:
-          stringType.mapFromDatabaseResponse(data['episode_identifier']),
-      episodeText: stringType.mapFromDatabaseResponse(data['episode_text']),
+      siteIdentifier: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}site_identifier']),
+      siteOfIdentifier: stringType.mapFromDatabaseResponse(
+          data['${effectivePrefix}site_of_identifier']),
+      episodeIdentifier: stringType.mapFromDatabaseResponse(
+          data['${effectivePrefix}episode_identifier']),
+      episodeText: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}episode_text']),
     );
   }
   factory CachedTextEntityData.fromJson(Map<String, dynamic> json) {
@@ -707,11 +919,10 @@ class CachedTextEntityData {
   }
 
   @override
-  int get hashCode =>
-      (((siteIdentifier.hashCode) * 31 + siteOfIdentifier.hashCode) * 31 +
-              episodeIdentifier.hashCode) *
-          31 +
-      episodeText.hashCode;
+  int get hashCode => $mrjf($mrjc(
+      $mrjc($mrjc($mrjc(0, siteIdentifier.hashCode), siteOfIdentifier.hashCode),
+          episodeIdentifier.hashCode),
+      episodeText.hashCode));
   @override
   bool operator ==(other) =>
       identical(this, other) ||
@@ -723,43 +934,75 @@ class CachedTextEntityData {
 }
 
 class $CachedTextEntityTable extends CachedTextEntity
-    implements TableInfo<CachedTextEntity, CachedTextEntityData> {
+    with TableInfo<$CachedTextEntityTable, CachedTextEntityData> {
   final GeneratedDatabase _db;
-  $CachedTextEntityTable(this._db);
+  final String _alias;
+  $CachedTextEntityTable(this._db, [this._alias]);
   GeneratedTextColumn _siteIdentifier;
   @override
   GeneratedTextColumn get siteIdentifier =>
-      _siteIdentifier ??= GeneratedTextColumn(
-        'site_identifier',
-        false,
-      );
+      _siteIdentifier ??= _constructSiteIdentifier();
+  GeneratedTextColumn _constructSiteIdentifier() {
+    var cName = 'site_identifier';
+    if (_alias != null) cName = '$_alias.$cName';
+    return GeneratedTextColumn(
+      'site_identifier',
+      $tableName,
+      false,
+    );
+  }
+
   GeneratedTextColumn _siteOfIdentifier;
   @override
   GeneratedTextColumn get siteOfIdentifier =>
-      _siteOfIdentifier ??= GeneratedTextColumn(
-        'site_of_identifier',
-        false,
-      );
+      _siteOfIdentifier ??= _constructSiteOfIdentifier();
+  GeneratedTextColumn _constructSiteOfIdentifier() {
+    var cName = 'site_of_identifier';
+    if (_alias != null) cName = '$_alias.$cName';
+    return GeneratedTextColumn(
+      'site_of_identifier',
+      $tableName,
+      false,
+    );
+  }
+
   GeneratedTextColumn _episodeIdentifier;
   @override
   GeneratedTextColumn get episodeIdentifier =>
-      _episodeIdentifier ??= GeneratedTextColumn(
-        'episode_identifier',
-        false,
-      );
+      _episodeIdentifier ??= _constructEpisodeIdentifier();
+  GeneratedTextColumn _constructEpisodeIdentifier() {
+    var cName = 'episode_identifier';
+    if (_alias != null) cName = '$_alias.$cName';
+    return GeneratedTextColumn(
+      'episode_identifier',
+      $tableName,
+      false,
+    );
+  }
+
   GeneratedTextColumn _episodeText;
   @override
-  GeneratedTextColumn get episodeText => _episodeText ??= GeneratedTextColumn(
-        'episode_text',
-        false,
-      );
+  GeneratedTextColumn get episodeText =>
+      _episodeText ??= _constructEpisodeText();
+  GeneratedTextColumn _constructEpisodeText() {
+    var cName = 'episode_text';
+    if (_alias != null) cName = '$_alias.$cName';
+    return GeneratedTextColumn(
+      'episode_text',
+      $tableName,
+      false,
+    );
+  }
+
   @override
   List<GeneratedColumn> get $columns =>
       [siteIdentifier, siteOfIdentifier, episodeIdentifier, episodeText];
   @override
-  CachedTextEntity get asDslTable => this;
+  $CachedTextEntityTable get asDslTable => this;
   @override
-  String get $tableName => 'cached_text_entity';
+  String get $tableName => _alias ?? 'cached_text_entity';
+  @override
+  final String actualTableName = 'cached_text_entity';
   @override
   bool validateIntegrity(CachedTextEntityData instance, bool isInserting) =>
       siteIdentifier.isAcceptableValue(instance.siteIdentifier, isInserting) &&
@@ -772,8 +1015,9 @@ class $CachedTextEntityTable extends CachedTextEntity
   Set<GeneratedColumn> get $primaryKey =>
       {siteIdentifier, siteOfIdentifier, episodeIdentifier};
   @override
-  CachedTextEntityData map(Map<String, dynamic> data) {
-    return CachedTextEntityData.fromData(data, _db);
+  CachedTextEntityData map(Map<String, dynamic> data, {String tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : null;
+    return CachedTextEntityData.fromData(data, _db, prefix: effectivePrefix);
   }
 
   @override
@@ -795,6 +1039,11 @@ class $CachedTextEntityTable extends CachedTextEntity
       map['episode_text'] = Variable<String, StringType>(d.episodeText);
     }
     return map;
+  }
+
+  @override
+  $CachedTextEntityTable createAlias(String alias) {
+    return $CachedTextEntityTable(_db, alias);
   }
 }
 
