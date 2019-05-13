@@ -315,8 +315,11 @@ class _TextPagerState extends State<TextPagerPage>
             ]),
             bottomNavigationBar: _buildBottomBar()),
         onWillPop: () async {
-          _viewModel.willPop();
-          return Future.value(true);
+          Navigator.pop(context, {
+            "readingEpisodeIdentifier":
+                _viewModel._currentEpisode.episodeIdentifier
+          });
+          return false;
         });
   }
 
@@ -468,6 +471,7 @@ class _TextPagerState extends State<TextPagerPage>
         setState(() {
           _viewModel._rawSliderOffset = 0;
           _viewModel._pageAnimating = false;
+          _viewModel.updateReadingEpisode();
         });
       });
     }
@@ -489,6 +493,7 @@ class _TextPagerState extends State<TextPagerPage>
         setState(() {
           _viewModel._rawSliderOffset = 0;
           _viewModel._pageAnimating = false;
+          _viewModel.updateReadingEpisode();
         });
       });
     }

@@ -69,11 +69,6 @@ class _EpisodeIndexViewModel {
       }
     });
   }
-
-  // 閲覧画面から戻ってきたときに「続きから読む」などをアップデートする
-  void refreshReadingStatus() {
-    showReadingContinue();
-  }
 }
 
 class _EpisodeIndexState extends State<EpisodeIndexPage> {
@@ -110,24 +105,26 @@ class _EpisodeIndexState extends State<EpisodeIndexPage> {
               child: RaisedButton(
                   color: sNMPrimaryColor,
                   textColor: Colors.white,
-                  onPressed: () {
+                  onPressed: () async {
                     // 読んでいる話のindex位置を探索
                     int index = episodes.indexWhere((episode) {
                       return episode.episodeIdentifier ==
                           _viewModel.readingEpisodeIdentifier;
                     });
-                    Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) {
-                                  return TextPagerPage(episodes, index);
-                                },
-                                fullscreenDialog: true))
-                        .then((_) {
+                    final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) {
+                              return TextPagerPage(episodes, index);
+                            },
+                            fullscreenDialog: true));
+                    if (result != null) {
+                      // 続きから読むの進捗を更新
                       setState(() {
-                        _viewModel.refreshReadingStatus();
+                        this._viewModel.readingEpisodeIdentifier =
+                            result["readingEpisodeIdentifier"];
                       });
-                    });
+                    }
                   },
                   child: Text("続きから読む")))
         ]),
@@ -291,19 +288,22 @@ class _EpisodeIndexState extends State<EpisodeIndexPage> {
           DateTime.fromMillisecondsSinceEpoch(episode.lastUpdateAt);
 
       Widget episodeWidget = InkWell(
-          onTap: () {
-            Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) {
-                          return TextPagerPage(episodes, index);
-                        },
-                        fullscreenDialog: true))
-                .then((_) {
+          onTap: () async {
+            final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) {
+                      return TextPagerPage(episodes, index);
+                    },
+                    fullscreenDialog: true));
+            if (result != null) {
+              // 続きから読むの進捗を更新
               setState(() {
-                _viewModel.readingEpisodeIdentifier = episode.episodeIdentifier;
+                print("update reading episode!!!!!");
+                _viewModel.readingEpisodeIdentifier =
+                    result["readingEpisodeIdentifier"];
               });
-            });
+            }
           },
           child: Container(
               padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16.0),
